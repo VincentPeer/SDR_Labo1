@@ -1,6 +1,8 @@
 package main
 
 type Person struct {
-	name     string
-	password string
+	Id       string `json:"id"`
+	Name     string `json:"name"`
+	Password string `json:"password"`
+	Function string `json:"function"`
 }

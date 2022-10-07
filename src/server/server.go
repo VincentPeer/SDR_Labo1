@@ -28,8 +28,10 @@ func main() {
 
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 
-	var users []User
+	var users []Person
 	json.Unmarshal(byteValue, &users)
+
+	fmt.Println(users)
 
 	// Listen for incoming connections.
 	l, err := net.Listen(CONN_TYPE, CONN_HOST+":"+CONN_PORT)

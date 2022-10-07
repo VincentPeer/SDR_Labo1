@@ -1,18 +1,36 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"os"
+	"path/filepath"
 )
 
 const (
-	CONN_HOST = "localhost"
-	CONN_PORT = "3333"
-	CONN_TYPE = "tcp"
+	CONN_HOST        = "localhost"
+	CONN_PORT        = "3333"
+	CONN_TYPE        = "tcp"
+	CONFIG_FILE_PATH = "src/server/config.json"
 )
 
 func main() {
+	absPath, _ := filepath.Abs(CONFIG_FILE_PATH)
+	jsonFile, err := os.Open(absPath)
+	if err != nil {
+		fmt.Println("Error reading config file:", err.Error())
+		os.Exit(1)
+	}
+	fmt.Println("Successfully opened " + jsonFile.Name())
+	defer jsonFile.Close()
+
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+
+	var users []User
+	json.Unmarshal(byteValue, &users)
+
 	// Listen for incoming connections.
 	l, err := net.Listen(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
 	if err != nil {

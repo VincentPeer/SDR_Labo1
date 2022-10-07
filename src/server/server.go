@@ -16,8 +16,8 @@ const (
 	CONFIG_FILE_PATH = "src/server/config.json"
 )
 
-func main() {
-	absPath, _ := filepath.Abs(CONFIG_FILE_PATH)
+func loadUsers(targetPath string) []User {
+	absPath, _ := filepath.Abs(targetPath)
 	jsonFile, err := os.Open(absPath)
 	if err != nil {
 		fmt.Println("Error reading config file:", err.Error())
@@ -30,6 +30,13 @@ func main() {
 
 	var users []Person
 	json.Unmarshal(byteValue, &users)
+	return users
+}
+
+func main() {
+	users := loadUsers(CONFIG_FILE_PATH)
+
+	fmt.Println("Users:", users)
 
 	fmt.Println(users)
 

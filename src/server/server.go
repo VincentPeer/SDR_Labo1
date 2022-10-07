@@ -16,7 +16,7 @@ const (
 	CONFIG_FILE_PATH = "src/server/config.json"
 )
 
-func loadUsers(targetPath string) []User {
+func loadUsers(targetPath string) []Person {
 	absPath, _ := filepath.Abs(targetPath)
 	jsonFile, err := os.Open(absPath)
 	if err != nil {

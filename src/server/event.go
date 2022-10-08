@@ -2,7 +2,7 @@ package main
 
 var Event struct {
 	eventName  string
-	organizer  Person
+	organizer  User
 	posts      []Post // pointeur?
-	volunteers []Person
+	volunteers []User
 }

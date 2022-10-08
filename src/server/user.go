@@ -1,6 +1,6 @@
 package main
 
-type Person struct {
+type User struct {
 	name     string
 	password string
 }

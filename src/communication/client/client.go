@@ -26,7 +26,11 @@ func main() {
 
 	reader := bufio.NewReader(os.Stdin)
 	writer := bufio.NewWriter(connection)
+	if err != nil {
+		return
+	}
+
 	readWriter := bufio.NewReadWriter(reader, writer)
-	ui.ClientInterface(readWriter)
+	ui.UserInterface(readWriter)
 
 }

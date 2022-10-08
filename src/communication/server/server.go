@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 const (
@@ -61,11 +62,17 @@ func HandleServer() {
 // Handles incoming requests.
 func handleRequest(conn net.Conn) {
 	reader := bufio.NewReader(conn)
-	writer := bufio.NewWriter(os.Stdout)
+	//writer := bufio.NewWriter(conn)
 	fmt.Println("Now we dialogue with client")
-	message, _ := reader.ReadString('\n')
-	writer.WriteString(message)
-	conn.Write([]byte("merci"))
+
+	for {
+		message, _ := reader.ReadString('\n')
+		fmt.Print("user is " + message)
+		if strings.Compare(message, "STOP") == 0 {
+			fmt.Println("TCP client exiting...")
+			return
+		}
+	}
 
 	/*	// Make a buffer to hold incoming data.
 		buf := make([]byte, 1024)

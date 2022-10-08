@@ -1,0 +1,30 @@
+{
+    "users" : 
+    [
+        {
+            "id" : "1",
+            "name" : "Alex Terrieur",
+            "password" : "123456",
+            "function" : "volunteer"
+        },
+        {
+            "id" : "2",
+            "name" : "Alain Terrieur",
+            "password" : "123456",
+            "function" : "volunteer"
+        }, 
+        {
+            "id" : "3",
+            "name" : "Sarah Croche",
+            "password" : "123456",
+            "function" : "organiser"
+        },
+        {
+            "id" : "4",
+            "name" : "Ondine Akeleur",
+            "password" : "123456",
+            "function" : "organiser"
+        }
+        
+    ]
+}

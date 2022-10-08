@@ -1,4 +1,4 @@
-package main
+package event
 
 var Event struct {
 	eventName  string

@@ -1,4 +1,4 @@
-package main
+package communication
 
 type Users struct {
 	Users []User `json:"users"`

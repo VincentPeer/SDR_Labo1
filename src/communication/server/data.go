@@ -1,4 +1,4 @@
-package main
+package communication
 
 type User struct {
 	Id       string `json:"id"`

@@ -6,14 +6,8 @@ import (
 )
 
 func UserInterface(readWriter *bufio.ReadWriter) {
-	fmt.Println("Welcome!\n Login : \nPlease enter your username : ")
-	username, _ := readWriter.ReadString('\n') // todo gérer le 2ème attribut de retour (err)
-	fmt.Println("Please enter your password : ")
-	password, _ := readWriter.ReadString('\n')
-	fmt.Println("username " + username + " password : " + password)
-	readWriter.WriteString(username + ", " + password) // todo check err
-	readWriter.Flush()
-
+	fmt.Println("Welcome!")
+	loginClient(readWriter)
 	for {
 		fmt.Println("what do you want to write?")
 		message, _ := readWriter.ReadString('\n')
@@ -28,4 +22,22 @@ func UserInterface(readWriter *bufio.ReadWriter) {
 		}
 	}
 
+}
+
+func loginClient(readWriter *bufio.ReadWriter) bool {
+	fmt.Println("Please enter your username : ")
+	username, readUsernameError := readWriter.ReadString('\n') // todo gérer le 2ème attribut de retour (err)
+
+	fmt.Println("Please enter your password : ")
+	password, readPasswordError := readWriter.ReadString('\n')
+
+	//fmt.Println("username " + username + " password : " + password)
+
+	_, writeError := readWriter.WriteString(username + ", " + password) // todo check err
+	readWriter.Flush()
+	if readUsernameError != nil || readPasswordError != nil || writeError != nil {
+		return false
+	} else {
+		return true
+	}
 }

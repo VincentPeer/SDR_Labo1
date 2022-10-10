@@ -1,13 +1,20 @@
 package main
 
 import (
+	"path/filepath"
 	"reflect"
 	"testing"
 )
 
 func TestLoadUsers(t *testing.T) {
 
-	got := loadUsers("config_test.json")
+	path, err := filepath.Abs("./config_test.json")
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	got := loadUsers(path)
 	want := []User{
 		{
 			Id:       "1",

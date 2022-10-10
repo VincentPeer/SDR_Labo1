@@ -15,7 +15,7 @@ const (
 	CONN_HOST        = "localhost"
 	CONN_PORT        = "3333"
 	CONN_TYPE        = "tcp"
-	CONFIG_FILE_PATH = "config.json"
+	CONFIG_FILE_PATH = "./config.json"
 )
 
 var (
@@ -23,8 +23,7 @@ var (
 )
 
 func loadUsers(jsonPath string) []User {
-	absPath, _ := filepath.Abs(jsonPath)
-	jsonFile, err := os.Open(absPath)
+	jsonFile, err := os.Open(jsonPath)
 	if err != nil {
 		fmt.Println("Error reading config file:", err.Error())
 		os.Exit(1)
@@ -41,7 +40,14 @@ func loadUsers(jsonPath string) []User {
 }
 
 func main() {
-	users = loadUsers(CONFIG_FILE_PATH)
+	path, err := filepath.Abs(CONFIG_FILE_PATH)
+
+	if err != nil {
+		fmt.Println("Error reading config file:", err.Error())
+		os.Exit(1)
+	}
+
+	users = loadUsers(path)
 	// Listen for incoming connections.
 	l, err := net.Listen(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
 	if err != nil {

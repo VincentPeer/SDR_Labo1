@@ -1,8 +1,10 @@
-package communication
+package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"os"
 	"path/filepath"
@@ -13,10 +15,10 @@ const (
 	CONN_HOST        = "localhost"
 	CONN_PORT        = "3333"
 	CONN_TYPE        = "tcp"
-	CONFIG_FILE_PATH = "C:\\Users\\Vincent\\Documents\\Heig\\Semestre5\\SDR\\Laboratoires\\Labo01\\SDR_Labo1\\src\\communication\\server\\config.json"
+	CONFIG_FILE_PATH = "src/communication/server/config.json"
 )
 
-func HandleServer() {
+func main() {
 	absPath, _ := filepath.Abs(CONFIG_FILE_PATH)
 	jsonFile, err := os.Open(absPath)
 	if err != nil {
@@ -26,17 +28,17 @@ func HandleServer() {
 	fmt.Println("Successfully opened " + jsonFile.Name())
 	defer jsonFile.Close()
 
-	/*	byteValue, _ := ioutil.ReadAll(jsonFile)
+	byteValue, _ := ioutil.ReadAll(jsonFile)
 
-		var users Users
-		json.Unmarshal(byteValue, &users)
+	var users []User
+	json.Unmarshal(byteValue, &users)
 
-		for i := 0; i < len(users.Users); i++ {
-			fmt.Println(users.Users[i].Id)
-			fmt.Println(users.Users[i].Name)
-			fmt.Println(users.Users[i].Password)
-			fmt.Println(users.Users[i].Function)
-		}*/
+	for i := 0; i < len(users); i++ {
+		fmt.Println(users[i].Id)
+		fmt.Println(users[i].Name)
+		fmt.Println(users[i].Password)
+		fmt.Println(users[i].Function)
+	}
 
 	// Listen for incoming connections.
 	l, err := net.Listen(CONN_TYPE, CONN_HOST+":"+CONN_PORT)

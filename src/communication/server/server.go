@@ -48,6 +48,7 @@ func main() {
 	}
 
 	users = loadUsers(path)
+
 	// Listen for incoming connections.
 	l, err := net.Listen(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
 	if err != nil {

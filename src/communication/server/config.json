@@ -1,4 +1,5 @@
-    [
+{
+    "users" : [
         {
             "id" : "1",
             "name" : "Alex Terrieur",
@@ -24,4 +25,46 @@
             "function" : "organiser"
         }
         
+    ],
+    "events" : [
+        {
+            "id" : "1",
+            "name" : "Festival de la bière",
+            "organiser" : "3",
+            "jobs" : [
+                {
+                    "id" : "1",
+                    "name" : "Bière",
+                    "required" : "2",
+                    "volunteers" : ["1"]
+                },
+                {
+                    "id" : "2",
+                    "name" : "Café",
+                    "required" : "1",
+                    "volunteers" : ["2"]
+                }
+            ]
+        },
+        {
+            "id" : "2",
+            "name" : "Baleinev",
+            "organiser" : "4",
+            "jobs" : [
+                {
+                    "id" : "3",
+                    "name" : "Bière",
+                    "required" : "2",
+                    "volunteers" : ["1"]
+                },
+                {
+                    "id" : "4",
+                    "name" : "Musique",
+                    "required" : "2",
+                    "volunteers" : ["2"]
+                }
+            ]
+        }
     ]
+
+}

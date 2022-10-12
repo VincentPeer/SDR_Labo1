@@ -19,10 +19,11 @@ const (
 )
 
 var (
-	users []User
+	users  []User
+	events []Event
 )
 
-func loadUsers(jsonPath string) []User {
+func loadConfig(jsonPath string) Config {
 	jsonFile, err := os.Open(jsonPath)
 	if err != nil {
 		fmt.Println("Error reading config file:", err.Error())
@@ -33,10 +34,10 @@ func loadUsers(jsonPath string) []User {
 
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 
-	var users []User
-	json.Unmarshal(byteValue, &users)
+	var conf Config
+	json.Unmarshal(byteValue, &conf)
 
-	return users
+	return conf
 }
 
 func main() {
@@ -47,7 +48,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	users = loadUsers(path)
+	config := loadConfig(path)
+	users = config.Users
+	events = config.Events
 
 	// Listen for incoming connections.
 	l, err := net.Listen(CONN_TYPE, CONN_HOST+":"+CONN_PORT)

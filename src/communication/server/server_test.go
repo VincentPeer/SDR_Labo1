@@ -21,7 +21,7 @@ func getTestData(t *testing.T) string {
 
 func TestLoadUsers(t *testing.T) {
 
-	got := loadUsers(getTestData(t))
+	got := loadConfig(getTestData(t)).Users
 	want := []User{
 		{
 			Id:       "1",
@@ -55,7 +55,7 @@ func TestLoadUsers(t *testing.T) {
 }
 
 func TestLogin(t *testing.T) {
-	users = loadUsers(getTestData(t))
+	users = loadConfig(getTestData(t)).Users
 
 	got := login("1", "AlexPWD")
 	want := true

@@ -16,13 +16,13 @@
             "id" : "3",
             "name" : "Sarah Croche",
             "password" : "123456",
-            "function" : "organiser"
+            "function" : "organizer"
         },
         {
             "id" : "4",
             "name" : "Ondine Akeleur",
             "password" : "123456",
-            "function" : "organiser"
+            "function" : "organizer"
         }
         
     ],
@@ -30,18 +30,18 @@
         {
             "id" : "1",
             "name" : "Festival de la bière",
-            "organiser" : "3",
+            "organizer" : "3",
             "jobs" : [
                 {
                     "id" : "1",
                     "name" : "Bière",
-                    "required" : "2",
+                    "required" : 2,
                     "volunteers" : ["1"]
                 },
                 {
                     "id" : "2",
                     "name" : "Café",
-                    "required" : "1",
+                    "required" : 1,
                     "volunteers" : ["2"]
                 }
             ]
@@ -49,18 +49,18 @@
         {
             "id" : "2",
             "name" : "Baleinev",
-            "organiser" : "4",
+            "organizer" : "4",
             "jobs" : [
                 {
                     "id" : "3",
                     "name" : "Bière",
-                    "required" : "2",
+                    "required" : 2,
                     "volunteers" : ["1"]
                 },
                 {
                     "id" : "4",
                     "name" : "Musique",
-                    "required" : "2",
+                    "required" : 2,
                     "volunteers" : ["2"]
                 }
             ]

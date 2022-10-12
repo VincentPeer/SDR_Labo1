@@ -15,13 +15,13 @@ type User struct {
 type Event struct {
 	Id        string `json:"id"`
 	Name      string `json:"name"`
-	Organizer User   `json:"organizer"`
+	Organizer string `json:"organizer"`
 	Jobs      []Job  `json:"jobs"`
 }
 
 type Job struct {
-	Id         string `json:"id"`
-	Name       string `json:"name"`
-	Required   int    `json:"required"`
-	Volunteers []User `json:"volunteers"`
+	Id         string   `json:"id"`
+	Name       string   `json:"name"`
+	Required   int      `json:"required"`
+	Volunteers []string `json:"volunteers"`
 }

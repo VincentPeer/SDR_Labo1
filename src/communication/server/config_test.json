@@ -16,52 +16,52 @@
             "id" : "3",
             "name" : "Sarah Croche",
             "password" : "SarahPWD",
-            "function" : "organiser"
+            "function" : "organizer"
         },
         {
             "id" : "4",
             "name" : "Ondine Akeleur",
             "password" : "OndinePWD",
-            "function" : "organiser"
+            "function" : "organizer"
         }
         
     ],
     "events" : [
         {
             "id" : "1",
-            "name" : "Festival de la bière",
-            "organiser" : "3",
+            "name" : "Festival de la musique",
+            "organizer" : "3",
             "jobs" : [
                 {
                     "id" : "1",
-                    "name" : "Bière",
-                    "required" : "2",
+                    "name" : "Buvette",
+                    "required" : 2,
                     "volunteers" : ["1"]
                 },
                 {
                     "id" : "2",
-                    "name" : "Café",
-                    "required" : "1",
-                    "volunteers" : ["2"]
+                    "name" : "Sécurité",
+                    "required" : 3,
+                    "volunteers" : []
                 }
             ]
         },
         {
             "id" : "2",
-            "name" : "Baleinev",
-            "organiser" : "4",
+            "name" : "Fête de la science",
+            "organizer" : "4",
             "jobs" : [
                 {
                     "id" : "3",
-                    "name" : "Bière",
-                    "required" : "2",
-                    "volunteers" : ["1"]
+                    "name" : "Buvette",
+                    "required" : 2,
+                    "volunteers" : []
                 },
                 {
                     "id" : "4",
-                    "name" : "Musique",
-                    "required" : "2",
-                    "volunteers" : ["2"]
+                    "name" : "Sécurité",
+                    "required" : 3,
+                    "volunteers" : []
                 }
             ]
         }

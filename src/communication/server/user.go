@@ -10,12 +10,12 @@ type User struct {
 }
 
 // Create a new user
-func createUser(id string, name string, password string, function string) {
-	users = append(users, User{id, name, password, function})
+func createUser(db []User, id string, name string, password string, function string) []User {
+	return append(db, User{id, name, password, function})
 }
 
-func getUser(id string) (User, error) {
-	for _, user := range users {
+func getUser(db []User, id string) (User, error) {
+	for _, user := range db {
 		if user.Id == id {
 			return user, nil
 		}

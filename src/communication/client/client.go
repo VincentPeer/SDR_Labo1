@@ -23,14 +23,11 @@ func main() {
 	} else {
 		fmt.Println("Connection done!")
 	}
+	defer connection.Close()
 
 	reader := bufio.NewReader(os.Stdin)
 	writer := bufio.NewWriter(connection)
-	if err != nil {
-		return
-	}
 
-	readWriter := bufio.NewReadWriter(reader, writer)
-	ui.UserInterface(readWriter)
+	ui.UserInterface(reader, writer)
 
 }

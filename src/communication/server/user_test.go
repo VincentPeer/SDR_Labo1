@@ -6,8 +6,11 @@ import (
 )
 
 func TestCreateUser(t *testing.T) {
-	testDb := loadConfig(getTestData(t)).Users
-	testDb = createUser(testDb, "5", "Test", "TestPWD", "volunteer")
+	db := loadConfig(getTestData(t)).Users
+	testDb, err := createUser(db, "5", "Test", "TestPWD", "volunteer")
+	if err != nil {
+		t.Error(err)
+	}
 	got := testDb
 	want := []User{
 		{
@@ -47,6 +50,14 @@ func TestCreateUser(t *testing.T) {
 	}
 }
 
+func TestCreateUserError(t *testing.T) {
+	testDb := loadConfig(getTestData(t)).Users
+	_, err := createUser(testDb, "1", "Test", "TestPWD", "volunteer")
+	if err == nil {
+		t.Error("Expected error")
+	}
+}
+
 func TestGetUser(t *testing.T) {
 	testDb := loadConfig(getTestData(t)).Users
 	got, _ := getUser(testDb, "1")
@@ -59,5 +70,13 @@ func TestGetUser(t *testing.T) {
 
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got %v want %v", got, want)
+	}
+}
+
+func TestGetUserError(t *testing.T) {
+	testDb := loadConfig(getTestData(t)).Users
+	_, err := getUser(testDb, "5")
+	if err == nil {
+		t.Errorf("got %v want %v", err, "User not found")
 	}
 }

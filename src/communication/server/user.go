@@ -14,7 +14,7 @@ type User struct {
 // Otherwise returns the new state of the database
 func createUser(db []User, id string, name string, password string, function string) ([]User, error) {
 	if _, err := getUser(db, id); err == nil {
-		return db, errors.New("User with same id already exists")
+		return nil, errors.New("User with same id already exists")
 	}
 	return append(db, User{id, name, password, function}), nil
 }
@@ -29,4 +29,13 @@ func getUser(db []User, id string) (User, error) {
 		}
 	}
 	return User{}, errors.New("User not found")
+}
+
+func login(id string, password string) bool {
+	for _, user := range users {
+		if user.Id == id && user.Password == password {
+			return true
+		}
+	}
+	return false
 }

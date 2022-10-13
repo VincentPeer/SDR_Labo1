@@ -104,21 +104,3 @@ func TestLoadEvents(t *testing.T) {
 		t.Errorf("got %v want %v", got, want)
 	}
 }
-
-func TestLogin(t *testing.T) {
-	users = loadConfig(getTestData(t)).Users
-
-	got := login("1", "AlexPWD")
-	want := true
-
-	if got != want {
-		t.Errorf("got %v want %v", got, want)
-	}
-
-	got = login("1", "AlexPWD2")
-	want = false
-
-	if got != want {
-		t.Errorf("got %v want %v", got, want)
-	}
-}

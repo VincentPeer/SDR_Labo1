@@ -84,17 +84,32 @@ func TestGetUserError(t *testing.T) {
 func TestLogin(t *testing.T) {
 	users = loadConfig(getTestData(t)).Users
 
-	got := login("1", "AlexPWD")
+	got, err := login("1", "AlexPWD")
 	want := true
 
+	if err != nil {
+		t.Error(err)
+	}
 	if got != want {
 		t.Errorf("got %v want %v", got, want)
 	}
 
-	got = login("1", "AlexPWD2")
+	got, err = login("1", "AlexPWD2")
 	want = false
 
+	if err != nil {
+		t.Error(err)
+	}
 	if got != want {
 		t.Errorf("got %v want %v", got, want)
+	}
+}
+
+func TestLoginError(t *testing.T) {
+	users = loadConfig(getTestData(t)).Users
+
+	_, err := login("5", "AlexPWD")
+	if err == nil {
+		t.Error("Expected error")
 	}
 }

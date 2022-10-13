@@ -31,11 +31,12 @@ func getUser(db []User, id string) (User, error) {
 	return User{}, errors.New("User not found")
 }
 
-func login(id string, password string) bool {
-	for _, user := range users {
-		if user.Id == id && user.Password == password {
-			return true
-		}
+// Confirm the password of a user
+// Returns an error if the user does not exist
+func login(id string, password string) (bool, error) {
+	user, err := getUser(users, id)
+	if err != nil {
+		return false, err
 	}
-	return false
+	return user.Password == password, nil
 }

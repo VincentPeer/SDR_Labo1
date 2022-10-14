@@ -3,6 +3,7 @@ package ui
 import (
 	"bufio"
 	"fmt"
+	"strings"
 )
 
 func UserInterface(reader *bufio.Reader, writer *bufio.Writer) {
@@ -18,9 +19,7 @@ func UserInterface(reader *bufio.Reader, writer *bufio.Writer) {
 			fmt.Println("TCP client exiting...")
 			return
 		}
-
 	}
-
 }
 
 // Gestion du login client
@@ -32,11 +31,14 @@ func loginClient(reader *bufio.Reader, writer *bufio.Writer) bool {
 	fmt.Println("Enter your password : ")
 	password, readPasswordError := reader.ReadString('\n')
 
+	username = strings.Split(username, "\n")[0]
+	password = strings.Split(password, "\n")[0]
+
 	// Envoi formulaire de login
-	_, writeError := writer.WriteString("LOGIN," + username + "," + password) // todo check err
+	_, writeError := writer.WriteString("LOGIN," + username + "," + password + "\n") // todo check err
 	writer.Flush()
 	response, responseError := reader.ReadString('\n')
-	if readUsernameError != nil || readPasswordError != nil ||
+	if readUsernameError != nil || readPasswordError != nil || // todo use log.Fatal dans une fonction auxiliaire
 		responseError != nil || writeError != nil || response == "FALSE" {
 		return false
 	} else {
@@ -62,7 +64,6 @@ func CreateEvent(reader *bufio.Reader, writer *bufio.Writer) bool {
 			break
 		}
 		writer.WriteString("CREATE_EVENT," + eventName + ",")
-
 	}
 	return true
 }

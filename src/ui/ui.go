@@ -31,8 +31,10 @@ func loginClient(reader *bufio.Reader, writer *bufio.Writer) bool {
 	fmt.Println("Enter your password : ")
 	password, readPasswordError := reader.ReadString('\n')
 
-	username = strings.Split(username, "\n")[0]
-	password = strings.Split(password, "\n")[0]
+	username = strings.TrimSuffix(username, "\r\n") + ","
+	password = strings.TrimSuffix(password, "\r\n")
+	result := "LOGIN," + username + password
+	fmt.Println(result)
 
 	// Envoi formulaire de login
 	_, writeError := writer.WriteString("LOGIN," + username + "," + password + "\n") // todo check err
@@ -46,7 +48,7 @@ func loginClient(reader *bufio.Reader, writer *bufio.Writer) bool {
 	}
 }
 
-func CreateEvent(reader *bufio.Reader, writer *bufio.Writer) bool {
+func createEvent(reader *bufio.Reader, writer *bufio.Writer) bool {
 	fmt.Println("Enter the event name : ")
 	eventName, _ := reader.ReadString('\n')
 	var jobList []string
@@ -66,4 +68,12 @@ func CreateEvent(reader *bufio.Reader, writer *bufio.Writer) bool {
 		writer.WriteString("CREATE_EVENT," + eventName + ",")
 	}
 	return true
+}
+
+func readFromServer(reader *bufio.Reader) {
+
+}
+
+func writeToServer(reader *bufio.Reader) {
+
 }

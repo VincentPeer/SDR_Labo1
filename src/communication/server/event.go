@@ -64,11 +64,7 @@ func getJob(event Event, id string) (Job, error) {
 // Adds a volunteer to a job
 // Returns an error if the job does not exist
 // Otherwise returns the new state of the database
-func addVolunteer(event Event, jobId string, userId string) (Event, error) {
-	job, err := getJob(event, jobId)
-	if err != nil {
-		return event, err
-	}
+func addVolunteer(job Job, userId string) (Job, error) {
 	job.Volunteers = append(job.Volunteers, userId)
-	return event, nil
+	return job, nil
 }

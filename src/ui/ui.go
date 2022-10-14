@@ -33,11 +33,11 @@ func loginClient(reader *bufio.Reader, writer *bufio.Writer) bool {
 
 	username = strings.TrimSuffix(username, "\r\n") + ","
 	password = strings.TrimSuffix(password, "\r\n")
-	result := "LOGIN," + username + password
+	result := "LOGIN," + username + password + ";"
 	fmt.Println(result)
 
 	// Envoi formulaire de login
-	_, writeError := writer.WriteString("LOGIN," + username + "," + password + "\n") // todo check err
+	_, writeError := writer.WriteString(result) // todo check err
 	writer.Flush()
 	response, responseError := reader.ReadString('\n')
 	if readUsernameError != nil || readPasswordError != nil || // todo use log.Fatal dans une fonction auxiliaire

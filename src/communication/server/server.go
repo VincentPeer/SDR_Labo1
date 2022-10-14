@@ -80,11 +80,26 @@ func handleRequest(conn net.Conn) {
 	fmt.Println("Now we dialogue with client")
 
 	for {
-		message, _ := reader.ReadString('\n')
-		fmt.Print("user is " + message)
-		if strings.Compare(message, "STOP") == 0 {
-			fmt.Println("TCP client exiting...")
+		data, err := reader.ReadString(',')
+		if err != nil {
+			fmt.Println("Error reading:", err.Error())
+			break
+		}
+		fmt.Print("Data Received:", string(data))
+
+		splitMessage := strings.Split(data, ",")
+		code := splitMessage[0]
+
+		if code == LOGIN {
+			fmt.Println("user wants to login")
+		} else if code == CREATE_EVENT {
+			fmt.Println("user wants to create an event")
+		} else if code == STOP {
+			fmt.Println("user wants to stop")
+			conn.Close()
 			return
+		} else {
+			fmt.Println("wtf is this")
 		}
 	}
 }

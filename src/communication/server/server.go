@@ -78,14 +78,14 @@ func handleRequest(conn net.Conn) {
 	reader := bufio.NewReader(conn)
 	//writer := bufio.NewWriter(conn)
 	fmt.Println("Now we dialogue with client")
-
+	fmt.Print("\n")
 	for {
-		data, err := reader.ReadString(',')
+		data, err := reader.ReadString(';')
 		if err != nil {
 			fmt.Println("Error reading:", err.Error())
 			break
 		}
-		fmt.Print("Data Received:", string(data))
+		fmt.Println("Data :", data)
 
 		splitMessage := strings.Split(data, ",")
 		code := splitMessage[0]

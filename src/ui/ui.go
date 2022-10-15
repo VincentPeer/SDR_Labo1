@@ -35,7 +35,7 @@ func loginClient(reader *bufio.Reader, writer *bufio.Writer) bool {
 	password = strings.Split(password, "\n")[0]
 
 	// Envoi formulaire de login
-	_, writeError := writer.WriteString("LOGIN," + username + "," + password + "\n") // todo check err
+	_, writeError := writer.WriteString("LOGIN," + username + "," + password + ";") // todo check err
 	writer.Flush()
 	response, responseError := reader.ReadString('\n')
 	if readUsernameError != nil || readPasswordError != nil || // todo use log.Fatal dans une fonction auxiliaire

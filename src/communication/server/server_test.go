@@ -55,12 +55,10 @@ func TestLoadEvents(t *testing.T) {
 	got := loadConfig(getTestData(t)).Events
 	want := []Event{
 		{
-			Id:        "1",
 			Name:      "Festival de la musique",
 			Organizer: "3",
 			Jobs: []Job{
 				{
-					Id:       "1",
 					Name:     "Buvette",
 					Required: 2,
 					Volunteers: []string{
@@ -68,7 +66,6 @@ func TestLoadEvents(t *testing.T) {
 					},
 				},
 				{
-					Id:         "2",
 					Name:       "Sécurité",
 					Required:   3,
 					Volunteers: []string{},
@@ -76,18 +73,15 @@ func TestLoadEvents(t *testing.T) {
 			},
 		},
 		{
-			Id:        "2",
 			Name:      "Fête de la science",
 			Organizer: "4",
 			Jobs: []Job{
 				{
-					Id:         "3",
 					Name:       "Buvette",
 					Required:   2,
 					Volunteers: []string{},
 				},
 				{
-					Id:         "4",
 					Name:       "Sécurité",
 					Required:   3,
 					Volunteers: []string{},

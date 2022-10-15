@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-func UserInterface(reader *bufio.Reader, writer *bufio.Writer) {
+func UserInterface(reader *bufio.Reader, writer *bufio.Writer, serverReader *bufio.Reader) {
 	fmt.Println("Welcome!")
 
 	for {
-		if !loginClient(reader, writer) {
+		if !loginClient(reader, writer, serverReader) {
 			continue
 		}
 
@@ -26,7 +26,7 @@ func UserInterface(reader *bufio.Reader, writer *bufio.Writer) {
 
 // Gestion du login client
 // Le client presse enter après chaque entrée, et ne doit pas saisir de ',' dans ses données
-func loginClient(reader *bufio.Reader, writer *bufio.Writer) bool {
+func loginClient(reader *bufio.Reader, writer *bufio.Writer, serverReader *bufio.Reader) bool {
 	username := readFromServer(reader, "Enter your username : ")
 	password := readFromServer(reader, "Enter your password : ")
 
@@ -39,7 +39,7 @@ func loginClient(reader *bufio.Reader, writer *bufio.Writer) bool {
 	writeToServer(writer, result)
 
 	// Traitement de la réponse après vérification du login par le serveur
-	response := readFromServer(reader, "")
+	response := readFromServer(serverReader, "")
 	fmt.Println("response from server is : " + response)
 	if strings.Compare(response, "OK") == 0 {
 		fmt.Println("Hello " + username + "!")

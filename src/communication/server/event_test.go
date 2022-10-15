@@ -158,7 +158,7 @@ func TestCreateJob(t *testing.T) {
 					Name:     "Buvette",
 					Required: 2,
 					Volunteers: []string{
-						"1",
+						"Alex Terrieur",
 					},
 				},
 				{
@@ -237,7 +237,7 @@ func TestGetJob(t *testing.T) {
 		Name:     "Buvette",
 		Required: 2,
 		Volunteers: []string{
-			"1",
+			"Alex Terrieur",
 		},
 	}
 
@@ -272,8 +272,8 @@ func TestAddVolunteer(t *testing.T) {
 					Name:     "Buvette",
 					Required: 2,
 					Volunteers: []string{
-						"1",
-						"2",
+						"Alex Terrieur",
+						"Alain Terrieur",
 					},
 				},
 				{

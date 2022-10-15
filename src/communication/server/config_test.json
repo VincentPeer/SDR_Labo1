@@ -1,19 +1,16 @@
 {
     "users" : [
         {
-            "id" : "1",
             "name" : "Alex Terrieur",
             "password" : "AlexPWD",
             "function" : "volunteer"
         },
         {
-            "id" : "2",
             "name" : "Alain Terrieur",
             "password" : "AlainPWD",
             "function" : "volunteer"
         }, 
         {
-            "id" : "3",
             "name" : "Sarah Croche",
             "password" : "SarahPWD",
             "function" : "organizer"

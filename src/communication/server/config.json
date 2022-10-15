@@ -1,25 +1,21 @@
 {
     "users" : [
         {
-            "id" : "1",
             "name" : "Alex Terrieur",
             "password" : "123456",
             "function" : "volunteer"
         },
         {
-            "id" : "2",
             "name" : "Alain Terrieur",
             "password" : "123456",
             "function" : "volunteer"
         }, 
         {
-            "id" : "3",
             "name" : "Sarah Croche",
             "password" : "123456",
             "function" : "organizer"
         },
         {
-            "id" : "4",
             "name" : "Ondine Akeleur",
             "password" : "123456",
             "function" : "organizer"
@@ -36,13 +32,13 @@
                     "id" : "1",
                     "name" : "Bière",
                     "required" : 2,
-                    "volunteers" : ["1"]
+                    "volunteers" : ["Alex Terrieur"]
                 },
                 {
                     "id" : "2",
                     "name" : "Café",
                     "required" : 1,
-                    "volunteers" : ["2"]
+                    "volunteers" : ["Alain Terrieur"]
                 }
             ]
         },
@@ -55,13 +51,13 @@
                     "id" : "3",
                     "name" : "Bière",
                     "required" : 2,
-                    "volunteers" : ["1"]
+                    "volunteers" : ["Alex Terrieur"]
                 },
                 {
                     "id" : "4",
                     "name" : "Musique",
                     "required" : 2,
-                    "volunteers" : ["2"]
+                    "volunteers" : ["Alain Terrieur"]
                 }
             ]
         }

@@ -85,8 +85,10 @@ func handleRequest(conn net.Conn) {
 			fmt.Println("Error reading:", err.Error())
 			break
 		}
-		fmt.Println("Data :", data)
 
+		fmt.Println("Data :", data)
+		// Remove the semicolon
+		data = data[:len(data)-1]
 		splitMessage := strings.Split(data, ",")
 		code := splitMessage[0]
 
@@ -96,9 +98,11 @@ func handleRequest(conn net.Conn) {
 				fmt.Println("Wrong number of arguments")
 				break
 			}
-			id := splitMessage[1]
+			name := splitMessage[1]
 			password := splitMessage[2]
-			fmt.Println(login(id, password))
+			fmt.Print("name: ", name)
+			fmt.Println(" password: ", password)
+			fmt.Println(login(name, password))
 		} else if code == CREATE_EVENT {
 			fmt.Println("user wants to create an event")
 		} else if code == STOP {

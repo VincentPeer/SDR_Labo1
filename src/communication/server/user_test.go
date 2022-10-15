@@ -7,38 +7,33 @@ import (
 
 func TestCreateUser(t *testing.T) {
 	db := loadConfig(getTestData(t)).Users
-	testDb, err := createUser(db, "5", "Test", "TestPWD", "volunteer")
+	testDb, err := createUser(db, "Test", "TestPWD", "volunteer")
 	if err != nil {
 		t.Error(err)
 	}
 	got := testDb
 	want := []User{
 		{
-			Id:       "1",
 			Name:     "Alex Terrieur",
 			Password: "AlexPWD",
 			Function: "volunteer",
 		},
 		{
-			Id:       "2",
 			Name:     "Alain Terrieur",
 			Password: "AlainPWD",
 			Function: "volunteer",
 		},
 		{
-			Id:       "3",
 			Name:     "Sarah Croche",
 			Password: "SarahPWD",
 			Function: "organizer",
 		},
 		{
-			Id:       "4",
 			Name:     "Ondine Akeleur",
 			Password: "OndinePWD",
 			Function: "organizer",
 		},
 		{
-			Id:       "5",
 			Name:     "Test",
 			Password: "TestPWD",
 			Function: "volunteer",
@@ -52,7 +47,7 @@ func TestCreateUser(t *testing.T) {
 
 func TestCreateUserError(t *testing.T) {
 	testDb := loadConfig(getTestData(t)).Users
-	_, err := createUser(testDb, "1", "Test", "TestPWD", "volunteer")
+	_, err := createUser(testDb, "Test", "TestPWD", "volunteer")
 	if err == nil {
 		t.Error("Expected error")
 	}
@@ -60,9 +55,8 @@ func TestCreateUserError(t *testing.T) {
 
 func TestGetUser(t *testing.T) {
 	testDb := loadConfig(getTestData(t)).Users
-	got, _ := getUser(testDb, "1")
+	got, _ := getUser(testDb, "Alex Terrieur")
 	want := User{
-		Id:       "1",
 		Name:     "Alex Terrieur",
 		Password: "AlexPWD",
 		Function: "volunteer",
@@ -75,7 +69,7 @@ func TestGetUser(t *testing.T) {
 
 func TestGetUserError(t *testing.T) {
 	testDb := loadConfig(getTestData(t)).Users
-	_, err := getUser(testDb, "5")
+	_, err := getUser(testDb, "Test")
 	if err == nil {
 		t.Errorf("got %v want %v", err, "User not found")
 	}
@@ -84,7 +78,7 @@ func TestGetUserError(t *testing.T) {
 func TestLogin(t *testing.T) {
 	users = loadConfig(getTestData(t)).Users
 
-	got, err := login("1", "AlexPWD")
+	got, err := login("Alex Terrieur", "AlexPWD")
 	want := true
 
 	if err != nil {
@@ -94,7 +88,7 @@ func TestLogin(t *testing.T) {
 		t.Errorf("got %v want %v", got, want)
 	}
 
-	got, err = login("1", "AlexPWD2")
+	got, err = login("Alex Terrieur", "AlexPWD2")
 	want = false
 
 	if err != nil {
@@ -108,7 +102,7 @@ func TestLogin(t *testing.T) {
 func TestLoginError(t *testing.T) {
 	users = loadConfig(getTestData(t)).Users
 
-	_, err := login("5", "AlexPWD")
+	_, err := login("Test", "AlexPWD")
 	if err == nil {
 		t.Error("Expected error")
 	}

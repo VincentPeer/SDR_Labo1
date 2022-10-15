@@ -26,7 +26,7 @@
         {
             "id" : "1",
             "name" : "Festival de la bière",
-            "organizer" : "3",
+            "organizer" : "Sarah Croche",
             "jobs" : [
                 {
                     "id" : "1",
@@ -45,7 +45,7 @@
         {
             "id" : "2",
             "name" : "Baleinev",
-            "organizer" : "4",
+            "organizer" : "Ondine Akeleur",
             "jobs" : [
                 {
                     "id" : "3",

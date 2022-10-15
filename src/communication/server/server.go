@@ -76,6 +76,7 @@ func main() {
 // Handles incoming requests.
 func handleRequest(conn net.Conn) {
 	reader := bufio.NewReader(conn)
+	writer := bufio.NewWriter(conn)
 	//writer := bufio.NewWriter(conn)
 	fmt.Println("Now we dialogue with client")
 	fmt.Print("\n")
@@ -105,15 +106,21 @@ func handleRequest(conn net.Conn) {
 			result, err := login(name, password)
 			if err != nil {
 				fmt.Println("Error logging in: ", err.Error())
-				conn.Write([]byte(NOTOK + ";"))
+				writer.WriteString(NOTOK + "\n")
 				break
 			}
 			if result {
 				fmt.Println("Login successful")
-				conn.Write([]byte(OK + ";"))
+				_, err := writer.WriteString(OK + "\n")
+				if err != nil {
+					fmt.Println("Error writing to client: ", err.Error())
+					break
+				} else {
+					fmt.Println("Successfully wrote to client")
+				}
 			} else {
 				fmt.Println("Login failed")
-				conn.Write([]byte(NOTOK + ";"))
+				writer.WriteString(NOTOK + "\n")
 			}
 		} else if code == CREATE_EVENT {
 			fmt.Println("user wants to create an event")
@@ -123,6 +130,24 @@ func handleRequest(conn net.Conn) {
 				break
 			}
 
+			eventName := splitMessage[1]
+			organizerName := splitMessage[2]
+			password := splitMessage[3]
+
+			result, err := login(organizerName, password)
+			if err != nil {
+				fmt.Println("Error logging in: ", err.Error())
+				writer.WriteString(NOTOK + "\n")
+				break
+			}
+			if !result {
+				fmt.Println("Login failed")
+				writer.WriteString(NOTOK + "\n")
+				break
+			}
+
+			createEvent(events, eventName, organizerName)
+
 		} else if code == STOP {
 			fmt.Println("user wants to stop")
 			conn.Close()
@@ -130,5 +155,13 @@ func handleRequest(conn net.Conn) {
 		} else {
 			fmt.Println("wtf is this")
 		}
+		err = writer.Flush()
+		if err != nil {
+			fmt.Println("Error flushing: ", err.Error())
+			break
+		} else {
+			fmt.Println("Successfully flushed")
+		}
+
 	}
 }

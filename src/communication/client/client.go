@@ -26,8 +26,9 @@ func main() {
 	defer connection.Close()
 
 	reader := bufio.NewReader(os.Stdin)
+	serverReader := bufio.NewReader(connection)
 	writer := bufio.NewWriter(connection)
 
-	ui.UserInterface(reader, writer)
+	ui.UserInterface(reader, writer, serverReader)
 
 }

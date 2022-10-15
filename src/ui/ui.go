@@ -26,11 +26,8 @@ func UserInterface(reader *bufio.Reader, writer *bufio.Writer) {
 // Gestion du login client
 // Le client presse enter après chaque entrée, et ne doit pas saisir de ',' dans ses données
 func loginClient(reader *bufio.Reader, writer *bufio.Writer) bool {
-	fmt.Println("Enter your username : ")
-	username := readFromServer(reader)
-
-	fmt.Println("Enter your password : ")
-	password := readFromServer(reader)
+	username := readFromServer(reader, "Enter your username : ")
+	password := readFromServer(reader, "Enter your password : ")
 
 	// Supression des retours à la ligne, et formatage pour l'envoi au serveur
 	username = strings.TrimSuffix(username, "\r\n") + ","
@@ -41,8 +38,10 @@ func loginClient(reader *bufio.Reader, writer *bufio.Writer) bool {
 	writeToServer(writer, result)
 
 	// Traitement de la réponse après vérification du login par le serveur
-	response := readFromServer(reader)
-	if strings.EqualFold(response, "OK") {
+	response := readFromServer(reader, "")
+	fmt.Println("response from server is : " + response)
+	if strings.Compare(response, "OK") == 0 {
+		fmt.Println("Hello " + username + "!")
 		return true
 	} else {
 		fmt.Println("You have entered an invalid username or password")
@@ -51,8 +50,7 @@ func loginClient(reader *bufio.Reader, writer *bufio.Writer) bool {
 }
 
 func createEvent(reader *bufio.Reader, writer *bufio.Writer) bool {
-	fmt.Println("Enter the event name : ")
-	eventName, _ := reader.ReadString('\n')
+	eventName := readFromServer(reader, "Enter the event name : ")
 	var jobList []string
 	fmt.Println("List all job's name followed by the number of volunteers needed\n" +
 		"(tap double enter when ended) : ")
@@ -72,7 +70,8 @@ func createEvent(reader *bufio.Reader, writer *bufio.Writer) bool {
 	return true
 }
 
-func readFromServer(reader *bufio.Reader) string {
+func readFromServer(reader *bufio.Reader, textForUser string) string {
+	fmt.Print(textForUser)
 	message, err := reader.ReadString('\n')
 	if err != nil {
 		log.Fatal(err)

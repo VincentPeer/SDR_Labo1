@@ -3,14 +3,12 @@ package main
 import "errors"
 
 type Event struct {
-	Id        string `json:"id"`
 	Name      string `json:"name"`
 	Organizer string `json:"organizer"`
 	Jobs      []Job  `json:"jobs"`
 }
 
 type Job struct {
-	Id         string   `json:"id"`
 	Name       string   `json:"name"`
 	Required   int      `json:"required"`
 	Volunteers []string `json:"volunteers"`
@@ -19,19 +17,19 @@ type Job struct {
 // Creates a new event and adds it to the database
 // Returns an error if an event with the same id already exists
 // Otherwise returns the new state of the database
-func createEvent(db []Event, id string, name string, organizer string) ([]Event, error) {
-	if _, err := getEvent(db, id); err == nil {
+func createEvent(db []Event, name string, organizer string) ([]Event, error) {
+	if _, err := getEvent(db, name); err == nil {
 		return nil, errors.New("Event with same id already exists")
 	}
-	return append(db, Event{id, name, organizer, []Job{}}), nil
+	return append(db, Event{name, organizer, []Job{}}), nil
 }
 
 // Get an event from the database
 // Returns an error if the event does not exist
 // Otherwise returns the event
-func getEvent(db []Event, id string) (Event, error) {
+func getEvent(db []Event, name string) (Event, error) {
 	for _, event := range db {
-		if event.Id == id {
+		if event.Name == name {
 			return event, nil
 		}
 	}
@@ -41,20 +39,20 @@ func getEvent(db []Event, id string) (Event, error) {
 // Creates a new job and adds it to the database
 // Returns an error if a job with the same id already exists
 // Otherwise returns the new state of the database
-func createJob(event Event, id string, name string, required int) (Event, error) {
-	if _, err := getJob(event, id); err == nil {
+func createJob(event Event, name string, required int) (Event, error) {
+	if _, err := getJob(event, name); err == nil {
 		return event, errors.New("Job with same id already exists")
 	}
-	event.Jobs = append(event.Jobs, Job{id, name, required, []string{}})
+	event.Jobs = append(event.Jobs, Job{name, required, []string{}})
 	return event, nil
 }
 
 // Get a job from the database
 // Returns an error if the job does not exist
 // Otherwise returns the job
-func getJob(event Event, id string) (Job, error) {
+func getJob(event Event, name string) (Job, error) {
 	for _, job := range event.Jobs {
-		if job.Id == id {
+		if job.Name == name {
 			return job, nil
 		}
 	}

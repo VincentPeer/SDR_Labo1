@@ -117,6 +117,12 @@ func handleRequest(conn net.Conn) {
 			}
 		} else if code == CREATE_EVENT {
 			fmt.Println("user wants to create an event")
+
+			if len(splitMessage) < 4 {
+				fmt.Println("Wrong number of arguments")
+				break
+			}
+
 		} else if code == STOP {
 			fmt.Println("user wants to stop")
 			conn.Close()

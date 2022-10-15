@@ -7,27 +7,24 @@ import (
 
 func TestCreateEvent(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	testDb, err := createEvent(db, "3", "Test", "3")
+	testDb, err := createEvent(db, "Test", "3")
 	if err != nil {
 		t.Error(err)
 	}
 	got := testDb
 	want := []Event{
 		{
-			Id:        "1",
 			Name:      "Festival de la musique",
 			Organizer: "3",
 			Jobs: []Job{
 				{
-					Id:       "1",
 					Name:     "Buvette",
 					Required: 2,
 					Volunteers: []string{
-						"1",
+						"Alex Terrieur",
 					},
 				},
 				{
-					Id:         "2",
 					Name:       "Sécurité",
 					Required:   3,
 					Volunteers: []string{},
@@ -35,18 +32,15 @@ func TestCreateEvent(t *testing.T) {
 			},
 		},
 		{
-			Id:        "2",
 			Name:      "Fête de la science",
 			Organizer: "4",
 			Jobs: []Job{
 				{
-					Id:         "3",
 					Name:       "Buvette",
 					Required:   2,
 					Volunteers: []string{},
 				},
 				{
-					Id:         "4",
 					Name:       "Sécurité",
 					Required:   3,
 					Volunteers: []string{},
@@ -54,7 +48,6 @@ func TestCreateEvent(t *testing.T) {
 			},
 		},
 		{
-			Id:        "3",
 			Name:      "Test",
 			Organizer: "3",
 			Jobs:      []Job{},
@@ -68,7 +61,7 @@ func TestCreateEvent(t *testing.T) {
 
 func TestCreateEventErrorIfIdExists(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	_, err := createEvent(db, "1", "Test", "3")
+	_, err := createEvent(db, "Festival de la musique", "3")
 	if err == nil {
 		t.Error("Error not raised")
 	}
@@ -76,7 +69,7 @@ func TestCreateEventErrorIfIdExists(t *testing.T) {
 
 func TestCreateEventErrorIfNameIsEmpty(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	_, err := createEvent(db, "3", "", "3")
+	_, err := createEvent(db, "", "3")
 	if err == nil {
 		t.Error("Error not raised")
 	}
@@ -84,7 +77,7 @@ func TestCreateEventErrorIfNameIsEmpty(t *testing.T) {
 
 func TestCreateEventErrorIfOrganizerDoesntExist(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	_, err := createEvent(db, "3", "Test", "5")
+	_, err := createEvent(db, "Test", "5")
 	if err == nil {
 		t.Error("Error not raised")
 	}
@@ -92,7 +85,7 @@ func TestCreateEventErrorIfOrganizerDoesntExist(t *testing.T) {
 
 func TestCreateEventErrorIfOrganizerIsEmpty(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	_, err := createEvent(db, "3", "Test", "")
+	_, err := createEvent(db, "Test", "")
 	if err == nil {
 		t.Error("Error not raised")
 	}
@@ -106,20 +99,17 @@ func TestGetEvent(t *testing.T) {
 	}
 	got := testDb
 	want := Event{
-		Id:        "1",
 		Name:      "Festival de la musique",
 		Organizer: "3",
 		Jobs: []Job{
 			{
-				Id:       "1",
 				Name:     "Buvette",
 				Required: 2,
 				Volunteers: []string{
-					"1",
+					"Alex Terrieur",
 				},
 			},
 			{
-				Id:         "2",
 				Name:       "Sécurité",
 				Required:   3,
 				Volunteers: []string{},
@@ -142,19 +132,17 @@ func TestGetEventErrorIfIdDoesntExist(t *testing.T) {
 
 func TestCreateJob(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	testDb, err := createJob(db[0], "3", "Test", 3)
+	testDb, err := createJob(db[0], "Test", 3)
 	if err != nil {
 		t.Error(err)
 	}
 	got := testDb
 	want := []Event{
 		{
-			Id:        "1",
 			Name:      "Festival de la musique",
 			Organizer: "3",
 			Jobs: []Job{
 				{
-					Id:       "1",
 					Name:     "Buvette",
 					Required: 2,
 					Volunteers: []string{
@@ -162,13 +150,11 @@ func TestCreateJob(t *testing.T) {
 					},
 				},
 				{
-					Id:         "2",
 					Name:       "Sécurité",
 					Required:   3,
 					Volunteers: []string{},
 				},
 				{
-					Id:         "3",
 					Name:       "Test",
 					Required:   3,
 					Volunteers: []string{},
@@ -176,18 +162,15 @@ func TestCreateJob(t *testing.T) {
 			},
 		},
 		{
-			Id:        "2",
 			Name:      "Fête de la science",
 			Organizer: "4",
 			Jobs: []Job{
 				{
-					Id:         "3",
 					Name:       "Buvette",
 					Required:   2,
 					Volunteers: []string{},
 				},
 				{
-					Id:         "4",
 					Name:       "Sécurité",
 					Required:   3,
 					Volunteers: []string{},
@@ -203,7 +186,7 @@ func TestCreateJob(t *testing.T) {
 
 func TestCreateJobErrorIfIdExists(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	_, err := createJob(db[0], "1", "Test", 3)
+	_, err := createJob(db[0], "Buvette", 3)
 	if err == nil {
 		t.Error("Error not raised")
 	}
@@ -211,7 +194,7 @@ func TestCreateJobErrorIfIdExists(t *testing.T) {
 
 func TestCreateJobErrorIfNameIsEmpty(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	_, err := createJob(db[0], "3", "", 3)
+	_, err := createJob(db[0], "", 3)
 	if err == nil {
 		t.Error("Error not raised")
 	}
@@ -219,7 +202,7 @@ func TestCreateJobErrorIfNameIsEmpty(t *testing.T) {
 
 func TestCreateJobErrorIfRequiredIsNegative(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	_, err := createJob(db[0], "3", "Test", -1)
+	_, err := createJob(db[0], "Test", -1)
 	if err == nil {
 		t.Error("Error not raised")
 	}
@@ -227,13 +210,12 @@ func TestCreateJobErrorIfRequiredIsNegative(t *testing.T) {
 
 func TestGetJob(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	testDb, err := getJob(db[0], "1")
+	testDb, err := getJob(db[0], "Buvette")
 	if err != nil {
 		t.Error(err)
 	}
 	got := testDb
 	want := Job{
-		Id:       "1",
 		Name:     "Buvette",
 		Required: 2,
 		Volunteers: []string{
@@ -263,12 +245,10 @@ func TestAddVolunteer(t *testing.T) {
 	got := testDb
 	want := []Event{
 		{
-			Id:        "1",
 			Name:      "Festival de la musique",
 			Organizer: "3",
 			Jobs: []Job{
 				{
-					Id:       "1",
 					Name:     "Buvette",
 					Required: 2,
 					Volunteers: []string{
@@ -277,7 +257,6 @@ func TestAddVolunteer(t *testing.T) {
 					},
 				},
 				{
-					Id:         "2",
 					Name:       "Sécurité",
 					Required:   3,
 					Volunteers: []string{},
@@ -285,18 +264,15 @@ func TestAddVolunteer(t *testing.T) {
 			},
 		},
 		{
-			Id:        "2",
 			Name:      "Fête de la science",
 			Organizer: "4",
 			Jobs: []Job{
 				{
-					Id:         "3",
 					Name:       "Buvette",
 					Required:   2,
 					Volunteers: []string{},
 				},
 				{
-					Id:         "4",
 					Name:       "Sécurité",
 					Required:   3,
 					Volunteers: []string{},

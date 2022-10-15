@@ -102,7 +102,19 @@ func handleRequest(conn net.Conn) {
 			password := splitMessage[2]
 			fmt.Print("name: ", name)
 			fmt.Println(" password: ", password)
-			fmt.Println(login(name, password))
+			result, err := login(name, password)
+			if err != nil {
+				fmt.Println("Error logging in: ", err.Error())
+				conn.Write([]byte(NOTOK + ";"))
+				break
+			}
+			if result {
+				fmt.Println("Login successful")
+				conn.Write([]byte(OK + ";"))
+			} else {
+				fmt.Println("Login failed")
+				conn.Write([]byte(NOTOK + ";"))
+			}
 		} else if code == CREATE_EVENT {
 			fmt.Println("user wants to create an event")
 		} else if code == STOP {

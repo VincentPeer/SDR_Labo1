@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 )
 
@@ -52,22 +53,24 @@ func loginClient(reader *bufio.Reader, writer *bufio.Writer) bool {
 func createEvent(reader *bufio.Reader, writer *bufio.Writer) bool {
 	eventName := readFromServer(reader, "Enter the event name : ")
 	var jobList []string
+	var i = 0
 	fmt.Println("List all job's name followed by the number of volunteers needed\n" +
 		"(tap double enter when ended) : ")
 	for {
-		jobName, jobError := reader.ReadString('\n')
-		_, writeError := writer.WriteString("JOB," + jobName)
-		if jobError != nil || writeError != nil {
-			return false
-		}
-		jobList = append(jobList, jobName)
-		m, _ := reader.ReadString('\n')
-		if m == "\n" {
+		i++
+		jobName := readFromServer(reader, "Insert name of Job "+strconv.Itoa(i)+": ")
+		if jobName == "\n" {
 			break
 		}
-		writer.WriteString("CREATE_EVENT," + eventName + ",")
+		jobList = append(jobList, jobName)
 	}
-	return true
+	writeToServer(writer, "CREATE_EVENT,"+eventName+";")
+	response := readFromServer(reader, "")
+	if strings.Compare(response, "OK") == 0 {
+		return true
+	} else {
+		return false
+	}
 }
 
 func readFromServer(reader *bufio.Reader, textForUser string) string {

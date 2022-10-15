@@ -92,6 +92,13 @@ func handleRequest(conn net.Conn) {
 
 		if code == LOGIN {
 			fmt.Println("user wants to login")
+			if len(splitMessage) != 3 {
+				fmt.Println("Wrong number of arguments")
+				break
+			}
+			id := splitMessage[1]
+			password := splitMessage[2]
+			fmt.Println(login(id, password))
 		} else if code == CREATE_EVENT {
 			fmt.Println("user wants to create an event")
 		} else if code == STOP {

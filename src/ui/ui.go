@@ -3,6 +3,7 @@ package ui
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"strings"
 )
 
@@ -26,25 +27,26 @@ func UserInterface(reader *bufio.Reader, writer *bufio.Writer) {
 // Le client presse enter après chaque entrée, et ne doit pas saisir de ',' dans ses données
 func loginClient(reader *bufio.Reader, writer *bufio.Writer) bool {
 	fmt.Println("Enter your username : ")
-	username, readUsernameError := reader.ReadString('\n') // todo gérer le 2ème attribut de retour (err)
+	username := readFromServer(reader)
 
 	fmt.Println("Enter your password : ")
-	password, readPasswordError := reader.ReadString('\n')
+	password := readFromServer(reader)
 
+	// Supression des retours à la ligne, et formatage pour l'envoi au serveur
 	username = strings.TrimSuffix(username, "\r\n") + ","
 	password = strings.TrimSuffix(password, "\r\n")
 	result := "LOGIN," + username + password + ";"
-	fmt.Println(result)
 
 	// Envoi formulaire de login
-	_, writeError := writer.WriteString(result) // todo check err
-	writer.Flush()
-	response, responseError := reader.ReadString('\n')
-	if readUsernameError != nil || readPasswordError != nil || // todo use log.Fatal dans une fonction auxiliaire
-		responseError != nil || writeError != nil || response == "FALSE" {
-		return false
-	} else {
+	writeToServer(writer, result)
+
+	// Traitement de la réponse après vérification du login par le serveur
+	response := readFromServer(reader)
+	if strings.EqualFold(response, "OK") {
 		return true
+	} else {
+		fmt.Println("You have entered an invalid username or password")
+		return false
 	}
 }
 
@@ -70,10 +72,21 @@ func createEvent(reader *bufio.Reader, writer *bufio.Writer) bool {
 	return true
 }
 
-func readFromServer(reader *bufio.Reader) {
-
+func readFromServer(reader *bufio.Reader) string {
+	message, err := reader.ReadString('\n')
+	if err != nil {
+		log.Fatal(err)
+	}
+	return message
 }
 
-func writeToServer(reader *bufio.Reader) {
-
+func writeToServer(writer *bufio.Writer, message string) {
+	_, writtingError := writer.WriteString(message)
+	if writtingError != nil {
+		log.Fatal(writtingError)
+	}
+	flushError := writer.Flush()
+	if flushError != nil {
+		log.Fatal(flushError)
+	}
 }

@@ -12,6 +12,7 @@ const (
 	CONN_HOST = "localhost"
 	CONN_PORT = "3333"
 	CONN_TYPE = "tcp"
+	OK        = "OK"
 )
 
 func main() {
@@ -25,10 +26,10 @@ func main() {
 	}
 	defer connection.Close()
 
-	reader := bufio.NewReader(os.Stdin)
+	consoleReader := bufio.NewReader(os.Stdin)
 	serverReader := bufio.NewReader(connection)
-	writer := bufio.NewWriter(connection)
+	serverWriter := bufio.NewWriter(connection)
 
-	ui.UserInterface(reader, writer, serverReader)
+	ui.UserInterface(consoleReader, serverReader, serverWriter)
 
 }

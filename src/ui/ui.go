@@ -4,30 +4,30 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 )
 
-func UserInterface(reader *bufio.Reader, writer *bufio.Writer, serverReader *bufio.Reader) {
+const EOF = "\r\n"
+
+func UserInterface(consoleReader *bufio.Reader, serverReader *bufio.Reader, serverWriter *bufio.Writer) {
 	fmt.Println("Welcome!")
 
 	for {
-		if !loginClient(reader, writer, serverReader) {
-			continue
-		}
-
-		message, _ := reader.ReadString('\n')
-		if message == "STOP" {
-			fmt.Println("TCP client exiting...")
-			return
+		fmt.Println("start loop")
+		if loginClient(consoleReader, serverReader, serverWriter) == true {
+			break
 		}
 	}
+	createEvent(consoleReader, serverReader, serverWriter)
+
 }
 
 // Gestion du login client
 // Le client presse enter après chaque entrée, et ne doit pas saisir de ',' dans ses données
-func loginClient(reader *bufio.Reader, writer *bufio.Writer, serverReader *bufio.Reader) bool {
-	username := readFromServer(reader, "Enter your username : ")
-	password := readFromServer(reader, "Enter your password : ")
+func loginClient(consoleReader *bufio.Reader, serverReader *bufio.Reader, serverWriter *bufio.Writer) bool {
+	username := stringReader(consoleReader, "Enter your username : ")
+	password := stringReader(consoleReader, "Enter your password : ")
 
 	// Supression des retours à la ligne, et formatage pour l'envoi au serveur
 	username = strings.TrimSuffix(username, "\r\n") + ","
@@ -35,12 +35,12 @@ func loginClient(reader *bufio.Reader, writer *bufio.Writer, serverReader *bufio
 	result := "LOGIN," + username + password + ";"
 
 	// Envoi formulaire de login
-	writeToServer(writer, result)
+	writeToServer(serverWriter, result)
 
 	// Traitement de la réponse après vérification du login par le serveur
-	response := readFromServer(serverReader, "")
+	response := stringReader(serverReader, "")
 	fmt.Println("response from server is : " + response)
-	if strings.Compare(response, "OK") == 0 {
+	if strings.Compare(response, "OK\n") == 0 {
 		fmt.Println("Hello " + username + "!")
 		return true
 	} else {
@@ -49,29 +49,42 @@ func loginClient(reader *bufio.Reader, writer *bufio.Writer, serverReader *bufio
 	}
 }
 
-func createEvent(reader *bufio.Reader, writer *bufio.Writer) bool {
-	eventName := readFromServer(reader, "Enter the event name : ")
-	var jobList []string
+func createEvent(consoleReader *bufio.Reader, serverReader *bufio.Reader, serverWriter *bufio.Writer) bool {
+	eventName := stringReader(consoleReader, "Enter the event name : ")
 	fmt.Println("List all job's name followed by the number of volunteers needed\n" +
-		"(tap double enter when ended) : ")
+		"(tap enter with empty field when ended) : ")
+
+	var jobList []string
+	var i = 0
+	var nbVolunteers int
 	for {
-		jobName, jobError := reader.ReadString('\n')
-		_, writeError := writer.WriteString("JOB," + jobName)
-		if jobError != nil || writeError != nil {
-			return false
-		}
-		jobList = append(jobList, jobName)
-		m, _ := reader.ReadString('\n')
-		if m == "\n" {
+		i++
+		jobName := stringReader(consoleReader, "Insert name for Job "+strconv.Itoa(i)+": ")
+		if strings.Compare(jobName, EOF) == 0 {
 			break
 		}
-		writer.WriteString("CREATE_EVENT," + eventName + ",")
+		fmt.Print("Number of volunteers needed : ")
+		fmt.Scanf("%d", &nbVolunteers)
+		jobList = append(jobList, jobName+","+strconv.Itoa(nbVolunteers))
 	}
-	return true
+
+	jobStringList := strings.Join(jobList, ", ")
+
+	eventResult := "CREATE_EVENT," + eventName + "," + jobStringList + ";"
+	eventResult = strings.Replace(eventResult, EOF, "", -1)
+	fmt.Println(eventResult)
+	writeToServer(serverWriter, eventResult)
+	response := stringReader(serverReader, "")
+	if strings.Compare(response, "OK"+"\n") == 0 {
+		fmt.Println("Event registrated, thank you!")
+		return true
+	} else {
+		return false
+	}
 }
 
-func readFromServer(reader *bufio.Reader, textForUser string) string {
-	fmt.Print(textForUser)
+func stringReader(reader *bufio.Reader, optinalMessage string) string {
+	fmt.Print(optinalMessage)
 	message, err := reader.ReadString('\n')
 	if err != nil {
 		log.Fatal(err)

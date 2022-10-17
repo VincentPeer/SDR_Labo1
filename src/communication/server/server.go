@@ -84,7 +84,7 @@ func handleRequest(conn net.Conn) {
 		data, err := reader.ReadString(';')
 		if err != nil {
 			fmt.Println("Error reading:", err.Error())
-			break
+			continue
 		}
 
 		fmt.Println("Data :", data)
@@ -97,7 +97,7 @@ func handleRequest(conn net.Conn) {
 			fmt.Println("user wants to login")
 			if len(splitMessage) != 3 {
 				fmt.Println("Wrong number of arguments")
-				break
+				continue
 			}
 			name := splitMessage[1]
 			password := splitMessage[2]
@@ -106,15 +106,16 @@ func handleRequest(conn net.Conn) {
 			result, err := login(name, password)
 			if err != nil {
 				fmt.Println("Error logging in: ", err.Error())
+				fmt.Println("we will send " + NOTOK + "\n")
 				writer.WriteString(NOTOK + "\n")
-				break
+				continue
 			}
 			if result {
 				fmt.Println("Login successful")
 				_, err := writer.WriteString(OK + "\n")
 				if err != nil {
 					fmt.Println("Error writing to client: ", err.Error())
-					break
+					continue
 				} else {
 					fmt.Println("Successfully wrote to client")
 				}
@@ -127,7 +128,7 @@ func handleRequest(conn net.Conn) {
 
 			if len(splitMessage) < 4 {
 				fmt.Println("Wrong number of arguments")
-				break
+				continue
 			}
 
 			eventName := splitMessage[1]
@@ -138,12 +139,12 @@ func handleRequest(conn net.Conn) {
 			if err != nil {
 				fmt.Println("Error logging in: ", err.Error())
 				writer.WriteString(NOTOK + "\n")
-				break
+				continue
 			}
 			if !result {
 				fmt.Println("Login failed")
 				writer.WriteString(NOTOK + "\n")
-				break
+				continue
 			}
 
 			createEvent(events, eventName, organizerName)
@@ -158,7 +159,7 @@ func handleRequest(conn net.Conn) {
 		err = writer.Flush()
 		if err != nil {
 			fmt.Println("Error flushing: ", err.Error())
-			break
+			continue
 		} else {
 			fmt.Println("Successfully flushed")
 		}

@@ -20,7 +20,6 @@ func UserInterface(consoleReader *bufio.Reader, serverReader *bufio.Reader, serv
 		}
 	}
 	createEvent(consoleReader, serverReader, serverWriter)
-
 }
 
 // Gestion du login client

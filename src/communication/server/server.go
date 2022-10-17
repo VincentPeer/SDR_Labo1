@@ -79,9 +79,9 @@ func handleRequest(conn net.Conn) {
 	writer := bufio.NewWriter(conn)
 	//writer := bufio.NewWriter(conn)
 	fmt.Println("Now we dialogue with client")
-	fmt.Print("\n")
+
 	for {
-		data, err := reader.ReadString(';')
+		data, err := reader.ReadString(DELIMITER)
 		if err != nil {
 			fmt.Println("Error reading:", err.Error())
 			continue
@@ -94,40 +94,35 @@ func handleRequest(conn net.Conn) {
 		code := splitMessage[0]
 
 		if code == LOGIN {
-			fmt.Println("user wants to login")
 			if len(splitMessage) != 3 {
-				fmt.Println("Wrong number of arguments")
+				sendError(writer, "Wrong number of arguments")
 				continue
 			}
 			name := splitMessage[1]
 			password := splitMessage[2]
+
+			fmt.Println("user wants to login")
 			fmt.Print("name: ", name)
 			fmt.Println(" password: ", password)
+
 			result, err := login(name, password)
 			if err != nil {
 				fmt.Println("Error logging in: ", err.Error())
-				fmt.Println("we will send " + NOTOK + "\n")
-				writer.WriteString(NOTOK + "\n")
+				sendError(writer, err.Error())
 				continue
 			}
 			if result {
 				fmt.Println("Login successful")
-				_, err := writer.WriteString(OK + "\n")
-				if err != nil {
-					fmt.Println("Error writing to client: ", err.Error())
-					continue
-				} else {
-					fmt.Println("Successfully wrote to client")
-				}
+				sendAck(writer, "")
 			} else {
 				fmt.Println("Login failed")
-				writer.WriteString(NOTOK + "\n")
+				sendError(writer, "Login failed")
 			}
 		} else if code == CREATE_EVENT {
 			fmt.Println("user wants to create an event")
 
 			if len(splitMessage) < 4 {
-				fmt.Println("Wrong number of arguments")
+				sendError(writer, "Wrong number of arguments")
 				continue
 			}
 
@@ -138,13 +133,13 @@ func handleRequest(conn net.Conn) {
 			result, err := login(organizerName, password)
 			if err != nil {
 				fmt.Println("Error logging in: ", err.Error())
-				writer.WriteString(NOTOK + "\n")
+				sendError(writer, "Login failed")
 				continue
 			}
 			if !result {
 				fmt.Println("Login failed")
-				writer.WriteString(NOTOK + "\n")
-				continue
+				sendError(writer, "Login failed")
+				break
 			}
 
 			createEvent(events, eventName, organizerName)
@@ -156,13 +151,5 @@ func handleRequest(conn net.Conn) {
 		} else {
 			fmt.Println("wtf is this")
 		}
-		err = writer.Flush()
-		if err != nil {
-			fmt.Println("Error flushing: ", err.Error())
-			continue
-		} else {
-			fmt.Println("Successfully flushed")
-		}
-
 	}
 }

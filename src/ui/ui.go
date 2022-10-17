@@ -37,9 +37,9 @@ func loginClient(consoleReader *bufio.Reader, serverReader *bufio.Reader, server
 	writeToServer(serverWriter, result)
 
 	// Traitement de la réponse après vérification du login par le serveur
-	response := stringReader(serverReader, "")
+	response := readFromServer(serverReader, "")
 	fmt.Println("response from server is : " + response)
-	if strings.Compare(response, "OK\n") == 0 {
+	if strings.Compare(response, "OK;") == 0 {
 		fmt.Println("Hello " + username + "!")
 		return true
 	} else {
@@ -56,25 +56,34 @@ func createEvent(consoleReader *bufio.Reader, serverReader *bufio.Reader, server
 	var jobList []string
 	var i = 0
 	var nbVolunteers int
+	var jobStringList = ""
 	for {
 		i++
 		jobName := stringReader(consoleReader, "Insert name for Job "+strconv.Itoa(i)+": ")
 		if strings.Compare(jobName, EOF) == 0 {
 			break
 		}
+
 		fmt.Print("Number of volunteers needed : ")
 		fmt.Scanf("%d", &nbVolunteers)
+
+		jobName = strings.TrimSuffix(jobName, "\r\n")
+
 		jobList = append(jobList, jobName+","+strconv.Itoa(nbVolunteers))
 	}
 
-	jobStringList := strings.Join(jobList, ", ")
+	if len(jobList) > 1 {
+		jobStringList = strings.Join(jobList, ", ")
+	} else if len(jobList) == 1 {
+		jobStringList = jobList[0]
+	}
 
 	eventResult := "CREATE_EVENT," + eventName + "," + jobStringList + ";"
 	eventResult = strings.Replace(eventResult, EOF, "", -1)
 	fmt.Println(eventResult)
 	writeToServer(serverWriter, eventResult)
-	response := stringReader(serverReader, "")
-	if strings.Compare(response, "OK"+"\n") == 0 {
+	response := readFromServer(serverReader, "")
+	if strings.Compare(response, "OK"+";") == 0 {
 		fmt.Println("Event registrated, thank you!")
 		return true
 	} else {
@@ -85,6 +94,15 @@ func createEvent(consoleReader *bufio.Reader, serverReader *bufio.Reader, server
 func stringReader(reader *bufio.Reader, optinalMessage string) string {
 	fmt.Print(optinalMessage)
 	message, err := reader.ReadString('\n')
+	if err != nil {
+		log.Fatal(err)
+	}
+	return message
+}
+
+func readFromServer(reader *bufio.Reader, optinalMessage string) string {
+	fmt.Print(optinalMessage)
+	message, err := reader.ReadString(';')
 	if err != nil {
 		log.Fatal(err)
 	}

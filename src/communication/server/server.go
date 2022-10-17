@@ -81,7 +81,7 @@ func handleRequest(conn net.Conn) {
 	fmt.Println("Now we dialogue with client")
 
 	for {
-		data, err := reader.ReadString(';')
+		data, err := reader.ReadString(DELIMITER)
 		if err != nil {
 			fmt.Println("Error reading:", err.Error())
 			continue
@@ -113,7 +113,7 @@ func handleRequest(conn net.Conn) {
 			}
 			if result {
 				fmt.Println("Login successful")
-				sendAck(writer, "Login successful")
+				sendAck(writer, "")
 			} else {
 				fmt.Println("Login failed")
 				sendError(writer, "Login failed")
@@ -138,7 +138,7 @@ func handleRequest(conn net.Conn) {
 			}
 			if !result {
 				fmt.Println("Login failed")
-				writer.WriteString(NOTOK + "\n")
+				sendError(writer, "Login failed")
 				break
 			}
 

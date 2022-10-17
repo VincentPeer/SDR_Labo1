@@ -9,16 +9,23 @@ const (
 	LOGIN        = "LOGIN"
 	CREATE_EVENT = "CREATE_EVENT"
 	STOP         = "STOP"
+	DELIMITER    = ';'
 )
 
 func sendError(destination *bufio.Writer, message string) error {
-	_, err := destination.WriteString(NOTOK + " " + message + "\n")
+	if message != "" {
+		message = "," + message
+	}
+	_, err := destination.WriteString(NOTOK + message + string(DELIMITER))
 	destination.Flush()
 	return err
 }
 
 func sendAck(destination *bufio.Writer, message string) error {
-	_, err := destination.WriteString(OK + " " + message + "\n")
+	if message != "" {
+		message = "," + message
+	}
+	_, err := destination.WriteString(OK + message + string(DELIMITER))
 	destination.Flush()
 	return err
 }

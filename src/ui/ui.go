@@ -11,16 +11,41 @@ import (
 
 const EOF = "\r\n"
 
+// Main function that communicate with a client, from here he can go through each
+// functionnality offered on this service
 func UserInterface(consoleReader *bufio.Reader, serverReader *bufio.Reader, serverWriter *bufio.Writer) {
 	fmt.Println("Welcome!")
 
+	var choice int
 	for {
-		fmt.Println("start loop")
-		if loginClient(consoleReader, serverReader, serverWriter) == true {
-			break
+		fmt.Println("Choose one of the following functionnality")
+		fmt.Println("[1] Create a new event")
+		fmt.Println("[2] Register to an event as a volunteer")
+		fmt.Println("[3] See all current events")
+		fmt.Println("[4] See the volunteers repartiton for a specific event")
+		fmt.Println("[5] To terminate the process")
+
+		choice = integerReader()
+		switch choice {
+		case 1:
+			createEvent(consoleReader, serverReader, serverWriter)
+		case 2:
+			volunteerRegistration()
+		case 3:
+			printEvents()
+		case 4:
+			volunteerRepartition()
+		case 5:
+			return // todo: ou break
+		default:
+			fmt.Println("You have entered a bad request")
 		}
+
+		//if loginClient(consoleReader, serverReader, serverWriter) == true {
+		//	break
+		//}
 	}
-	createEvent(consoleReader, serverReader, serverWriter)
+
 }
 
 // Gestion du login client
@@ -99,6 +124,18 @@ func createEvent(consoleReader *bufio.Reader, serverReader *bufio.Reader, server
 	}
 }
 
+func volunteerRegistration() {
+
+}
+
+func printEvents() {
+
+}
+
+func volunteerRepartition() {
+
+}
+
 func stringReader(reader *bufio.Reader, optinalMessage string) string {
 	fmt.Print(optinalMessage)
 	message, err := reader.ReadString('\n')
@@ -106,6 +143,18 @@ func stringReader(reader *bufio.Reader, optinalMessage string) string {
 		log.Fatal(err)
 	}
 	return message
+}
+
+func integerReader() int {
+	var i int
+	fmt.Println("set the number : ")
+	nbScanned, err := fmt.Scanf("%d", &i)
+	if err != nil {
+		log.Fatal(err)
+	} else if nbScanned != 1 {
+		log.Fatal("Expected one argument, actual : " + strconv.Itoa(nbScanned))
+	}
+	return i
 }
 
 func readFromServer(reader *bufio.Reader, optinalMessage string) string {

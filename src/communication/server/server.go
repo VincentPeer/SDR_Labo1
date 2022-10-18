@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,7 +8,6 @@ import (
 	"net"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 const (
@@ -20,8 +18,10 @@ const (
 )
 
 var (
-	users  []User
-	events []Event
+	nbClients         int = 0
+	users             []User
+	events            []Event
+	messagingProtocol = &tcpProtocol{}
 )
 
 func loadConfig(jsonPath string) Config {
@@ -65,24 +65,22 @@ func main() {
 	for {
 		// Listen for an incoming connection.
 		conn, err := l.Accept()
+		nbClients++
 		if err != nil {
 			fmt.Println("Error accepting: ", err.Error())
 			os.Exit(1)
 		}
 		// Handle connections in a new goroutine.
-		go handleRequest(conn)
+		go handleRequest(NewClient(nbClients, &conn, messagingProtocol))
 	}
 }
 
 // Handles incoming requests.
-func handleRequest(conn net.Conn) {
-	reader := bufio.NewReader(conn)
-	writer := bufio.NewWriter(conn)
-	//writer := bufio.NewWriter(conn)
+func handleRequest(client *client) {
 	fmt.Println("Now we dialogue with client")
 
 	for {
-		data, err := reader.ReadString(DELIMITER)
+		data, err := client.Read()
 		if err != nil {
 			if err == io.EOF {
 				fmt.Println("Client disconnected")
@@ -94,18 +92,16 @@ func handleRequest(conn net.Conn) {
 		}
 
 		fmt.Println("Data :", data)
-		// Remove the semicolon
-		data = data[:len(data)-1]
-		splitMessage := strings.Split(data, ",")
-		code := splitMessage[0]
 
-		if code == LOGIN {
-			if len(splitMessage) != 3 {
-				sendError(writer, "Wrong number of arguments")
+		switch data.Type {
+		case LOGIN:
+			if len(data.Data) != 2 {
+				client.Write(messagingProtocol.NewError("Invalid number of arguments"))
 				continue
 			}
-			name := splitMessage[1]
-			password := splitMessage[2]
+
+			name := data.Data[0]
+			password := data.Data[1]
 
 			fmt.Println("user wants to login")
 			fmt.Print("name: ", name)
@@ -114,48 +110,46 @@ func handleRequest(conn net.Conn) {
 			result, err := login(name, password)
 			if err != nil {
 				fmt.Println("Error logging in: ", err.Error())
-				sendError(writer, err.Error())
+				client.Write(messagingProtocol.NewError(err.Error()))
 				continue
 			}
 			if result {
 				fmt.Println("Login successful")
-				sendAck(writer, "")
+				client.Write(messagingProtocol.NewSuccess(""))
 			} else {
 				fmt.Println("Login failed")
-				sendError(writer, "Login failed")
+				client.Write(messagingProtocol.NewError("Login failed"))
 			}
-		} else if code == CREATE_EVENT {
+		case CREATE_EVENT:
 			fmt.Println("user wants to create an event")
 
-			if len(splitMessage) < 4 {
-				sendError(writer, "Wrong number of arguments")
+			if len(data.Data) < 3 {
+				client.Write(messagingProtocol.NewError("Invalid number of arguments"))
 				continue
 			}
 
-			eventName := splitMessage[1]
-			organizerName := splitMessage[2]
-			password := splitMessage[3]
+			eventName := data.Data[0]
+			organizerName := data.Data[1]
+			password := data.Data[2]
 
 			result, err := login(organizerName, password)
 			if err != nil {
 				fmt.Println("Error logging in: ", err.Error())
-				sendError(writer, "Login failed")
+				client.Write(messagingProtocol.NewError(err.Error()))
 				continue
 			}
 			if !result {
 				fmt.Println("Login failed")
-				sendError(writer, "Login failed")
+				client.Write(messagingProtocol.NewError("Login failed"))
 				break
 			}
 
 			createEvent(events, eventName, organizerName)
-
-		} else if code == STOP {
-			fmt.Println("user wants to stop")
-			conn.Close()
-			return
-		} else {
-			fmt.Println("wtf is this")
+		case STOP:
+			fmt.Println("user wants to stop the server")
+			client.Close()
+		default:
+			fmt.Println("Unknown command")
 		}
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 const EOF = "\r\n"
@@ -79,7 +80,12 @@ func createEvent(consoleReader *bufio.Reader, serverReader *bufio.Reader, server
 	}
 
 	eventResult := "CREATE_EVENT," + eventName + "," + jobStringList + ";"
-	eventResult = strings.Replace(eventResult, EOF, "", -1)
+	eventResult = strings.Map(func(r rune) rune {
+		if unicode.IsGraphic(r) {
+			return r
+		}
+		return -1
+	}, eventResult)
 	fmt.Println(eventResult)
 	writeToServer(serverWriter, eventResult)
 	response := readFromServer(serverReader, "")

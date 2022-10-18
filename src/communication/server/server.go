@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net"
 	"os"
@@ -83,8 +84,13 @@ func handleRequest(conn net.Conn) {
 	for {
 		data, err := reader.ReadString(DELIMITER)
 		if err != nil {
-			fmt.Println("Error reading:", err.Error())
-			continue
+			if err == io.EOF {
+				fmt.Println("Client disconnected")
+				break
+			} else {
+				fmt.Println("Error reading:", err.Error())
+				continue
+			}
 		}
 
 		fmt.Println("Data :", data)

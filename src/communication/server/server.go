@@ -78,6 +78,7 @@ func main() {
 // Handles incoming requests.
 func handleRequest(client *client) {
 	fmt.Println("Now we dialogue with client")
+	defer client.Close()
 
 	for {
 		data, err := client.Read()
@@ -87,7 +88,7 @@ func handleRequest(client *client) {
 				break
 			} else {
 				fmt.Println("Error reading:", err.Error())
-				continue
+				break
 			}
 		}
 
@@ -141,13 +142,13 @@ func handleRequest(client *client) {
 			if !result {
 				fmt.Println("Login failed")
 				client.Write(messagingProtocol.NewError("Login failed"))
-				break
+				continue
 			}
 
 			createEvent(events, eventName, organizerName)
 		case STOP:
 			fmt.Println("user wants to stop the server")
-			client.Close()
+			break
 		default:
 			fmt.Println("Unknown command")
 		}

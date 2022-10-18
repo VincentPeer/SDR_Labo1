@@ -75,6 +75,12 @@ func loginClient(consoleReader *bufio.Reader, serverReader *bufio.Reader, server
 }
 
 func createEvent(consoleReader *bufio.Reader, serverReader *bufio.Reader, serverWriter *bufio.Writer) bool {
+	for {
+		if loginClient(consoleReader, serverReader, serverWriter) == true {
+			break
+		}
+	}
+
 	eventName := stringReader(consoleReader, "Enter the event name : ")
 	fmt.Println("List all job's name followed by the number of volunteers needed\n" +
 		"(tap enter with empty field when ended) : ")

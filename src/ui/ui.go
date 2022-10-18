@@ -60,12 +60,14 @@ func createEvent(consoleReader *bufio.Reader, serverReader *bufio.Reader, server
 	for {
 		i++
 		jobName := stringReader(consoleReader, "Insert name for Job "+strconv.Itoa(i)+": ")
+		fmt.Println("read : " + jobName)
 		if strings.Compare(jobName, EOF) == 0 {
 			break
 		}
 
 		fmt.Print("Number of volunteers needed : ")
 		fmt.Scanf("%d", &nbVolunteers)
+		fmt.Println("read : ", nbVolunteers)
 
 		jobName = strings.TrimSuffix(jobName, "\r\n")
 

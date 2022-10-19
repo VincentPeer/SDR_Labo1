@@ -71,7 +71,7 @@ func TestCreateEvent(t *testing.T) {
 func TestCreateEventErrorIfIdExists(t *testing.T) {
 	db := LoadDatabaseFromJson(tests.GetTestData(t))
 	_, err := db.CreateEvent("Festival de la musique", "Sarah Croche")
-	if errors.Is(err, ErrorEventExists) {
+	if !errors.Is(err, ErrorEventExists) {
 		t.Error("Error not raised")
 	}
 }
@@ -79,7 +79,7 @@ func TestCreateEventErrorIfIdExists(t *testing.T) {
 func TestCreateEventErrorIfNameIsEmpty(t *testing.T) {
 	db := LoadDatabaseFromJson(tests.GetTestData(t))
 	_, err := db.CreateEvent("", "Sarah Croche")
-	if err != ErrorEventNameEmpty {
+	if !errors.Is(err, ErrorEventNameEmpty) {
 		t.Error("Error not raised")
 	}
 }
@@ -87,7 +87,7 @@ func TestCreateEventErrorIfNameIsEmpty(t *testing.T) {
 func TestCreateEventErrorIfOrganizerDoesntExist(t *testing.T) {
 	db := LoadDatabaseFromJson(tests.GetTestData(t))
 	_, err := db.CreateEvent("Test", "Bob")
-	if err != ErrorUserNotFound {
+	if !errors.Is(err, ErrorUserNotFound) {
 		t.Error("Error not raised")
 	}
 }
@@ -95,7 +95,7 @@ func TestCreateEventErrorIfOrganizerDoesntExist(t *testing.T) {
 func TestCreateEventErrorIfOrganizerIsEmpty(t *testing.T) {
 	db := LoadDatabaseFromJson(tests.GetTestData(t))
 	_, err := db.CreateEvent("Test", "")
-	if err != ErrorOrganizerEmpty {
+	if !errors.Is(err, ErrorOrganizerEmpty) {
 		t.Error("Error not raised")
 	}
 }

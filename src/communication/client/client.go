@@ -1,4 +1,4 @@
-// name of the package
+// This package set up the connection on the client side
 package client
 
 import (
@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-/* constants needed to connect to the server */
+// constants needed to connect to the server
 const (
 	CONN_HOST = "localhost"
 	CONN_PORT = "3333"
@@ -17,7 +17,7 @@ const (
 	OK        = "OK"
 )
 
-// connection contains buffered readers and writers for the console and the server
+// connection contains buffered readers and writers to allow communication between the client and the server
 type connection struct {
 	consoleIn *bufio.Reader
 	serverIn  *bufio.Reader
@@ -25,16 +25,14 @@ type connection struct {
 	protocol  protocol.Protocol
 }
 
-// newConnection creates a new connection with our server
+// newConnection establishes a new connection based on our own protocol
 func newConnection(consoleIn *bufio.Reader, serverIn *bufio.Reader, serverOut *bufio.Writer, protocol protocol.Protocol) *connection {
-
 	return &connection{
 		consoleIn: consoleIn,
 		serverIn:  serverIn,
 		serverOut: serverOut,
 		protocol:  protocol,
 	}
-
 }
 
 // Prepare the connection and start a client

@@ -135,7 +135,7 @@ func TestAddVolunteerErrorIfVolunteerAboveMaximum(t *testing.T) {
 	}
 }
 
-func TestToString(t *testing.T) {
+func TestJobToString(t *testing.T) {
 	job := Job{
 		ID:         1,
 		Name:       "Test",

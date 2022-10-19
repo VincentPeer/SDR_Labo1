@@ -41,12 +41,15 @@ func (event *Event) CreateJob(name string, required uint) (*Event, error) {
 // Returns an error if the job does not exist
 // Otherwise returns the job
 func (event *Event) GetJob(name string) (*Job, error) {
+	if name == "" {
+		return nil, ErrorJobNameEmpty
+	}
 	for _, job := range event.Jobs {
 		if job.Name == name {
 			return &job, nil
 		}
 	}
-	return &Job{}, errors.New("Job not found")
+	return &Job{}, ErrorJobNotFound
 }
 
 func (event *Event) ToString() string {

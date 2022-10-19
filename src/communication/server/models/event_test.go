@@ -108,7 +108,38 @@ func TestGetJob(t *testing.T) {
 func TestGetJobErrorIfIdDoesntExist(t *testing.T) {
 	db := LoadDatabaseFromJson(tests.GetTestData(t)).Events
 	_, err := db[0].GetJob("Test")
-	if err == nil {
+	if !errors.Is(err, ErrorJobNotFound) {
 		t.Error("Error not raised")
+	}
+}
+
+func TestGetJobErrorIfNameIsEmpty(t *testing.T) {
+	db := LoadDatabaseFromJson(tests.GetTestData(t)).Events
+	_, err := db[0].GetJob("")
+	if !errors.Is(err, ErrorJobNameEmpty) {
+		t.Error("Error not raised")
+	}
+}
+
+func TestEventToString(t *testing.T) {
+	db := LoadDatabaseFromJson(tests.GetTestData(t)).Events
+	got := db[0].ToString()
+	want := "0 | Festival de la musique | Sarah Croche"
+
+	if got != want {
+		t.Errorf("got %v want %v", got, want)
+	}
+}
+
+func TestGetJobsAsStringArray(t *testing.T) {
+	db := LoadDatabaseFromJson(tests.GetTestData(t)).Events
+	got := db[0].GetJobsAsStringArray()
+	want := []string{
+		"0 | Buvette | 2 | Alex Terrieur",
+		"1 | Sécurité | 3 | ",
+	}
+
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("got %v want %v", got, want)
 	}
 }

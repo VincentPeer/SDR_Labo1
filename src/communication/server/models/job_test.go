@@ -56,47 +56,26 @@ func TestAddVolunteer(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	got := db.Events
-	want := Events{
-		{
-			ID:        0,
-			Name:      "Festival de la musique",
-			Organizer: "Sarah Croche",
-			Jobs: []Job{
-				{
-					ID:       0,
-					Name:     "Buvette",
-					Required: 2,
-					Volunteers: []string{
-						"Alex Terrieur",
-						"Alain Terrieur",
-					},
-				},
-				{
-					ID:         1,
-					Name:       "Sécurité",
-					Required:   3,
-					Volunteers: []string{},
+	got := db.Events[0]
+	want := Event{
+		ID:        0,
+		Name:      "Festival de la musique",
+		Organizer: "Sarah Croche",
+		Jobs: []Job{
+			{
+				ID:       0,
+				Name:     "Buvette",
+				Required: 2,
+				Volunteers: []string{
+					"Alex Terrieur",
+					"Alain Terrieur",
 				},
 			},
-		},
-		{
-			ID:        1,
-			Name:      "Fête de la science",
-			Organizer: "Ondine Akeleur",
-			Jobs: []Job{
-				{
-					ID:         0,
-					Name:       "Buvette",
-					Required:   2,
-					Volunteers: []string{},
-				},
-				{
-					ID:         1,
-					Name:       "Sécurité",
-					Required:   3,
-					Volunteers: []string{},
-				},
+			{
+				ID:         1,
+				Name:       "Sécurité",
+				Required:   3,
+				Volunteers: []string{},
 			},
 		},
 	}

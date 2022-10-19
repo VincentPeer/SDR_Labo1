@@ -10,23 +10,23 @@ import (
 func TestLoadUsers(t *testing.T) {
 
 	got := LoadDatabaseFromJson(tests.GetTestData(t)).Users
-	want := Users{
-		{
+	want := map[string]User{
+		"Alex Terrieur": {
 			Name:     "Alex Terrieur",
 			Password: "AlexPWD",
 			Function: "volunteer",
 		},
-		{
+		"Alain Terrieur": {
 			Name:     "Alain Terrieur",
 			Password: "AlainPWD",
 			Function: "volunteer",
 		},
-		{
+		"Sarah Croche": {
 			Name:     "Sarah Croche",
 			Password: "SarahPWD",
 			Function: "organizer",
 		},
-		{
+		"Ondine Akeleur": {
 			Name:     "Ondine Akeleur",
 			Password: "OndinePWD",
 			Function: "organizer",
@@ -41,8 +41,9 @@ func TestLoadUsers(t *testing.T) {
 func TestLoadEvents(t *testing.T) {
 
 	got := LoadDatabaseFromJson(tests.GetTestData(t)).Events
-	want := Events{
-		{
+
+	want := map[uint]Event{
+		0: {
 			ID:        0,
 			Name:      "Festival de la musique",
 			Organizer: "Sarah Croche",
@@ -63,7 +64,7 @@ func TestLoadEvents(t *testing.T) {
 				},
 			},
 		},
-		{
+		1: {
 			ID:        1,
 			Name:      "Fête de la science",
 			Organizer: "Ondine Akeleur",
@@ -96,8 +97,8 @@ func TestCreateEvent(t *testing.T) {
 		t.Error(err)
 	}
 	got := testDb.Events
-	want := Events{
-		{
+	want := map[uint]Event{
+		0: {
 			ID:        0,
 			Name:      "Festival de la musique",
 			Organizer: "Sarah Croche",
@@ -118,7 +119,7 @@ func TestCreateEvent(t *testing.T) {
 				},
 			},
 		},
-		{
+		1: {
 			ID:        1,
 			Name:      "Fête de la science",
 			Organizer: "Ondine Akeleur",
@@ -137,7 +138,7 @@ func TestCreateEvent(t *testing.T) {
 				},
 			},
 		},
-		{
+		2: {
 			ID:        2,
 			Name:      "Test",
 			Organizer: "Sarah Croche",
@@ -189,7 +190,7 @@ func TestGetEvent(t *testing.T) {
 		t.Error(err)
 	}
 	got := testDb
-	want := Event{
+	want := &Event{
 		ID:        0,
 		Name:      "Festival de la musique",
 		Organizer: "Sarah Croche",

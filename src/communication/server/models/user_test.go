@@ -14,34 +14,34 @@ func TestCreateUser(t *testing.T) {
 		t.Error(err)
 	}
 	got := db.Users
-	want := Users{
-		{
+
+	want := map[string]User{
+		"Alex Terrieur": {
 			Name:     "Alex Terrieur",
 			Password: "AlexPWD",
 			Function: "volunteer",
 		},
-		{
+		"Alain Terrieur": {
 			Name:     "Alain Terrieur",
 			Password: "AlainPWD",
 			Function: "volunteer",
 		},
-		{
+		"Sarah Croche": {
 			Name:     "Sarah Croche",
 			Password: "SarahPWD",
 			Function: "organizer",
 		},
-		{
+		"Ondine Akeleur": {
 			Name:     "Ondine Akeleur",
 			Password: "OndinePWD",
 			Function: "organizer",
 		},
-		{
+		"Test": {
 			Name:     "Test",
 			Password: "TestPWD",
 			Function: "volunteer",
 		},
 	}
-
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got %v want %v", got, want)
 	}

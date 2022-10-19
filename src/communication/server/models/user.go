@@ -18,6 +18,14 @@ type User struct {
 
 type Users []User
 
+func (users *Users) ToMap() map[string]User {
+	usersMap := make(map[string]User)
+	for _, user := range *users {
+		usersMap[user.Name] = user
+	}
+	return usersMap
+}
+
 // Creates a new user and adds it to the database
 // Returns an error if a user with the same id already exists
 // Otherwise returns the new state of the database
@@ -34,7 +42,7 @@ func (db *Database) CreateUser(name string, password string, function string) (*
 	if _, err := db.GetUser(name); err == nil {
 		return nil, ErrorUserExists
 	}
-	db.Users = append(db.Users, User{name, password, function})
+	db.Users[name] = User{name, password, function}
 	return db, nil
 }
 

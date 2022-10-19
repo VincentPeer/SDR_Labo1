@@ -22,6 +22,14 @@ type Event struct {
 
 type Events []Event
 
+func (event *Events) ToMap() map[uint]Event {
+	events := make(map[uint]Event)
+	for _, event := range *event {
+		events[event.ID] = event
+	}
+	return events
+}
+
 // Creates a new job and adds it to the database
 // Returns an error if a job with the same id already exists
 // Otherwise returns the new state of the database
@@ -33,7 +41,7 @@ func (event *Event) CreateJob(name string, required uint) (*Event, error) {
 		return event, ErrorJobExists
 	}
 
-	event.Jobs = append(event.Jobs, Job{uint(len(event.Jobs)), name, required, []string{}})
+	event.Jobs = append(event.Jobs, Job{uint(len(event.Jobs)), name, required, []string{}, event.ID})
 	return event, nil
 }
 

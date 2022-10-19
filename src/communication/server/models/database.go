@@ -8,6 +8,11 @@ import (
 )
 
 type Database struct {
+	Events map[uint]Event
+	Users  map[string]User
+}
+
+type jsonDatabase struct {
 	Events Events `json:"events"`
 	Users  Users  `json:"users"`
 }
@@ -23,22 +28,22 @@ func LoadDatabaseFromJson(jsonPath string) Database {
 
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 
-	var conf Database
+	var conf jsonDatabase
 	json.Unmarshal(byteValue, &conf)
 
-	return conf
+	return Database{conf.Events.ToMap(), conf.Users.ToMap()}
 }
 
 // Get an event from the database
 // Returns an error if the event does not exist
 // Otherwise returns the event
-func (db *Database) GetEvent(name string) (Event, error) {
+func (db *Database) GetEvent(name string) (*Event, error) {
 	for _, event := range db.Events {
 		if event.Name == name {
-			return event, nil
+			return &event, nil
 		}
 	}
-	return Event{}, ErrorEventNotFound
+	return nil, ErrorEventNotFound
 }
 
 func (db *Database) GetEventsAsStringArray() []string {
@@ -70,6 +75,7 @@ func (db *Database) CreateEvent(name string, organizer string) (*Database, error
 	if _, err := db.GetEvent(name); err == nil {
 		return db, ErrorEventExists
 	}
-	db.Events = append(db.Events, Event{uint(len(db.Events)), name, organizer, []Job{}})
+	id := uint(len(db.Events))
+	db.Events[id] = Event{id, name, organizer, []Job{}}
 	return db, nil
 }

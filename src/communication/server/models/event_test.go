@@ -9,88 +9,80 @@ import (
 
 func TestCreateJob(t *testing.T) {
 	db := LoadDatabaseFromJson(tests.GetTestData(t))
-	_, err := db.Events[0].CreateJob("Test", 3)
+	got, err := db.GetEvent("Festival de la musique")
 	if err != nil {
 		t.Error(err)
 	}
-	got := db.Events
-	want := Events{
-		{
-			ID:        0,
-			Name:      "Festival de la musique",
-			Organizer: "Sarah Croche",
-			Jobs: []Job{
-				{
-					ID:       0,
-					Name:     "Buvette",
-					Required: 2,
-					Volunteers: []string{
-						"Alex Terrieur",
-					},
-				},
-				{
-					ID:         1,
-					Name:       "Sécurité",
-					Required:   3,
-					Volunteers: []string{},
-				},
-				{
-					ID:         2,
-					Name:       "Test",
-					Required:   3,
-					Volunteers: []string{},
+	_, err = got.CreateJob("Test", 3)
+	if err != nil {
+		t.Error(err)
+	}
+	want := &Event{
+		ID:        0,
+		Name:      "Festival de la musique",
+		Organizer: "Sarah Croche",
+		Jobs: []Job{
+			{
+				ID:       0,
+				Name:     "Buvette",
+				Required: 2,
+				Volunteers: []string{
+					"Alex Terrieur",
 				},
 			},
-		},
-		{
-			ID:        1,
-			Name:      "Fête de la science",
-			Organizer: "Ondine Akeleur",
-			Jobs: []Job{
-				{
-					ID:         0,
-					Name:       "Buvette",
-					Required:   2,
-					Volunteers: []string{},
-				},
-				{
-					ID:         1,
-					Name:       "Sécurité",
-					Required:   3,
-					Volunteers: []string{},
-				},
+			{
+				ID:         1,
+				Name:       "Sécurité",
+				Required:   3,
+				Volunteers: []string{},
+			},
+			{
+				ID:         2,
+				Name:       "Test",
+				Required:   3,
+				Volunteers: []string{},
 			},
 		},
 	}
-
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got %v want %v", got, want)
 	}
 }
 
 func TestCreateJobErrorIfIdExists(t *testing.T) {
-	db := LoadDatabaseFromJson(tests.GetTestData(t)).Events
-	_, err := db[0].CreateJob("Buvette", 3)
+	db := LoadDatabaseFromJson(tests.GetTestData(t))
+	event, err := db.GetEvent("Festival de la musique")
+	if err != nil {
+		t.Error(err)
+	}
+	_, err = event.CreateJob("Buvette", 3)
 	if !errors.Is(err, ErrorJobExists) {
 		t.Error("Error not raised")
 	}
 }
 
 func TestCreateJobErrorIfNameIsEmpty(t *testing.T) {
-	db := LoadDatabaseFromJson(tests.GetTestData(t)).Events
-	_, err := db[0].CreateJob("", 3)
+	db := LoadDatabaseFromJson(tests.GetTestData(t))
+	event, err := db.GetEvent("Festival de la musique")
+	if err != nil {
+		t.Error(err)
+	}
+	_, err = event.CreateJob("", 3)
 	if !errors.Is(err, ErrorJobNameEmpty) {
 		t.Error("Error not raised")
 	}
 }
 
 func TestGetJob(t *testing.T) {
-	db := LoadDatabaseFromJson(tests.GetTestData(t)).Events
-	testDb, err := db[0].GetJob("Buvette")
+	db := LoadDatabaseFromJson(tests.GetTestData(t))
+	event, err := db.GetEvent("Festival de la musique")
 	if err != nil {
 		t.Error(err)
 	}
-	got := testDb
+	got, err := event.GetJob("Buvette")
+	if err != nil {
+		t.Error(err)
+	}
 	want := &Job{
 		ID:       0,
 		Name:     "Buvette",
@@ -106,24 +98,36 @@ func TestGetJob(t *testing.T) {
 }
 
 func TestGetJobErrorIfIdDoesntExist(t *testing.T) {
-	db := LoadDatabaseFromJson(tests.GetTestData(t)).Events
-	_, err := db[0].GetJob("Test")
+	db := LoadDatabaseFromJson(tests.GetTestData(t))
+	event, err := db.GetEvent("Festival de la musique")
+	if err != nil {
+		t.Error(err)
+	}
+	_, err = event.GetJob("Test")
 	if !errors.Is(err, ErrorJobNotFound) {
 		t.Error("Error not raised")
 	}
 }
 
 func TestGetJobErrorIfNameIsEmpty(t *testing.T) {
-	db := LoadDatabaseFromJson(tests.GetTestData(t)).Events
-	_, err := db[0].GetJob("")
+	db := LoadDatabaseFromJson(tests.GetTestData(t))
+	event, err := db.GetEvent("Festival de la musique")
+	if err != nil {
+		t.Error(err)
+	}
+	_, err = event.GetJob("")
 	if !errors.Is(err, ErrorJobNameEmpty) {
 		t.Error("Error not raised")
 	}
 }
 
 func TestEventToString(t *testing.T) {
-	db := LoadDatabaseFromJson(tests.GetTestData(t)).Events
-	got := db[0].ToString()
+	db := LoadDatabaseFromJson(tests.GetTestData(t))
+	event, err := db.GetEvent("Festival de la musique")
+	if err != nil {
+		t.Error(err)
+	}
+	got := event.ToString()
 	want := "0 | Festival de la musique | Sarah Croche"
 
 	if got != want {
@@ -132,8 +136,12 @@ func TestEventToString(t *testing.T) {
 }
 
 func TestGetJobsAsStringArray(t *testing.T) {
-	db := LoadDatabaseFromJson(tests.GetTestData(t)).Events
-	got := db[0].GetJobsAsStringArray()
+	db := LoadDatabaseFromJson(tests.GetTestData(t))
+	event, err := db.GetEvent("Festival de la musique")
+	if err != nil {
+		t.Error(err)
+	}
+	got := event.GetJobsAsStringArray()
 	want := []string{
 		"0 | Buvette | 2 | Alex Terrieur",
 		"1 | Sécurité | 3 | ",

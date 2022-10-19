@@ -206,7 +206,7 @@ func TestCreateJob(t *testing.T) {
 func TestCreateJobErrorIfIdExists(t *testing.T) {
 	db := LoadDatabaseFromJson(tests.GetTestData(t)).Events
 	_, err := db[0].CreateJob("Buvette", 3)
-	if err == nil {
+	if !errors.Is(err, ErrorJobExists) {
 		t.Error("Error not raised")
 	}
 }
@@ -214,7 +214,7 @@ func TestCreateJobErrorIfIdExists(t *testing.T) {
 func TestCreateJobErrorIfNameIsEmpty(t *testing.T) {
 	db := LoadDatabaseFromJson(tests.GetTestData(t)).Events
 	_, err := db[0].CreateJob("", 3)
-	if err == nil {
+	if !errors.Is(err, ErrorJobNameEmpty) {
 		t.Error("Error not raised")
 	}
 }
@@ -307,7 +307,7 @@ func TestAddVolunteer(t *testing.T) {
 func TestAddVolunteerErrorIfVolunteerAlreadyExists(t *testing.T) {
 	db := LoadDatabaseFromJson(tests.GetTestData(t)).Events
 	_, err := db[0].Jobs[0].AddVolunteer("Alex Terrieur")
-	if err != ErrorVolunteerExists {
+	if !errors.Is(err, ErrorVolunteerExists) {
 		t.Error("Error not raised")
 	}
 }

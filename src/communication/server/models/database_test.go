@@ -185,7 +185,7 @@ func TestCreateEventErrorIfOrganizerIsEmpty(t *testing.T) {
 
 func TestGetEvent(t *testing.T) {
 	db := LoadDatabaseFromJson(tests.GetTestData(t))
-	testDb, err := db.GetEvent("Festival de la musique")
+	testDb, err := db.GetEventByName("Festival de la musique")
 	if err != nil {
 		t.Error(err)
 	}
@@ -219,7 +219,7 @@ func TestGetEvent(t *testing.T) {
 
 func TestGetEventErrorIfIdDoesntExist(t *testing.T) {
 	db := LoadDatabaseFromJson(tests.GetTestData(t))
-	_, err := db.GetEvent("Bob's party")
+	_, err := db.GetEventByName("Bob's party")
 	if err == nil {
 		t.Error("Error not raised")
 	}

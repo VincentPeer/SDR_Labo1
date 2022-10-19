@@ -37,11 +37,21 @@ func LoadDatabaseFromJson(jsonPath string) Database {
 // Get an event from the database
 // Returns an error if the event does not exist
 // Otherwise returns the event
-func (db *Database) GetEvent(name string) (*Event, error) {
+func (db *Database) GetEventByName(name string) (*Event, error) {
 	for _, event := range db.Events {
 		if event.Name == name {
 			return &event, nil
 		}
+	}
+	return nil, ErrorEventNotFound
+}
+
+// Get an event from the database
+// Returns an error if the event does not exist
+// Otherwise returns the event
+func (db *Database) GetEvent(id uint) (*Event, error) {
+	if event, ok := db.Events[id]; ok {
+		return &event, nil
 	}
 	return nil, ErrorEventNotFound
 }
@@ -72,7 +82,7 @@ func (db *Database) CreateEvent(name string, organizer string) (*Database, error
 		return nil, ErrorNotOrganizer
 	}
 
-	if _, err := db.GetEvent(name); err == nil {
+	if _, err := db.GetEventByName(name); err == nil {
 		return db, ErrorEventExists
 	}
 	id := uint(len(db.Events))

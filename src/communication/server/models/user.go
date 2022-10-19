@@ -50,10 +50,11 @@ func (db *Database) CreateUser(name string, password string, function string) (*
 // Returns an error if the user does not exist
 // Otherwise returns the user
 func (db *Database) GetUser(name string) (User, error) {
-	for _, user := range db.Users {
-		if user.Name == name {
-			return user, nil
-		}
+	if name == "" {
+		return User{}, ErrorUserNameEmpty
+	}
+	if user, ok := db.Users[name]; ok {
+		return user, nil
 	}
 	return User{}, ErrorUserNotFound
 }

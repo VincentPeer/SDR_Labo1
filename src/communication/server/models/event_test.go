@@ -9,7 +9,7 @@ import (
 
 func TestCreateJob(t *testing.T) {
 	db := LoadDatabaseFromJson(tests.GetTestData(t))
-	got, err := db.GetEvent("Festival de la musique")
+	got, err := db.GetEvent(0)
 	if err != nil {
 		t.Error(err)
 	}
@@ -51,7 +51,7 @@ func TestCreateJob(t *testing.T) {
 
 func TestCreateJobErrorIfIdExists(t *testing.T) {
 	db := LoadDatabaseFromJson(tests.GetTestData(t))
-	event, err := db.GetEvent("Festival de la musique")
+	event, err := db.GetEvent(0)
 	if err != nil {
 		t.Error(err)
 	}
@@ -63,7 +63,7 @@ func TestCreateJobErrorIfIdExists(t *testing.T) {
 
 func TestCreateJobErrorIfNameIsEmpty(t *testing.T) {
 	db := LoadDatabaseFromJson(tests.GetTestData(t))
-	event, err := db.GetEvent("Festival de la musique")
+	event, err := db.GetEvent(0)
 	if err != nil {
 		t.Error(err)
 	}
@@ -75,7 +75,7 @@ func TestCreateJobErrorIfNameIsEmpty(t *testing.T) {
 
 func TestGetJob(t *testing.T) {
 	db := LoadDatabaseFromJson(tests.GetTestData(t))
-	event, err := db.GetEvent("Festival de la musique")
+	event, err := db.GetEvent(0)
 	if err != nil {
 		t.Error(err)
 	}
@@ -99,7 +99,7 @@ func TestGetJob(t *testing.T) {
 
 func TestGetJobErrorIfIdDoesntExist(t *testing.T) {
 	db := LoadDatabaseFromJson(tests.GetTestData(t))
-	event, err := db.GetEvent("Festival de la musique")
+	event, err := db.GetEvent(0)
 	if err != nil {
 		t.Error(err)
 	}
@@ -111,7 +111,7 @@ func TestGetJobErrorIfIdDoesntExist(t *testing.T) {
 
 func TestGetJobErrorIfNameIsEmpty(t *testing.T) {
 	db := LoadDatabaseFromJson(tests.GetTestData(t))
-	event, err := db.GetEvent("Festival de la musique")
+	event, err := db.GetEvent(0)
 	if err != nil {
 		t.Error(err)
 	}
@@ -123,7 +123,7 @@ func TestGetJobErrorIfNameIsEmpty(t *testing.T) {
 
 func TestEventToString(t *testing.T) {
 	db := LoadDatabaseFromJson(tests.GetTestData(t))
-	event, err := db.GetEvent("Festival de la musique")
+	event, err := db.GetEvent(0)
 	if err != nil {
 		t.Error(err)
 	}
@@ -137,7 +137,7 @@ func TestEventToString(t *testing.T) {
 
 func TestGetJobsAsStringArray(t *testing.T) {
 	db := LoadDatabaseFromJson(tests.GetTestData(t))
-	event, err := db.GetEvent("Festival de la musique")
+	event, err := db.GetEvent(0)
 	if err != nil {
 		t.Error(err)
 	}

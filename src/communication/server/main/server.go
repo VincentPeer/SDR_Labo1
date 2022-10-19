@@ -132,7 +132,7 @@ func handleRequest(client *client) {
 				continue
 			}
 			fmt.Println("Event created")
-			event, err := db.GetEvent(eventName)
+			event, err := db.GetEventByName(eventName)
 			if err != nil {
 				fmt.Println("Error creating event: ", err.Error())
 				client.Write(messagingProtocol.NewError(err.Error()))
@@ -180,7 +180,7 @@ func handleRequest(client *client) {
 
 			eventName := data.Data[0]
 
-			event, err := db.GetEvent(eventName)
+			event, err := db.GetEventByName(eventName)
 			if err != nil {
 				fmt.Println("Error getting event: ", err.Error())
 				client.Write(messagingProtocol.NewError(err.Error()))
@@ -221,7 +221,7 @@ func handleRequest(client *client) {
 			eventName := data.Data[0]
 			jobName := data.Data[1]
 
-			event, err := db.GetEvent(eventName)
+			event, err := db.GetEventByName(eventName)
 			if err != nil {
 				fmt.Println("Error getting event: ", err.Error())
 				client.Write(messagingProtocol.NewError(err.Error()))

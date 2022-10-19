@@ -26,7 +26,7 @@ var (
 )
 
 type database struct {
-	Users  []models.User  `json:"users"`
+	Users  models.Users   `json:"users"`
 	Events []models.Event `json:"events"`
 }
 
@@ -79,10 +79,16 @@ func main() {
 	}
 }
 
+func closeRequest(client *client) {
+	fmt.Println("Closing client")
+	nbClients--
+	client.Close()
+}
+
 // Handles incoming requests.
 func handleRequest(client *client) {
 	fmt.Println("Now we dialogue with client")
-	defer client.Close()
+	defer closeRequest(client)
 
 	for {
 		data, err := client.Read()
@@ -112,7 +118,7 @@ func handleRequest(client *client) {
 			fmt.Print("name: ", name)
 			fmt.Println(" password: ", password)
 
-			result, err := models.Login(db.Users, name, password)
+			result, err := db.Users.Login(name, password)
 			if err != nil {
 				fmt.Println("Error logging in: ", err.Error())
 				client.Write(messagingProtocol.NewError(err.Error()))
@@ -137,7 +143,7 @@ func handleRequest(client *client) {
 			organizerName := data.Data[1]
 			password := data.Data[2]
 
-			result, err := models.Login(db.Users, organizerName, password)
+			result, err := db.Users.Login(organizerName, password)
 			if err != nil {
 				fmt.Println("Error logging in: ", err.Error())
 				client.Write(messagingProtocol.NewError(err.Error()))

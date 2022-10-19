@@ -8,7 +8,7 @@ import (
 
 func TestCreateUser(t *testing.T) {
 	db := loadConfig(getTestData(t)).Users
-	testDb, err := models.CreateUser(db, "Test", "TestPWD", "volunteer")
+	testDb, err := db.CreateUser("Test", "TestPWD", "volunteer")
 	if err != nil {
 		t.Error(err)
 	}
@@ -48,7 +48,7 @@ func TestCreateUser(t *testing.T) {
 
 func TestCreateUserError(t *testing.T) {
 	testDb := loadConfig(getTestData(t)).Users
-	_, err := models.CreateUser(testDb, "Test", "TestPWD", "volunteer")
+	_, err := testDb.CreateUser("Test", "TestPWD", "volunteer")
 	if err == nil {
 		t.Error("Expected error")
 	}
@@ -56,7 +56,7 @@ func TestCreateUserError(t *testing.T) {
 
 func TestGetUser(t *testing.T) {
 	testDb := loadConfig(getTestData(t)).Users
-	got, _ := models.GetUser(testDb, "Alex Terrieur")
+	got, _ := testDb.GetUser("Alex Terrieur")
 	want := models.User{
 		Name:     "Alex Terrieur",
 		Password: "AlexPWD",
@@ -70,16 +70,16 @@ func TestGetUser(t *testing.T) {
 
 func TestGetUserError(t *testing.T) {
 	testDb := loadConfig(getTestData(t)).Users
-	_, err := models.GetUser(testDb, "Test")
+	_, err := testDb.GetUser("Test")
 	if err == nil {
 		t.Errorf("got %v want %v", err, "User not found")
 	}
 }
 
 func TestLogin(t *testing.T) {
-	users = loadConfig(getTestData(t)).Users
+	users := loadConfig(getTestData(t)).Users
 
-	got, err := models.Login(users, "Alex Terrieur", "AlexPWD")
+	got, err := users.Login("Alex Terrieur", "AlexPWD")
 	want := true
 
 	if err != nil {
@@ -89,7 +89,7 @@ func TestLogin(t *testing.T) {
 		t.Errorf("got %v want %v", got, want)
 	}
 
-	got, err = models.Login(users, "Alex Terrieur", "AlexPWD2")
+	got, err = users.Login("Alex Terrieur", "AlexPWD2")
 	want = false
 
 	if err != nil {
@@ -101,9 +101,9 @@ func TestLogin(t *testing.T) {
 }
 
 func TestLoginError(t *testing.T) {
-	users = loadConfig(getTestData(t)).Users
+	users := loadConfig(getTestData(t)).Users
 
-	_, err := models.Login(users, "Test", "AlexPWD")
+	_, err := users.Login("Test", "AlexPWD")
 	if err == nil {
 		t.Error("Expected error")
 	}

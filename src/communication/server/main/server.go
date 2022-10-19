@@ -170,6 +170,49 @@ func handleRequest(client *client) {
 				}
 			}
 
+		case protocol.JOIN_EVENT:
+			fmt.Println("user wants to join an event")
+
+			if len(data.Data) != 2 {
+				fmt.Println("Invalid number of arguments")
+				client.Write(messagingProtocol.NewError("Invalid number of arguments"))
+				continue
+			}
+
+			if client.state != connected {
+				fmt.Println("User is not logged in")
+				client.Write(messagingProtocol.NewError("You must be logged in to join an event"))
+				continue
+			}
+
+			eventName := data.Data[0]
+			jobName := data.Data[1]
+
+			event, err := db.GetEvent(eventName)
+			if err != nil {
+				fmt.Println("Error getting event: ", err.Error())
+				client.Write(messagingProtocol.NewError(err.Error()))
+				continue
+			}
+
+			job, err := event.GetJob(jobName)
+			if err != nil {
+				fmt.Println("Error getting job: ", err.Error())
+				client.Write(messagingProtocol.NewError(err.Error()))
+				continue
+			}
+
+			_, err = job.AddVolunteer(client.GetConnected())
+			if err != nil {
+				fmt.Println("Error adding volunteer: ", err.Error())
+				client.Write(messagingProtocol.NewError(err.Error()))
+				continue
+			}
+
+			fmt.Println("Volunteer added")
+			client.Write(messagingProtocol.NewSuccess(""))
+			client.Logout()
+
 		case protocol.STOP:
 			fmt.Println("user wants to stop the server")
 			return

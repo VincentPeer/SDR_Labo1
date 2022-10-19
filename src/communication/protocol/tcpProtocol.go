@@ -11,6 +11,7 @@ const (
 	NOTOK        = "NOTOK"
 	LOGIN        = "LOGIN"
 	CREATE_EVENT = "CREATE_EVENT"
+	JOIN_EVENT   = "JOIN_EVENT"
 	STOP         = "STOP"
 	DELIMITER    = ';'
 	SEPARATOR    = ','

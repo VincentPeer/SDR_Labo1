@@ -7,11 +7,13 @@ import (
 )
 
 var (
-	ErrorJobNotFound       = errors.New("job not found")
-	ErrorJobExists         = errors.New("job with same id already exists")
-	ErrorJobNameEmpty      = errors.New("job name cannot be empty")
-	ErrorVolunteerNotFound = errors.New("volunteer not found")
-	ErrorVolunteerExists   = errors.New("volunteer already signed up for this job")
+	ErrorJobNotFound           = errors.New("job not found")
+	ErrorJobExists             = errors.New("job with same id already exists")
+	ErrorJobNameEmpty          = errors.New("job name cannot be empty")
+	ErrorVolunteerNotFound     = errors.New("volunteer not found")
+	ErrorVolunteerExists       = errors.New("volunteer already signed up for this job")
+	ErrorVolunteerEmpty        = errors.New("volunteer name cannot be empty")
+	ErrorVolunteerAboveMaximum = errors.New("volunteer count is above maximum")
 )
 
 type Job struct {
@@ -24,6 +26,9 @@ type Job struct {
 // Get a volunteer from the database
 // Returns an error if the volunteer does not exist
 func (job *Job) GetVolunteer(name string) (string, error) {
+	if name == "" {
+		return "", ErrorVolunteerEmpty
+	}
 	for _, volunteer := range job.Volunteers {
 		if volunteer == name {
 			return volunteer, nil
@@ -36,6 +41,12 @@ func (job *Job) GetVolunteer(name string) (string, error) {
 // Returns an error if the job does not exist
 // Otherwise returns the new state of the database
 func (job *Job) AddVolunteer(name string) (*Job, error) {
+	if name == "" {
+		return nil, ErrorVolunteerEmpty
+	}
+	if job.Required == uint(len(job.Volunteers)) {
+		return nil, ErrorVolunteerAboveMaximum
+	}
 	if _, err := job.GetVolunteer(name); err != ErrorVolunteerNotFound {
 		return job, ErrorVolunteerExists
 	}

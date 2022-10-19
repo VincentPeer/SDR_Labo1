@@ -124,6 +124,15 @@ func (c *connection) volunteerRegistration() bool {
 }
 
 func (c *connection) printEvents() {
+	c.writeToServer(protocol.DataPacket{Type: protocol.GET_EVENTS})
+	response := c.readFromServer()
+	if response.Type == protocol.OK {
+		for i := 0; i < len(response.Data); i++ {
+			fmt.Print(response.Data[i])
+		}
+	} else {
+		fmt.Println("No event found")
+	}
 
 }
 

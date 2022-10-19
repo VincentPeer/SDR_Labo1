@@ -131,6 +131,7 @@ func handleRequest(client *client) {
 				client.Write(messagingProtocol.NewError(err.Error()))
 				continue
 			}
+			fmt.Println("Event created")
 			event, err := db.GetEvent(eventName)
 			if err != nil {
 				fmt.Println("Error creating event: ", err.Error())
@@ -146,7 +147,7 @@ func handleRequest(client *client) {
 				}
 				event.CreateJob(data.Data[i], uint(nbVolunteers))
 			}
-
+			fmt.Println("Jobs created")
 			client.Logout()
 
 		case protocol.STOP:

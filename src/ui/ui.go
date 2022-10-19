@@ -128,16 +128,17 @@ func volunteerRepartition() {
 
 func stringReader(reader *bufio.Reader, optionalMessage string) string {
 	fmt.Print(optionalMessage)
-	var s string
+	//var s string
 
-	nbScanned, err := fmt.Fscan(reader, &s)
+	str, err := reader.ReadString('n')
 	if err != nil {
 		log.Fatal(err)
-	} else if nbScanned != 1 {
-		log.Fatal("Expected one argument, actual : " + strconv.Itoa(nbScanned))
 	}
+	//} else if nbScanned != 1 {
+	//	log.Fatal("Expected one argument, actual : " + strconv.Itoa(nbScanned))
+	//}
 	reader.ReadString('\n') // clean the buffer
-	return s
+	return str
 }
 
 func integerReader(reader *bufio.Reader) int {
@@ -148,7 +149,7 @@ func integerReader(reader *bufio.Reader) int {
 	} else if nbScanned != 1 {
 		log.Fatal("Expected one argument, actual : " + strconv.Itoa(nbScanned))
 	}
-	reader.ReadString('\n') // clean the buffer
+	//reader.ReadString('\n') // clean the buffer
 	return n
 }
 

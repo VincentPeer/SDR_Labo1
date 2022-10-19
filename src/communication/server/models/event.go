@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 )
 
 var (
@@ -56,4 +57,16 @@ func (db *Database) GetEvent(name string) (Event, error) {
 		}
 	}
 	return Event{}, ErrorEventNotFound
+}
+
+func (event *Event) ToString() string {
+	return fmt.Sprintf("%d, %s, %s", event.ID, event.Name, event.Organizer)
+}
+
+func (db *Database) ToStringArray() []string {
+	var events []string
+	for _, event := range db.Events {
+		events = append(events, event.ToString())
+	}
+	return events
 }

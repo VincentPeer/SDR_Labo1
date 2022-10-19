@@ -151,8 +151,21 @@ func handleRequest(client *client) {
 			client.Write(messagingProtocol.NewSuccess(""))
 			client.Logout()
 
-		case protocol.JOIN_EVENT:
-			fmt.Println("user wants to join an event")
+		case protocol.GET_EVENTS:
+			fmt.Println("user wants to get events")
+
+			err := client.Write(protocol.DataPacket{
+				Type: protocol.GET_EVENTS,
+				Data: db.ToStringArray(),
+			})
+
+			if err != nil {
+				fmt.Println("Error sending events: ", err.Error())
+				client.Write(messagingProtocol.NewError(err.Error()))
+				continue
+			} else {
+				fmt.Println("Events sent")
+			}
 
 		case protocol.STOP:
 			fmt.Println("user wants to stop the server")

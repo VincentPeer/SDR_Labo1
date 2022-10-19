@@ -12,6 +12,7 @@ const (
 	LOGIN        = "LOGIN"
 	CREATE_EVENT = "CREATE_EVENT"
 	JOIN_EVENT   = "JOIN_EVENT"
+	GET_EVENTS   = "GET_EVENTS"
 	STOP         = "STOP"
 	DELIMITER    = ';'
 	SEPARATOR    = ','

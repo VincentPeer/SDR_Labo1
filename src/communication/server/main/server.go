@@ -26,8 +26,8 @@ var (
 )
 
 type database struct {
-	Users  models.Users   `json:"users"`
-	Events []models.Event `json:"events"`
+	Users  models.Users  `json:"users"`
+	Events models.Events `json:"events"`
 }
 
 func loadConfig(jsonPath string) database {
@@ -155,7 +155,7 @@ func handleRequest(client *client) {
 				continue
 			}
 
-			models.CreateEvent(db.Events, eventName, organizerName)
+			db.Events.CreateEvent(eventName, organizerName)
 		case protocol.STOP:
 			fmt.Println("user wants to stop the server")
 		default:

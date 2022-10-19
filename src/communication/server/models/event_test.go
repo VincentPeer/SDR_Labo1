@@ -2,6 +2,7 @@ package models
 
 import (
 	"SDR_Labo1/src/communication/server/tests"
+	"errors"
 	"reflect"
 	"testing"
 )
@@ -70,7 +71,7 @@ func TestCreateEvent(t *testing.T) {
 func TestCreateEventErrorIfIdExists(t *testing.T) {
 	db := LoadDatabaseFromJson(tests.GetTestData(t))
 	_, err := db.CreateEvent("Festival de la musique", "Sarah Croche")
-	if err != ErrorEventExists {
+	if errors.Is(err, ErrorEventExists) {
 		t.Error("Error not raised")
 	}
 }

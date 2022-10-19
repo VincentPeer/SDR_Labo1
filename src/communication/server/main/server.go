@@ -155,7 +155,7 @@ func handleRequest(client *client) {
 			fmt.Println("user wants to get events")
 
 			err := client.Write(protocol.DataPacket{
-				Type: protocol.GET_EVENTS,
+				Type: protocol.OK,
 				Data: db.ToStringArray(),
 			})
 

@@ -15,6 +15,7 @@ const (
 	OK        = "OK"
 )
 
+// connection contains buffered readers and writers for the console and the server
 type connection struct {
 	consoleIn *bufio.Reader
 	serverIn  *bufio.Reader

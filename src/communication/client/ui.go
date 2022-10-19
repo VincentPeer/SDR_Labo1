@@ -23,8 +23,9 @@ func userInterface(c *connection) {
 		fmt.Println("[1] Create a new event")
 		fmt.Println("[2] Register to an event as a volunteer")
 		fmt.Println("[3] List all current events")
-		fmt.Println("[4] List the volunteers repartiton for a specific event")
-		fmt.Println("[5] To terminate the process")
+		fmt.Println("[4] List all jobs for a specific event")
+		fmt.Println("[5] List the volunteers repartiton for a specific event")
+		fmt.Println("[6] To terminate the process")
 
 		choice = c.integerReader()
 		switch choice {
@@ -35,8 +36,10 @@ func userInterface(c *connection) {
 		case 3:
 			c.printEvents()
 		case 4:
-			c.volunteerRepartition()
+			c.listJobs()
 		case 5:
+			c.volunteerRepartition()
+		case 6:
 			c.writeToServer(protocol.DataPacket{Type: protocol.STOP})
 			return
 		default:
@@ -110,6 +113,18 @@ func (c *connection) createEvent() bool {
 	}
 }
 
+func (c *connection) printEvents() {
+	c.writeToServer(protocol.DataPacket{Type: protocol.GET_EVENTS})
+	response := c.readFromServer()
+	if response.Type == protocol.OK {
+		for i := 0; i < len(response.Data); i++ {
+			fmt.Println(response.Data[i])
+		}
+	} else {
+		fmt.Println("No event found")
+	}
+}
+
 func (c *connection) volunteerRegistration() {
 	for {
 		if c.loginClient() {
@@ -151,17 +166,20 @@ func (c *connection) volunteerRegistration() {
 	}
 }
 
-func (c *connection) printEvents() {
-	c.writeToServer(protocol.DataPacket{Type: protocol.GET_EVENTS})
+func (c *connection) listJobs() {
+	var eventId int
+	fmt.Println("Enter the jobsToList id : ")
+	eventId = c.integerReader()
+	jobsToList := protocol.DataPacket{Type: protocol.GET_JOBS, Data: []string{strconv.Itoa(eventId)}}
+	c.writeToServer(jobsToList)
 	response := c.readFromServer()
 	if response.Type == protocol.OK {
 		for i := 0; i < len(response.Data); i++ {
 			fmt.Println(response.Data[i])
 		}
 	} else {
-		fmt.Println("No event found")
+		fmt.Println("No job found")
 	}
-
 }
 
 func (c *connection) volunteerRepartition() {

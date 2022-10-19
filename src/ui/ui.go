@@ -1,19 +1,22 @@
 package ui
 
 import (
+	"SDR_Labo1/src/communication/protocol"
 	"bufio"
 	"fmt"
 	"log"
 	"strconv"
 	"strings"
-	"unicode"
 )
+
+var messagingProtocol = &protocol.TcpProtocol{}
 
 const EOF = "\r\n"
 
 // Main function that communicate with a client, from here he can go through each
 // functionnality offered on this service
 func UserInterface(consoleReader *bufio.Reader, serverReader *bufio.Reader, serverWriter *bufio.Writer) {
+	stop := protocol.DataPacket{Type: protocol.STOP}
 	fmt.Println("Welcome!")
 
 	var choice int
@@ -36,7 +39,8 @@ func UserInterface(consoleReader *bufio.Reader, serverReader *bufio.Reader, serv
 		case 4:
 			volunteerRepartition()
 		case 5:
-			return // todo: ou break
+			writeToServer(serverWriter, stop)
+			return
 		default:
 			fmt.Println("You have entered a bad request")
 		}
@@ -46,22 +50,20 @@ func UserInterface(consoleReader *bufio.Reader, serverReader *bufio.Reader, serv
 // Gestion du login client
 // Le client presse enter après chaque entrée, et ne doit pas saisir de ',' dans ses données
 func loginClient(consoleReader *bufio.Reader, serverReader *bufio.Reader, serverWriter *bufio.Writer) bool {
-	const LOG_PROTOCOL = "LOGIN"
 	username := stringReader(consoleReader, "Enter your username : ")
 	password := stringReader(consoleReader, "Enter your password : ")
 
 	// Supression des retours à la ligne, et formatage pour l'envoi au serveur
 	username = strings.TrimSuffix(username, EOF)
 	password = strings.TrimSuffix(password, EOF)
-	tmpResult := []string{LOG_PROTOCOL, username, password}
-	result := strings.Join(tmpResult, ",") + ";"
+	result := protocol.DataPacket{Type: protocol.LOGIN, Data: []string{username, password}}
 
 	// Envoi formulaire de login
 	writeToServer(serverWriter, result)
 
 	// Traitement de la réponse après vérification du login par le serveur
-	response := readFromServer(serverReader, "")
-	if strings.Compare(response, "OK;") == 0 {
+	response := readFromServer(serverReader)
+	if response.Type == protocol.OK {
 		fmt.Println("Welcome " + username + "!")
 		return true
 	} else {
@@ -83,6 +85,7 @@ func createEvent(consoleReader *bufio.Reader, serverReader *bufio.Reader, server
 		"(tap STOP when ended) : ")
 
 	var jobList []string
+	jobList = append(jobList, eventName)
 	var i = 0
 	var nbVolunteers int
 	for {
@@ -93,31 +96,17 @@ func createEvent(consoleReader *bufio.Reader, serverReader *bufio.Reader, server
 		}
 
 		fmt.Print("Number of volunteers needed : ")
-		fmt.Scanf("%d", &nbVolunteers)
-		fmt.Println("read : ", nbVolunteers)
+		nbVolunteers = integerReader(consoleReader)
 
 		jobName = strings.TrimSuffix(jobName, "\r\n")
-
-		jobList = append(jobList, jobName+","+strconv.Itoa(nbVolunteers))
-	}
-	var jobStringList string
-	if len(jobList) > 1 {
-		jobStringList = strings.Join(jobList, ", ")
-	} else if len(jobList) == 1 {
-		jobStringList = jobList[0]
+		jobList = append(jobList, jobName, strconv.Itoa(nbVolunteers))
 	}
 
-	eventResult := "CREATE_EVENT," + eventName + "," + jobStringList + ";"
-	eventResult = strings.Map(func(r rune) rune {
-		if unicode.IsGraphic(r) {
-			return r
-		}
-		return -1
-	}, eventResult)
-	fmt.Println(eventResult)
+	eventResult := protocol.DataPacket{Type: protocol.CREATE_EVENT, Data: jobList}
 	writeToServer(serverWriter, eventResult)
-	response := readFromServer(serverReader, "")
-	if strings.Compare(response, "OK"+";") == 0 {
+	response := readFromServer(serverReader)
+	fmt.Println("response from server : ", response)
+	if response.Type == protocol.OK {
 		fmt.Println("Event registrated, thank you!")
 		return true
 	} else {
@@ -163,17 +152,25 @@ func integerReader(reader *bufio.Reader) int {
 	return n
 }
 
-func readFromServer(reader *bufio.Reader, optinalMessage string) string {
-	fmt.Print(optinalMessage)
-	message, err := reader.ReadString(';')
+func readFromServer(reader *bufio.Reader) protocol.DataPacket {
+	message, err := reader.ReadString(protocol.DELIMITER)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return message
+	data, e := messagingProtocol.Receive(message)
+	if e != nil {
+		log.Fatal(e)
+	}
+	return data
 }
 
-func writeToServer(writer *bufio.Writer, message string) {
-	_, writtingError := writer.WriteString(message)
+func writeToServer(writer *bufio.Writer, data protocol.DataPacket) {
+	m, e := messagingProtocol.ToSend(data)
+	fmt.Println(m)
+	if e != nil {
+		log.Fatal(e)
+	}
+	_, writtingError := writer.WriteString(m)
 	if writtingError != nil {
 		log.Fatal(writtingError)
 	}

@@ -60,7 +60,7 @@ func (db *Database) GetEvent(name string) (Event, error) {
 }
 
 func (event *Event) ToString() string {
-	return fmt.Sprintf("%d, %s, %s", event.ID, event.Name, event.Organizer)
+	return fmt.Sprintf("%d | %s | %s", event.ID, event.Name, event.Organizer)
 }
 
 func (db *Database) ToStringArray() []string {

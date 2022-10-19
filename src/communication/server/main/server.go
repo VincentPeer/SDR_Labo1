@@ -165,6 +165,9 @@ func handleRequest(client *client) {
 				continue
 			} else {
 				fmt.Println("Events sent")
+				for _, event := range db.ToStringArray() {
+					fmt.Println("Event: ", event)
+				}
 			}
 
 		case protocol.STOP:

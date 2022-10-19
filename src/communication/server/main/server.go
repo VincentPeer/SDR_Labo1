@@ -113,10 +113,12 @@ func handleRequest(client *client) {
 			fmt.Println("user wants to create an event")
 
 			if len(data.Data) < 3 {
+				fmt.Println("Invalid number of arguments")
 				client.Write(messagingProtocol.NewError("Invalid number of arguments"))
 				continue
 			}
 			if client.state != connected {
+				fmt.Println("User is not logged in")
 				client.Write(messagingProtocol.NewError("You must be logged in to create an event"))
 				continue
 			}

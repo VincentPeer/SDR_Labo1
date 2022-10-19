@@ -1,6 +1,7 @@
 package main
 
 import (
+	"SDR_Labo1/src/communication/server/models"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -22,7 +23,7 @@ func getTestData(t *testing.T) string {
 func TestLoadUsers(t *testing.T) {
 
 	got := loadConfig(getTestData(t)).Users
-	want := []User{
+	want := []models.User{
 		{
 			Name:     "Alex Terrieur",
 			Password: "AlexPWD",
@@ -53,11 +54,11 @@ func TestLoadUsers(t *testing.T) {
 func TestLoadEvents(t *testing.T) {
 
 	got := loadConfig(getTestData(t)).Events
-	want := []Event{
+	want := []models.Event{
 		{
 			Name:      "Festival de la musique",
 			Organizer: "3",
-			Jobs: []Job{
+			Jobs: []models.Job{
 				{
 					Name:     "Buvette",
 					Required: 2,
@@ -75,7 +76,7 @@ func TestLoadEvents(t *testing.T) {
 		{
 			Name:      "Fête de la science",
 			Organizer: "4",
-			Jobs: []Job{
+			Jobs: []models.Job{
 				{
 					Name:       "Buvette",
 					Required:   2,

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"SDR_Labo1/src/communication/protocol"
+	"SDR_Labo1/src/communication/server/models"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -17,11 +19,16 @@ const (
 	CONFIG_FILE_PATH = "./config.json"
 )
 
+type Config struct {
+	Users  []models.User  `json:"users"`
+	Events []models.Event `json:"events"`
+}
+
 var (
 	nbClients         int = 0
-	users             []User
-	events            []Event
-	messagingProtocol = &tcpProtocol{}
+	users             []models.User
+	events            []models.Event
+	messagingProtocol = &protocol.TcpProtocol{}
 )
 
 func loadConfig(jsonPath string) Config {
@@ -95,7 +102,7 @@ func handleRequest(client *client) {
 		fmt.Println("Data :", data)
 
 		switch data.Type {
-		case LOGIN:
+		case protocol.LOGIN:
 			if len(data.Data) != 2 {
 				client.Write(messagingProtocol.NewError("Invalid number of arguments"))
 				continue
@@ -108,7 +115,7 @@ func handleRequest(client *client) {
 			fmt.Print("name: ", name)
 			fmt.Println(" password: ", password)
 
-			result, err := login(name, password)
+			result, err := models.Login(users, name, password)
 			if err != nil {
 				fmt.Println("Error logging in: ", err.Error())
 				client.Write(messagingProtocol.NewError(err.Error()))
@@ -121,7 +128,7 @@ func handleRequest(client *client) {
 				fmt.Println("Login failed")
 				client.Write(messagingProtocol.NewError("Login failed"))
 			}
-		case CREATE_EVENT:
+		case protocol.CREATE_EVENT:
 			fmt.Println("user wants to create an event")
 
 			if len(data.Data) < 3 {
@@ -133,7 +140,7 @@ func handleRequest(client *client) {
 			organizerName := data.Data[1]
 			password := data.Data[2]
 
-			result, err := login(organizerName, password)
+			result, err := models.Login(users, organizerName, password)
 			if err != nil {
 				fmt.Println("Error logging in: ", err.Error())
 				client.Write(messagingProtocol.NewError(err.Error()))
@@ -145,8 +152,8 @@ func handleRequest(client *client) {
 				continue
 			}
 
-			createEvent(events, eventName, organizerName)
-		case STOP:
+			models.CreateEvent(events, eventName, organizerName)
+		case protocol.STOP:
 			fmt.Println("user wants to stop the server")
 			break
 		default:

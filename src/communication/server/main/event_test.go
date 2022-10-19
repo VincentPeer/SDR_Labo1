@@ -1,22 +1,23 @@
 package main
 
 import (
+	"SDR_Labo1/src/communication/server/models"
 	"reflect"
 	"testing"
 )
 
 func TestCreateEvent(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	testDb, err := createEvent(db, "Test", "3")
+	testDb, err := models.CreateEvent(db, "Test", "3")
 	if err != nil {
 		t.Error(err)
 	}
 	got := testDb
-	want := []Event{
+	want := []models.Event{
 		{
 			Name:      "Festival de la musique",
 			Organizer: "3",
-			Jobs: []Job{
+			Jobs: []models.Job{
 				{
 					Name:     "Buvette",
 					Required: 2,
@@ -34,7 +35,7 @@ func TestCreateEvent(t *testing.T) {
 		{
 			Name:      "Fête de la science",
 			Organizer: "4",
-			Jobs: []Job{
+			Jobs: []models.Job{
 				{
 					Name:       "Buvette",
 					Required:   2,
@@ -50,7 +51,7 @@ func TestCreateEvent(t *testing.T) {
 		{
 			Name:      "Test",
 			Organizer: "3",
-			Jobs:      []Job{},
+			Jobs:      []models.Job{},
 		},
 	}
 
@@ -61,7 +62,7 @@ func TestCreateEvent(t *testing.T) {
 
 func TestCreateEventErrorIfIdExists(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	_, err := createEvent(db, "Festival de la musique", "3")
+	_, err := models.CreateEvent(db, "Festival de la musique", "3")
 	if err == nil {
 		t.Error("Error not raised")
 	}
@@ -69,7 +70,7 @@ func TestCreateEventErrorIfIdExists(t *testing.T) {
 
 func TestCreateEventErrorIfNameIsEmpty(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	_, err := createEvent(db, "", "3")
+	_, err := models.CreateEvent(db, "", "3")
 	if err == nil {
 		t.Error("Error not raised")
 	}
@@ -77,7 +78,7 @@ func TestCreateEventErrorIfNameIsEmpty(t *testing.T) {
 
 func TestCreateEventErrorIfOrganizerDoesntExist(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	_, err := createEvent(db, "Test", "5")
+	_, err := models.CreateEvent(db, "Test", "5")
 	if err == nil {
 		t.Error("Error not raised")
 	}
@@ -85,7 +86,7 @@ func TestCreateEventErrorIfOrganizerDoesntExist(t *testing.T) {
 
 func TestCreateEventErrorIfOrganizerIsEmpty(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	_, err := createEvent(db, "Test", "")
+	_, err := models.CreateEvent(db, "Test", "")
 	if err == nil {
 		t.Error("Error not raised")
 	}
@@ -93,15 +94,15 @@ func TestCreateEventErrorIfOrganizerIsEmpty(t *testing.T) {
 
 func TestGetEvent(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	testDb, err := getEvent(db, "1")
+	testDb, err := models.GetEvent(db, "1")
 	if err != nil {
 		t.Error(err)
 	}
 	got := testDb
-	want := Event{
+	want := models.Event{
 		Name:      "Festival de la musique",
 		Organizer: "3",
-		Jobs: []Job{
+		Jobs: []models.Job{
 			{
 				Name:     "Buvette",
 				Required: 2,
@@ -124,7 +125,7 @@ func TestGetEvent(t *testing.T) {
 
 func TestGetEventErrorIfIdDoesntExist(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	_, err := getEvent(db, "3")
+	_, err := models.GetEvent(db, "3")
 	if err == nil {
 		t.Error("Error not raised")
 	}
@@ -132,16 +133,16 @@ func TestGetEventErrorIfIdDoesntExist(t *testing.T) {
 
 func TestCreateJob(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	testDb, err := createJob(db[0], "Test", 3)
+	testDb, err := models.CreateJob(db[0], "Test", 3)
 	if err != nil {
 		t.Error(err)
 	}
 	got := testDb
-	want := []Event{
+	want := []models.Event{
 		{
 			Name:      "Festival de la musique",
 			Organizer: "3",
-			Jobs: []Job{
+			Jobs: []models.Job{
 				{
 					Name:     "Buvette",
 					Required: 2,
@@ -164,7 +165,7 @@ func TestCreateJob(t *testing.T) {
 		{
 			Name:      "Fête de la science",
 			Organizer: "4",
-			Jobs: []Job{
+			Jobs: []models.Job{
 				{
 					Name:       "Buvette",
 					Required:   2,
@@ -186,7 +187,7 @@ func TestCreateJob(t *testing.T) {
 
 func TestCreateJobErrorIfIdExists(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	_, err := createJob(db[0], "Buvette", 3)
+	_, err := models.CreateJob(db[0], "Buvette", 3)
 	if err == nil {
 		t.Error("Error not raised")
 	}
@@ -194,7 +195,7 @@ func TestCreateJobErrorIfIdExists(t *testing.T) {
 
 func TestCreateJobErrorIfNameIsEmpty(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	_, err := createJob(db[0], "", 3)
+	_, err := models.CreateJob(db[0], "", 3)
 	if err == nil {
 		t.Error("Error not raised")
 	}
@@ -202,7 +203,7 @@ func TestCreateJobErrorIfNameIsEmpty(t *testing.T) {
 
 func TestCreateJobErrorIfRequiredIsNegative(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	_, err := createJob(db[0], "Test", -1)
+	_, err := models.CreateJob(db[0], "Test", -1)
 	if err == nil {
 		t.Error("Error not raised")
 	}
@@ -210,12 +211,12 @@ func TestCreateJobErrorIfRequiredIsNegative(t *testing.T) {
 
 func TestGetJob(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	testDb, err := getJob(db[0], "Buvette")
+	testDb, err := models.GetJob(db[0], "Buvette")
 	if err != nil {
 		t.Error(err)
 	}
 	got := testDb
-	want := Job{
+	want := models.Job{
 		Name:     "Buvette",
 		Required: 2,
 		Volunteers: []string{
@@ -230,7 +231,7 @@ func TestGetJob(t *testing.T) {
 
 func TestGetJobErrorIfIdDoesntExist(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	_, err := getJob(db[0], "3")
+	_, err := models.GetJob(db[0], "3")
 	if err == nil {
 		t.Error("Error not raised")
 	}
@@ -238,16 +239,16 @@ func TestGetJobErrorIfIdDoesntExist(t *testing.T) {
 
 func TestAddVolunteer(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	testDb, err := addVolunteer(db[0].Jobs[0], "2")
+	testDb, err := models.AddVolunteer(db[0].Jobs[0], "2")
 	if err != nil {
 		t.Error(err)
 	}
 	got := testDb
-	want := []Event{
+	want := []models.Event{
 		{
 			Name:      "Festival de la musique",
 			Organizer: "3",
-			Jobs: []Job{
+			Jobs: []models.Job{
 				{
 					Name:     "Buvette",
 					Required: 2,
@@ -266,7 +267,7 @@ func TestAddVolunteer(t *testing.T) {
 		{
 			Name:      "Fête de la science",
 			Organizer: "4",
-			Jobs: []Job{
+			Jobs: []models.Job{
 				{
 					Name:       "Buvette",
 					Required:   2,
@@ -288,7 +289,7 @@ func TestAddVolunteer(t *testing.T) {
 
 func TestAddVolunteerErrorIfVolunteerAlreadyExists(t *testing.T) {
 	db := loadConfig(getTestData(t)).Events
-	_, err := addVolunteer(db[0].Jobs[0], "1")
+	_, err := models.AddVolunteer(db[0].Jobs[0], "1")
 	if err == nil {
 		t.Error("Error not raised")
 	}

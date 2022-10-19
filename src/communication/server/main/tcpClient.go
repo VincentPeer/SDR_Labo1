@@ -1,6 +1,7 @@
 package main
 
 import (
+	"SDR_Labo1/src/communication/protocol"
 	"bufio"
 	"net"
 )
@@ -22,11 +23,11 @@ type client struct {
 	bufin    *bufio.Reader
 	bufout   *bufio.Writer
 	conn     *net.Conn
-	protocol protocol
+	protocol protocol.Protocol
 }
 
 // NewClient creates a new client
-func NewClient(id int, conn *net.Conn, protocol protocol) *client {
+func NewClient(id int, conn *net.Conn, protocol protocol.Protocol) *client {
 	return &client{
 		ID:       id,
 		bufin:    bufio.NewReader(*conn),
@@ -37,12 +38,12 @@ func NewClient(id int, conn *net.Conn, protocol protocol) *client {
 }
 
 // Read reads a message from the client
-func (c *client) Read() (dataPacket, error) {
+func (c *client) Read() (protocol.DataPacket, error) {
 	// Read the message
 	message, err := c.bufin.ReadString(c.protocol.GetDelimiter())
 
 	if err != nil {
-		return dataPacket{}, err
+		return protocol.DataPacket{}, err
 	} else {
 		// Parse the message
 		return c.protocol.Receive(message)
@@ -50,7 +51,7 @@ func (c *client) Read() (dataPacket, error) {
 }
 
 // Write writes a message to the client
-func (c *client) Write(data dataPacket) error {
+func (c *client) Write(data protocol.DataPacket) error {
 	message, err := c.protocol.ToSend(data)
 
 	if err == nil {

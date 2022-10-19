@@ -1,8 +1,7 @@
-package ui
+package main
 
 import (
 	"SDR_Labo1/src/communication/protocol"
-	"bufio"
 	"fmt"
 	"log"
 	"strconv"
@@ -13,9 +12,9 @@ var messagingProtocol = &protocol.TcpProtocol{}
 
 const EOF = "\r\n"
 
-// Main function that communicate with a client, from here he can go through each
+// Main function that communicate with a connection, from here he can go through each
 // functionnality offered on this service
-func UserInterface(consoleReader *bufio.Reader, serverReader *bufio.Reader, serverWriter *bufio.Writer) {
+func userInterface(c *connection) {
 	stop := protocol.DataPacket{Type: protocol.STOP}
 	fmt.Println("Welcome!")
 
@@ -24,22 +23,22 @@ func UserInterface(consoleReader *bufio.Reader, serverReader *bufio.Reader, serv
 		fmt.Println("Choose one of the following functionnality")
 		fmt.Println("[1] Create a new event")
 		fmt.Println("[2] Register to an event as a volunteer")
-		fmt.Println("[3] See all current events")
-		fmt.Println("[4] See the volunteers repartiton for a specific event")
+		fmt.Println("[3] List all current events")
+		fmt.Println("[4] List the volunteers repartiton for a specific event")
 		fmt.Println("[5] To terminate the process")
 
-		choice = integerReader(consoleReader)
+		choice = c.integerReader()
 		switch choice {
 		case 1:
-			createEvent(consoleReader, serverReader, serverWriter)
+			c.createEvent()
 		case 2:
-			volunteerRegistration()
+			c.volunteerRegistration()
 		case 3:
-			printEvents()
+			c.printEvents()
 		case 4:
-			volunteerRepartition()
+			c.volunteerRepartition()
 		case 5:
-			writeToServer(serverWriter, stop)
+			c.writeToServer(stop)
 			return
 		default:
 			fmt.Println("You have entered a bad request")
@@ -47,19 +46,19 @@ func UserInterface(consoleReader *bufio.Reader, serverReader *bufio.Reader, serv
 	}
 }
 
-// Gestion du login client
-// Le client presse enter après chaque entrée, et ne doit pas saisir de ',' dans ses données
-func loginClient(consoleReader *bufio.Reader, serverReader *bufio.Reader, serverWriter *bufio.Writer) bool {
-	username := stringReader(consoleReader, "Enter your username : ")
-	password := stringReader(consoleReader, "Enter your password : ")
+// Gestion du login connection
+// Le connection presse enter après chaque entrée, et ne doit pas saisir de ',' dans ses données
+func (c *connection) loginClient() bool {
+	username := c.stringReader("Enter your username : ")
+	password := c.stringReader("Enter your password : ")
 
 	result := protocol.DataPacket{Type: protocol.LOGIN, Data: []string{username, password}}
 
 	// Envoi formulaire de login
-	writeToServer(serverWriter, result)
+	c.writeToServer(result)
 
 	// Traitement de la réponse après vérification du login par le serveur
-	response := readFromServer(serverReader)
+	response := c.readFromServer()
 	if response.Type == protocol.OK {
 		fmt.Println("Welcome " + username + "!")
 		return true
@@ -69,15 +68,15 @@ func loginClient(consoleReader *bufio.Reader, serverReader *bufio.Reader, server
 	}
 }
 
-// Create a new event, it  asks the client to login and then the name of the event with each job's information
-func createEvent(consoleReader *bufio.Reader, serverReader *bufio.Reader, serverWriter *bufio.Writer) bool {
+// Create a new event, it  asks the connection to login and then the name of the event with each job's information
+func (c *connection) createEvent() bool {
 	for {
-		if loginClient(consoleReader, serverReader, serverWriter) == true {
+		if c.loginClient() {
 			break
 		}
 	}
 
-	eventName := stringReader(consoleReader, "Enter the event name : ")
+	eventName := c.stringReader("Enter the event name : ")
 	fmt.Println("List all job's name followed by the number of volunteers needed\n" +
 		"(tap STOP when ended) : ")
 
@@ -86,13 +85,13 @@ func createEvent(consoleReader *bufio.Reader, serverReader *bufio.Reader, server
 	var i = 0
 	for {
 		i++
-		jobName := stringReader(consoleReader, "Insert a name for Job "+strconv.Itoa(i)+": ")
+		jobName := c.stringReader("Insert a name for Job " + strconv.Itoa(i) + ": ")
 		if strings.Compare(jobName, "STOP") == 0 {
 			break
 		}
 
 		fmt.Print("Number of volunteers needed : ")
-		nbVolunteers, err := strconv.ParseInt(stringReader(consoleReader, ""), 10, 32)
+		nbVolunteers, err := strconv.ParseInt(c.stringReader(""), 10, 32)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -101,8 +100,8 @@ func createEvent(consoleReader *bufio.Reader, serverReader *bufio.Reader, server
 	}
 
 	eventResult := protocol.DataPacket{Type: protocol.CREATE_EVENT, Data: jobList}
-	writeToServer(serverWriter, eventResult)
-	response := readFromServer(serverReader)
+	c.writeToServer(eventResult)
+	response := c.readFromServer()
 	fmt.Println("response from server : ", response)
 	if response.Type == protocol.OK {
 		fmt.Println("Event registrated, thank you!")
@@ -112,22 +111,30 @@ func createEvent(consoleReader *bufio.Reader, serverReader *bufio.Reader, server
 	}
 }
 
-func volunteerRegistration() {
+func (c *connection) volunteerRegistration() bool {
+	for {
+		if c.loginClient() {
+			break
+		}
+	}
+
+	fmt.Println()
+
+	return true
+}
+
+func (c *connection) printEvents() {
 
 }
 
-func printEvents() {
+func (c *connection) volunteerRepartition() {
 
 }
 
-func volunteerRepartition() {
-
-}
-
-func stringReader(reader *bufio.Reader, optionalMessage string) string {
+func (c *connection) stringReader(optionalMessage string) string {
 	fmt.Print(optionalMessage)
 
-	message, err := reader.ReadString('\n')
+	message, err := c.consoleIn.ReadString('\n')
 
 	if err != nil {
 		log.Fatal(err)
@@ -136,8 +143,8 @@ func stringReader(reader *bufio.Reader, optionalMessage string) string {
 	return strings.TrimRight(message, EOF)
 }
 
-func readFromServer(reader *bufio.Reader) protocol.DataPacket {
-	message, err := reader.ReadString(protocol.DELIMITER)
+func (c *connection) readFromServer() protocol.DataPacket {
+	message, err := c.serverIn.ReadString(protocol.DELIMITER)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -148,29 +155,29 @@ func readFromServer(reader *bufio.Reader) protocol.DataPacket {
 	return data
 }
 
-func integerReader(reader *bufio.Reader) int {
+func (c *connection) integerReader() int {
 	var n int
-	nbScanned, err := fmt.Fscan(reader, &n)
+	nbScanned, err := fmt.Fscan(c.consoleIn, &n)
 	if err != nil {
 		log.Fatal(err)
 	} else if nbScanned != 1 {
 		log.Fatal("Expected one argument, actual : " + strconv.Itoa(nbScanned))
 	}
-	reader.ReadString('\n') // clean the buffer
+	c.consoleIn.ReadString('\n') // clean the buffer
 	return n
 }
 
-func writeToServer(writer *bufio.Writer, data protocol.DataPacket) {
+func (c *connection) writeToServer(data protocol.DataPacket) {
 	m, e := messagingProtocol.ToSend(data)
 	fmt.Println(m)
 	if e != nil {
 		log.Fatal(e)
 	}
-	_, writtingError := writer.WriteString(m)
+	_, writtingError := c.serverOut.WriteString(m)
 	if writtingError != nil {
 		log.Fatal(writtingError)
 	}
-	flushError := writer.Flush()
+	flushError := c.serverOut.Flush()
 	if flushError != nil {
 		log.Fatal(flushError)
 	}

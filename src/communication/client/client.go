@@ -1,7 +1,7 @@
 package main
 
 import (
-	"SDR_Labo1/src/ui"
+	"SDR_Labo1/src/communication/protocol"
 	"bufio"
 	"fmt"
 	"net"
@@ -15,21 +15,40 @@ const (
 	OK        = "OK"
 )
 
+type connection struct {
+	consoleIn *bufio.Reader
+	serverIn  *bufio.Reader
+	serverOut *bufio.Writer
+	protocol  protocol.Protocol
+}
+
+func newConnection(consoleIn *bufio.Reader, serverIn *bufio.Reader, serverOut *bufio.Writer, protocol protocol.Protocol) *connection {
+
+	return &connection{
+		consoleIn: consoleIn,
+		serverIn:  serverIn,
+		serverOut: serverOut,
+		protocol:  protocol,
+	}
+
+}
+
 func main() {
 
-	connection, err := net.Dial(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
+	conn, err := net.Dial(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
 	if err != nil {
 		fmt.Println(err)
 		return
 	} else {
 		fmt.Println("Connection done!")
 	}
-	defer connection.Close()
+	defer conn.Close()
 
 	consoleReader := bufio.NewReader(os.Stdin)
-	serverReader := bufio.NewReader(connection)
-	serverWriter := bufio.NewWriter(connection)
+	serverReader := bufio.NewReader(conn)
+	serverWriter := bufio.NewWriter(conn)
+	client := newConnection(consoleReader, serverReader, serverWriter, &protocol.TcpProtocol{})
 
-	ui.UserInterface(consoleReader, serverReader, serverWriter)
+	userInterface(client)
 
 }

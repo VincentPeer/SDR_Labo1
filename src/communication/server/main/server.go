@@ -19,19 +19,18 @@ const (
 	CONFIG_FILE_PATH = "./config.json"
 )
 
-type Config struct {
+var (
+	nbClients         int = 0
+	db                database
+	messagingProtocol = &protocol.TcpProtocol{}
+)
+
+type database struct {
 	Users  []models.User  `json:"users"`
 	Events []models.Event `json:"events"`
 }
 
-var (
-	nbClients         int = 0
-	users             []models.User
-	events            []models.Event
-	messagingProtocol = &protocol.TcpProtocol{}
-)
-
-func loadConfig(jsonPath string) Config {
+func loadConfig(jsonPath string) database {
 	jsonFile, err := os.Open(jsonPath)
 	if err != nil {
 		fmt.Println("Error reading config file:", err.Error())
@@ -42,7 +41,7 @@ func loadConfig(jsonPath string) Config {
 
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 
-	var conf Config
+	var conf database
 	json.Unmarshal(byteValue, &conf)
 
 	return conf
@@ -56,9 +55,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	config := loadConfig(path)
-	users = config.Users
-	events = config.Events
+	db = loadConfig(path)
 
 	// Listen for incoming connections.
 	l, err := net.Listen(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
@@ -115,7 +112,7 @@ func handleRequest(client *client) {
 			fmt.Print("name: ", name)
 			fmt.Println(" password: ", password)
 
-			result, err := models.Login(users, name, password)
+			result, err := models.Login(db.Users, name, password)
 			if err != nil {
 				fmt.Println("Error logging in: ", err.Error())
 				client.Write(messagingProtocol.NewError(err.Error()))
@@ -140,7 +137,7 @@ func handleRequest(client *client) {
 			organizerName := data.Data[1]
 			password := data.Data[2]
 
-			result, err := models.Login(users, organizerName, password)
+			result, err := models.Login(db.Users, organizerName, password)
 			if err != nil {
 				fmt.Println("Error logging in: ", err.Error())
 				client.Write(messagingProtocol.NewError(err.Error()))
@@ -152,10 +149,9 @@ func handleRequest(client *client) {
 				continue
 			}
 
-			models.CreateEvent(events, eventName, organizerName)
+			models.CreateEvent(db.Events, eventName, organizerName)
 		case protocol.STOP:
 			fmt.Println("user wants to stop the server")
-			break
 		default:
 			fmt.Println("Unknown command")
 		}

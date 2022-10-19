@@ -49,6 +49,7 @@ func userInterface(c *connection) {
 }
 
 // loginClient ask the user to enter his username and password and check if the login is correct
+// the client is asked to enter his username and password until the login is correct
 func (c *connection) loginClient() {
 	for {
 		username := c.stringReader("Enter your username : ")
@@ -56,11 +57,9 @@ func (c *connection) loginClient() {
 
 		// Send the login request to the server
 		result := protocol.DataPacket{Type: protocol.LOGIN, Data: []string{username, password}}
-
-		// Envoi formulaire de login
 		c.writeToServer(result)
 
-		// Traitement de la réponse après vérification du login par le serveur
+		// Read the response from the server and treat it
 		response := c.readFromServer()
 		if response.Type == protocol.OK {
 			fmt.Println("Welcome " + username + "!")
@@ -72,7 +71,7 @@ func (c *connection) loginClient() {
 	}
 }
 
-// Create a new event, it  asks the connection to login and then the name of the event with each job's information
+// createEvent creates a new event with an organizer
 func (c *connection) createEvent() bool {
 	c.loginClient()
 

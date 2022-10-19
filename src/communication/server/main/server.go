@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"strconv"
 )
 
 const (
@@ -102,6 +103,7 @@ func handleRequest(client *client) {
 			}
 			if result {
 				fmt.Println("Login successful")
+				client.Login(name)
 				client.Write(messagingProtocol.NewSuccess(""))
 			} else {
 				fmt.Println("Login failed")
@@ -114,24 +116,37 @@ func handleRequest(client *client) {
 				client.Write(messagingProtocol.NewError("Invalid number of arguments"))
 				continue
 			}
+			if client.state != connected {
+				client.Write(messagingProtocol.NewError("You must be logged in to create an event"))
+				continue
+			}
 
 			eventName := data.Data[0]
-			organizerName := data.Data[1]
-			password := data.Data[2]
 
-			result, err := db.Login(organizerName, password)
+			_, err := db.CreateEvent(eventName, client.GetConnected())
 			if err != nil {
-				fmt.Println("Error logging in: ", err.Error())
+				fmt.Println("Error creating event: ", err.Error())
 				client.Write(messagingProtocol.NewError(err.Error()))
 				continue
 			}
-			if !result {
-				fmt.Println("Login failed")
-				client.Write(messagingProtocol.NewError("Login failed"))
+			event, err := db.GetEvent(eventName)
+			if err != nil {
+				fmt.Println("Error creating event: ", err.Error())
+				client.Write(messagingProtocol.NewError(err.Error()))
 				continue
 			}
+			for i := 1; i < len(data.Data)-1; i += 2 {
+				nbVolunteers, err := strconv.ParseUint(data.Data[i+1], 10, 32)
+				if err != nil {
+					fmt.Println("Error parsing number of volunteers: ", err.Error())
+					client.Write(messagingProtocol.NewError(err.Error()))
+					continue
+				}
+				event.CreateJob(data.Data[i], uint(nbVolunteers))
+			}
 
-			db.CreateEvent(eventName, organizerName)
+			client.Logout()
+
 		case protocol.STOP:
 			fmt.Println("user wants to stop the server")
 		default:

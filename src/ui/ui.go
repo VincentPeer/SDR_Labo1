@@ -25,7 +25,7 @@ func UserInterface(consoleReader *bufio.Reader, serverReader *bufio.Reader, serv
 		fmt.Println("[4] See the volunteers repartiton for a specific event")
 		fmt.Println("[5] To terminate the process")
 
-		choice = integerReader(consoleReader)
+		choice = integerReader()
 		switch choice {
 		case 1:
 			createEvent(consoleReader, serverReader, serverWriter)
@@ -40,29 +40,34 @@ func UserInterface(consoleReader *bufio.Reader, serverReader *bufio.Reader, serv
 		default:
 			fmt.Println("You have entered a bad request")
 		}
+
+		//if loginClient(consoleReader, serverReader, serverWriter) == true {
+		//	break
+		//}
 	}
+
 }
 
 // Gestion du login client
 // Le client presse enter après chaque entrée, et ne doit pas saisir de ',' dans ses données
 func loginClient(consoleReader *bufio.Reader, serverReader *bufio.Reader, serverWriter *bufio.Writer) bool {
-	const LOG_PROTOCOL = "LOGIN"
 	username := stringReader(consoleReader, "Enter your username : ")
 	password := stringReader(consoleReader, "Enter your password : ")
 
 	// Supression des retours à la ligne, et formatage pour l'envoi au serveur
-	username = strings.TrimSuffix(username, EOF)
-	password = strings.TrimSuffix(password, EOF)
-	tmpResult := []string{LOG_PROTOCOL, username, password}
-	result := strings.Join(tmpResult, ",") + ";"
+	username = strings.TrimSuffix(username, "\r\n") + ","
+	password = strings.TrimSuffix(password, "\r\n")
+
+	result := "LOGIN," + username + password + ";"
 
 	// Envoi formulaire de login
 	writeToServer(serverWriter, result)
 
 	// Traitement de la réponse après vérification du login par le serveur
 	response := readFromServer(serverReader, "")
+	fmt.Println("response from server is : " + response)
 	if strings.Compare(response, "OK;") == 0 {
-		fmt.Println("Welcome " + username + "!")
+		fmt.Println("Hello " + username + "!")
 		return true
 	} else {
 		fmt.Println("You have entered an invalid username or password")
@@ -70,7 +75,6 @@ func loginClient(consoleReader *bufio.Reader, serverReader *bufio.Reader, server
 	}
 }
 
-// Create a new event, it  asks the client to login and then the name of the event with each job's information
 func createEvent(consoleReader *bufio.Reader, serverReader *bufio.Reader, serverWriter *bufio.Writer) bool {
 	for {
 		if loginClient(consoleReader, serverReader, serverWriter) == true {
@@ -80,15 +84,17 @@ func createEvent(consoleReader *bufio.Reader, serverReader *bufio.Reader, server
 
 	eventName := stringReader(consoleReader, "Enter the event name : ")
 	fmt.Println("List all job's name followed by the number of volunteers needed\n" +
-		"(tap STOP when ended) : ")
+		"(tap enter with empty field when ended) : ")
 
 	var jobList []string
 	var i = 0
 	var nbVolunteers int
+	var jobStringList = ""
 	for {
 		i++
-		jobName := stringReader(consoleReader, "Insert a name for Job "+strconv.Itoa(i)+": ")
-		if strings.Compare(jobName, "STOP") == 0 {
+		jobName := stringReader(consoleReader, "Insert name for Job "+strconv.Itoa(i)+": ")
+		fmt.Println("read : " + jobName)
+		if strings.Compare(jobName, EOF) == 0 {
 			break
 		}
 
@@ -100,7 +106,7 @@ func createEvent(consoleReader *bufio.Reader, serverReader *bufio.Reader, server
 
 		jobList = append(jobList, jobName+","+strconv.Itoa(nbVolunteers))
 	}
-	var jobStringList string
+
 	if len(jobList) > 1 {
 		jobStringList = strings.Join(jobList, ", ")
 	} else if len(jobList) == 1 {
@@ -137,30 +143,25 @@ func volunteerRepartition() {
 
 }
 
-func stringReader(reader *bufio.Reader, optionalMessage string) string {
-	fmt.Print(optionalMessage)
-	var s string
-
-	nbScanned, err := fmt.Fscan(reader, &s)
+func stringReader(reader *bufio.Reader, optinalMessage string) string {
+	fmt.Print(optinalMessage)
+	message, err := reader.ReadString('\n')
 	if err != nil {
 		log.Fatal(err)
-	} else if nbScanned != 1 {
-		log.Fatal("Expected one argument, actual : " + strconv.Itoa(nbScanned))
 	}
-	reader.ReadString('\n') // clean the buffer
-	return s
+	return message
 }
 
-func integerReader(reader *bufio.Reader) int {
-	var n int
-	nbScanned, err := fmt.Fscan(reader, &n)
+func integerReader() int {
+	var i int
+	fmt.Println("set the number : ")
+	nbScanned, err := fmt.Scanf("%d", &i)
 	if err != nil {
 		log.Fatal(err)
 	} else if nbScanned != 1 {
 		log.Fatal("Expected one argument, actual : " + strconv.Itoa(nbScanned))
 	}
-	reader.ReadString('\n') // clean the buffer
-	return n
+	return i
 }
 
 func readFromServer(reader *bufio.Reader, optinalMessage string) string {

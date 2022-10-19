@@ -15,7 +15,6 @@ const EOF = "\r\n"
 // Main function that communicate with a connection, from here he can go through each
 // functionnality offered on this service
 func userInterface(c *connection) {
-	stop := protocol.DataPacket{Type: protocol.STOP}
 	fmt.Println("Welcome!")
 
 	var choice int
@@ -38,7 +37,7 @@ func userInterface(c *connection) {
 		case 4:
 			c.volunteerRepartition()
 		case 5:
-			c.writeToServer(stop)
+			c.writeToServer(protocol.DataPacket{Type: protocol.STOP})
 			return
 		default:
 			fmt.Println("You have entered a bad request")
@@ -111,16 +110,45 @@ func (c *connection) createEvent() bool {
 	}
 }
 
-func (c *connection) volunteerRegistration() bool {
+func (c *connection) volunteerRegistration() {
 	for {
 		if c.loginClient() {
 			break
 		}
 	}
 
-	fmt.Println()
+	var eventId int
+	var jobId int
+	for {
+		fmt.Println("Choose one of the following functionnality")
+		fmt.Println("[1] List all open events with their jobs")
+		fmt.Println("[2] Register to an event as a volunteer")
+		fmt.Println("[3] To terminate the process")
 
-	return true
+		choice := c.integerReader()
+		switch choice {
+		case 1:
+			c.printEvents()
+		case 2:
+			fmt.Println("Enter the id of the event you want to register to : ")
+			eventId = c.integerReader()
+			fmt.Println("Enter the id of the job you want to register to : ")
+			jobId = c.integerReader()
+			registration := protocol.DataPacket{Type: protocol.EVENT_REG, Data: []string{strconv.Itoa(eventId), strconv.Itoa(jobId)}}
+			c.writeToServer(registration)
+			response := c.readFromServer()
+			if response.Type == protocol.OK {
+				fmt.Println("Registration successful")
+				return
+			} else {
+				fmt.Println("Registration failed")
+				continue
+			}
+		case 3:
+			c.writeToServer(protocol.DataPacket{Type: protocol.STOP})
+			return
+		}
+	}
 }
 
 func (c *connection) printEvents() {

@@ -156,7 +156,7 @@ func handleRequest(client *client) {
 
 			err := client.Write(protocol.DataPacket{
 				Type: protocol.OK,
-				Data: db.ToStringArray(),
+				Data: db.GetEventsAsStringArray(),
 			})
 
 			if err != nil {
@@ -165,8 +165,41 @@ func handleRequest(client *client) {
 				continue
 			} else {
 				fmt.Println("Events sent")
-				for _, event := range db.ToStringArray() {
+				for _, event := range db.GetEventsAsStringArray() {
 					fmt.Println("Event: ", event)
+				}
+			}
+		case protocol.GET_JOBS:
+			fmt.Println("user wants to get jobs")
+
+			if len(data.Data) != 1 {
+				fmt.Println("Invalid number of arguments")
+				client.Write(messagingProtocol.NewError("Invalid number of arguments"))
+				continue
+			}
+
+			eventName := data.Data[0]
+
+			event, err := db.GetEvent(eventName)
+			if err != nil {
+				fmt.Println("Error getting event: ", err.Error())
+				client.Write(messagingProtocol.NewError(err.Error()))
+				continue
+			}
+
+			err = client.Write(protocol.DataPacket{
+				Type: protocol.OK,
+				Data: event.GetJobsAsStringArray(),
+			})
+
+			if err != nil {
+				fmt.Println("Error sending jobs: ", err.Error())
+				client.Write(messagingProtocol.NewError(err.Error()))
+				continue
+			} else {
+				fmt.Println("Jobs sent")
+				for _, job := range event.GetJobsAsStringArray() {
+					fmt.Println("Job: ", job)
 				}
 			}
 

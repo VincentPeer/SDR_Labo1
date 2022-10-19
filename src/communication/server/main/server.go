@@ -148,6 +148,7 @@ func handleRequest(client *client) {
 				event.CreateJob(data.Data[i], uint(nbVolunteers))
 			}
 			fmt.Println("Jobs created")
+			client.Write(messagingProtocol.NewSuccess(""))
 			client.Logout()
 
 		case protocol.JOIN_EVENT:

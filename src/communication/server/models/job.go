@@ -1,6 +1,10 @@
 package models
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+	"strings"
+)
 
 var (
 	ErrorJobNotFound       = errors.New("job not found")
@@ -64,4 +68,8 @@ func (job *Job) AddVolunteer(name string) (*Job, error) {
 	}
 	job.Volunteers = append(job.Volunteers, name)
 	return job, nil
+}
+
+func (job *Job) ToString() string {
+	return fmt.Sprintf("%d | %s | %d | %s", job.ID, job.Name, job.Required, strings.Join(job.Volunteers, " - "))
 }

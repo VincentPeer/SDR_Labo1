@@ -60,13 +60,21 @@ func (db *Database) GetEvent(name string) (Event, error) {
 }
 
 func (event *Event) ToString() string {
-	return fmt.Sprintf("%d, %s, %s", event.ID, event.Name, event.Organizer)
+	return fmt.Sprintf("%d | %s | %s", event.ID, event.Name, event.Organizer)
 }
 
-func (db *Database) ToStringArray() []string {
+func (db *Database) GetEventsAsStringArray() []string {
 	var events []string
 	for _, event := range db.Events {
 		events = append(events, event.ToString())
 	}
 	return events
+}
+
+func (event *Event) GetJobsAsStringArray() []string {
+	var jobs []string
+	for _, job := range event.Jobs {
+		jobs = append(jobs, job.ToString())
+	}
+	return jobs
 }

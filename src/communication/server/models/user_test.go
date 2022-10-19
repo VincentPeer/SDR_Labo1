@@ -2,6 +2,7 @@ package models
 
 import (
 	"SDR_Labo1/src/communication/server/tests"
+	"errors"
 	"reflect"
 	"testing"
 )
@@ -49,7 +50,7 @@ func TestCreateUser(t *testing.T) {
 func TestCreateUserErrorIfUserAlreadyExist(t *testing.T) {
 	testDb := LoadDatabaseFromJson(tests.GetTestData(t))
 	_, err := testDb.CreateUser("Alex Terrieur", "TestPWD", "volunteer")
-	if err != ErrorUserExists {
+	if !errors.Is(err, ErrorUserExists) {
 		t.Error("Expected error")
 	}
 }
@@ -57,7 +58,7 @@ func TestCreateUserErrorIfUserAlreadyExist(t *testing.T) {
 func TestCreateUserErrorIfUserNameEmpty(t *testing.T) {
 	testDb := LoadDatabaseFromJson(tests.GetTestData(t))
 	_, err := testDb.CreateUser("", "TestPWD", "volunteer")
-	if err != ErrorUserNameEmpty {
+	if !errors.Is(err, ErrorUserNameEmpty) {
 		t.Error("Expected error")
 	}
 }
@@ -65,7 +66,7 @@ func TestCreateUserErrorIfUserNameEmpty(t *testing.T) {
 func TestCreateUserErrorIfPasswordEmpty(t *testing.T) {
 	testDb := LoadDatabaseFromJson(tests.GetTestData(t))
 	_, err := testDb.CreateUser("Test", "", "volunteer")
-	if err != ErrorPasswordEmpty {
+	if !errors.Is(err, ErrorPasswordEmpty) {
 		t.Error("Expected error")
 	}
 }
@@ -73,7 +74,7 @@ func TestCreateUserErrorIfPasswordEmpty(t *testing.T) {
 func TestCreateUserErrorIfFunctionEmpty(t *testing.T) {
 	testDb := LoadDatabaseFromJson(tests.GetTestData(t))
 	_, err := testDb.CreateUser("Test", "TestPWD", "")
-	if err != ErrorFunctionEmpty {
+	if !errors.Is(err, ErrorFunctionEmpty) {
 		t.Error("Expected error")
 	}
 }
@@ -95,7 +96,7 @@ func TestGetUser(t *testing.T) {
 func TestGetUserError(t *testing.T) {
 	testDb := LoadDatabaseFromJson(tests.GetTestData(t))
 	_, err := testDb.GetUser("Test")
-	if err == nil {
+	if !errors.Is(err, ErrorUserNotFound) {
 		t.Errorf("got %v want %v", err, "User not found")
 	}
 }
@@ -127,7 +128,7 @@ func TestLoginError(t *testing.T) {
 	users := LoadDatabaseFromJson(tests.GetTestData(t))
 
 	_, err := users.Login("Test", "AlexPWD")
-	if err == nil {
+	if errors.Is(err, ErrorUserNotFound) {
 		t.Error("Expected error")
 	}
 }

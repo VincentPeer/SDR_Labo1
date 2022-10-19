@@ -128,7 +128,7 @@ func (c *connection) printEvents() {
 	response := c.readFromServer()
 	if response.Type == protocol.OK {
 		for i := 0; i < len(response.Data); i++ {
-			fmt.Print(response.Data[i])
+			fmt.Println(response.Data[i])
 		}
 	} else {
 		fmt.Println("No event found")

@@ -22,53 +22,35 @@ type Event struct {
 
 type Events []Event
 
-// Creates a new event and adds it to the database
-// Returns an error if an event with the same id already exists
+// Creates a new job and adds it to the database
+// Returns an error if a job with the same id already exists
 // Otherwise returns the new state of the database
-func (db *Database) CreateEvent(name string, organizer string) (*Database, error) {
+func (event *Event) CreateJob(name string, required uint) (*Event, error) {
 	if name == "" {
-		return nil, ErrorEventNameEmpty
+		return nil, ErrorJobNameEmpty
 	}
-	if organizer == "" {
-		return nil, ErrorOrganizerEmpty
-	}
-	user, err := db.GetUser(organizer)
-	if err != nil {
-		return nil, err
-	}
-	if user.Function != "organizer" {
-		return nil, ErrorNotOrganizer
+	if _, err := event.GetJob(name); err == nil {
+		return event, ErrorJobExists
 	}
 
-	if _, err := db.GetEvent(name); err == nil {
-		return db, ErrorEventExists
-	}
-	db.Events = append(db.Events, Event{uint(len(db.Events)), name, organizer, []Job{}})
-	return db, nil
+	event.Jobs = append(event.Jobs, Job{uint(len(event.Jobs)), name, required, []string{}})
+	return event, nil
 }
 
-// Get an event from the database
-// Returns an error if the event does not exist
-// Otherwise returns the event
-func (db *Database) GetEvent(name string) (Event, error) {
-	for _, event := range db.Events {
-		if event.Name == name {
-			return event, nil
+// Get a job from the database
+// Returns an error if the job does not exist
+// Otherwise returns the job
+func (event *Event) GetJob(name string) (*Job, error) {
+	for _, job := range event.Jobs {
+		if job.Name == name {
+			return &job, nil
 		}
 	}
-	return Event{}, ErrorEventNotFound
+	return &Job{}, errors.New("Job not found")
 }
 
 func (event *Event) ToString() string {
 	return fmt.Sprintf("%d | %s | %s", event.ID, event.Name, event.Organizer)
-}
-
-func (db *Database) GetEventsAsStringArray() []string {
-	var events []string
-	for _, event := range db.Events {
-		events = append(events, event.ToString())
-	}
-	return events
 }
 
 func (event *Event) GetJobsAsStringArray() []string {

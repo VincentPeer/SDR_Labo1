@@ -128,7 +128,7 @@ func TestLoginError(t *testing.T) {
 	users := LoadDatabaseFromJson(tests.GetTestData(t))
 
 	_, err := users.Login("Test", "AlexPWD")
-	if errors.Is(err, ErrorUserNotFound) {
+	if !errors.Is(err, ErrorUserNotFound) {
 		t.Error("Expected error")
 	}
 }

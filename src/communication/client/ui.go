@@ -1,4 +1,4 @@
-package main
+package client
 
 import (
 	"SDR_Labo1/src/communication/protocol"

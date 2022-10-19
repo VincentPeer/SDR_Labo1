@@ -1,4 +1,5 @@
-package main
+// name of the package
+package client
 
 import (
 	"SDR_Labo1/src/communication/protocol"
@@ -8,6 +9,7 @@ import (
 	"os"
 )
 
+/* constants needed to connect to the server */
 const (
 	CONN_HOST = "localhost"
 	CONN_PORT = "3333"
@@ -23,6 +25,7 @@ type connection struct {
 	protocol  protocol.Protocol
 }
 
+// newConnection creates a new connection with our server
 func newConnection(consoleIn *bufio.Reader, serverIn *bufio.Reader, serverOut *bufio.Writer, protocol protocol.Protocol) *connection {
 
 	return &connection{
@@ -34,7 +37,8 @@ func newConnection(consoleIn *bufio.Reader, serverIn *bufio.Reader, serverOut *b
 
 }
 
-func main() {
+// Prepare the connection and start a client
+func Createclient() {
 
 	conn, err := net.Dial(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
 	if err != nil {
@@ -50,6 +54,6 @@ func main() {
 	serverWriter := bufio.NewWriter(conn)
 	client := newConnection(consoleReader, serverReader, serverWriter, &protocol.TcpProtocol{})
 
+	// Start the client
 	userInterface(client)
-
 }

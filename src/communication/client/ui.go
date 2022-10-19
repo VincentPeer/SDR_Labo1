@@ -12,8 +12,8 @@ var messagingProtocol = &protocol.TcpProtocol{}
 
 const EOF = "\r\n"
 
-// Main function that communicate with a connection, from here he can go through each
-// functionnality offered on this service
+// userInterface is the main function that communicate with the server,
+// the client can go through each different functionnality
 func userInterface(c *connection) {
 	fmt.Println("Welcome!")
 
@@ -48,35 +48,32 @@ func userInterface(c *connection) {
 	}
 }
 
-// Gestion du login connection
-// Le connection presse enter après chaque entrée, et ne doit pas saisir de ',' dans ses données
-func (c *connection) loginClient() bool {
-	username := c.stringReader("Enter your username : ")
-	password := c.stringReader("Enter your password : ")
+// loginClient ask the user to enter his username and password and check if the login is correct
+// the client is asked to enter his username and password until the login is correct
+func (c *connection) loginClient() {
+	for {
+		username := c.stringReader("Enter your username : ")
+		password := c.stringReader("Enter your password : ")
 
-	result := protocol.DataPacket{Type: protocol.LOGIN, Data: []string{username, password}}
+		// Send the login request to the server
+		result := protocol.DataPacket{Type: protocol.LOGIN, Data: []string{username, password}}
+		c.writeToServer(result)
 
-	// Envoi formulaire de login
-	c.writeToServer(result)
-
-	// Traitement de la réponse après vérification du login par le serveur
-	response := c.readFromServer()
-	if response.Type == protocol.OK {
-		fmt.Println("Welcome " + username + "!")
-		return true
-	} else {
-		fmt.Println("You have entered an invalid username or password")
-		return false
+		// Read the response from the server and treat it
+		response := c.readFromServer()
+		if response.Type == protocol.OK {
+			fmt.Println("Welcome " + username + "!")
+			return
+		} else {
+			fmt.Println("You have entered an invalid username or password")
+			continue
+		}
 	}
 }
 
-// Create a new event, it  asks the connection to login and then the name of the event with each job's information
+// createEvent creates a new event with an organizer
 func (c *connection) createEvent() bool {
-	for {
-		if c.loginClient() {
-			break
-		}
-	}
+	c.loginClient()
 
 	eventName := c.stringReader("Enter the event name : ")
 	fmt.Println("List all job's name followed by the number of volunteers needed\n" +
@@ -126,11 +123,7 @@ func (c *connection) printEvents() {
 }
 
 func (c *connection) volunteerRegistration() {
-	for {
-		if c.loginClient() {
-			break
-		}
-	}
+	c.loginClient()
 
 	var eventId int
 	var jobId int

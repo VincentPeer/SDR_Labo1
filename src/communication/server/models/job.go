@@ -11,6 +11,7 @@ var (
 )
 
 type Job struct {
+	ID         uint     `json:"id"`
 	Name       string   `json:"name"`
 	Required   uint     `json:"required"`
 	Volunteers []string `json:"volunteers"`
@@ -26,7 +27,8 @@ func (event *Event) CreateJob(name string, required uint) (*Event, error) {
 	if _, err := event.GetJob(name); err == nil {
 		return event, errors.New("Job with same id already exists")
 	}
-	event.Jobs = append(event.Jobs, Job{name, required, []string{}})
+
+	event.Jobs = append(event.Jobs, Job{uint(len(event.Jobs)), name, required, []string{}})
 	return event, nil
 }
 

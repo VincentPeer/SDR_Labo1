@@ -25,15 +25,18 @@
     ],
     "events" : [
         {
+            "id" : 0,
             "name" : "Festival de la musique",
             "organizer" : "Sarah Croche",
             "jobs" : [
                 {
+                    "id" : 0,
                     "name" : "Buvette",
                     "required" : 2,
                     "volunteers" : ["Alex Terrieur"]
                 },
                 {
+                    "id" : 1,
                     "name" : "Sécurité",
                     "required" : 3,
                     "volunteers" : []
@@ -41,15 +44,18 @@
             ]
         },
         {
+            "id" : 1,
             "name" : "Fête de la science",
             "organizer" : "Ondine Akeleur",
             "jobs" : [
                 {
+                    "id" : 0,
                     "name" : "Buvette",
                     "required" : 2,
                     "volunteers" : []
                 },
                 {
+                    "id" : 1,
                     "name" : "Sécurité",
                     "required" : 3,
                     "volunteers" : []

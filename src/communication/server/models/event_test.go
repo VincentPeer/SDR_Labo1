@@ -15,10 +15,12 @@ func TestCreateEvent(t *testing.T) {
 	got := testDb.Events
 	want := Events{
 		{
+			ID:        0,
 			Name:      "Festival de la musique",
 			Organizer: "Sarah Croche",
 			Jobs: []Job{
 				{
+					ID:       0,
 					Name:     "Buvette",
 					Required: 2,
 					Volunteers: []string{
@@ -26,6 +28,7 @@ func TestCreateEvent(t *testing.T) {
 					},
 				},
 				{
+					ID:         1,
 					Name:       "Sécurité",
 					Required:   3,
 					Volunteers: []string{},
@@ -33,15 +36,18 @@ func TestCreateEvent(t *testing.T) {
 			},
 		},
 		{
+			ID:        1,
 			Name:      "Fête de la science",
 			Organizer: "Ondine Akeleur",
 			Jobs: []Job{
 				{
+					ID:         0,
 					Name:       "Buvette",
 					Required:   2,
 					Volunteers: []string{},
 				},
 				{
+					ID:         1,
 					Name:       "Sécurité",
 					Required:   3,
 					Volunteers: []string{},
@@ -49,6 +55,7 @@ func TestCreateEvent(t *testing.T) {
 			},
 		},
 		{
+			ID:        2,
 			Name:      "Test",
 			Organizer: "Sarah Croche",
 			Jobs:      []Job{},
@@ -100,10 +107,12 @@ func TestGetEvent(t *testing.T) {
 	}
 	got := testDb
 	want := Event{
+		ID:        0,
 		Name:      "Festival de la musique",
 		Organizer: "Sarah Croche",
 		Jobs: []Job{
 			{
+				ID:       0,
 				Name:     "Buvette",
 				Required: 2,
 				Volunteers: []string{
@@ -111,6 +120,7 @@ func TestGetEvent(t *testing.T) {
 				},
 			},
 			{
+				ID:         1,
 				Name:       "Sécurité",
 				Required:   3,
 				Volunteers: []string{},
@@ -140,10 +150,12 @@ func TestCreateJob(t *testing.T) {
 	got := db.Events
 	want := Events{
 		{
+			ID:        0,
 			Name:      "Festival de la musique",
 			Organizer: "Sarah Croche",
 			Jobs: []Job{
 				{
+					ID:       0,
 					Name:     "Buvette",
 					Required: 2,
 					Volunteers: []string{
@@ -151,11 +163,13 @@ func TestCreateJob(t *testing.T) {
 					},
 				},
 				{
+					ID:         1,
 					Name:       "Sécurité",
 					Required:   3,
 					Volunteers: []string{},
 				},
 				{
+					ID:         2,
 					Name:       "Test",
 					Required:   3,
 					Volunteers: []string{},
@@ -163,15 +177,18 @@ func TestCreateJob(t *testing.T) {
 			},
 		},
 		{
+			ID:        1,
 			Name:      "Fête de la science",
 			Organizer: "Ondine Akeleur",
 			Jobs: []Job{
 				{
+					ID:         0,
 					Name:       "Buvette",
 					Required:   2,
 					Volunteers: []string{},
 				},
 				{
+					ID:         1,
 					Name:       "Sécurité",
 					Required:   3,
 					Volunteers: []string{},
@@ -209,6 +226,7 @@ func TestGetJob(t *testing.T) {
 	}
 	got := testDb
 	want := &Job{
+		ID:       0,
 		Name:     "Buvette",
 		Required: 2,
 		Volunteers: []string{
@@ -238,10 +256,12 @@ func TestAddVolunteer(t *testing.T) {
 	got := db.Events
 	want := Events{
 		{
+			ID:        0,
 			Name:      "Festival de la musique",
 			Organizer: "Sarah Croche",
 			Jobs: []Job{
 				{
+					ID:       0,
 					Name:     "Buvette",
 					Required: 2,
 					Volunteers: []string{
@@ -250,6 +270,7 @@ func TestAddVolunteer(t *testing.T) {
 					},
 				},
 				{
+					ID:         1,
 					Name:       "Sécurité",
 					Required:   3,
 					Volunteers: []string{},
@@ -257,15 +278,18 @@ func TestAddVolunteer(t *testing.T) {
 			},
 		},
 		{
+			ID:        1,
 			Name:      "Fête de la science",
 			Organizer: "Ondine Akeleur",
 			Jobs: []Job{
 				{
+					ID:         0,
 					Name:       "Buvette",
 					Required:   2,
 					Volunteers: []string{},
 				},
 				{
+					ID:         1,
 					Name:       "Sécurité",
 					Required:   3,
 					Volunteers: []string{},

@@ -150,8 +150,12 @@ func handleRequest(client *client) {
 			fmt.Println("Jobs created")
 			client.Logout()
 
+		case protocol.JOIN_EVENT:
+			fmt.Println("user wants to join an event")
+
 		case protocol.STOP:
 			fmt.Println("user wants to stop the server")
+			return
 		default:
 			fmt.Println("Unknown command")
 		}

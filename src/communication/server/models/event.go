@@ -1,6 +1,8 @@
 package models
 
-import "errors"
+import (
+	"errors"
+)
 
 var (
 	ErrorEventNotFound  = errors.New("event not found")
@@ -11,6 +13,7 @@ var (
 )
 
 type Event struct {
+	ID        uint   `json:"id"`
 	Name      string `json:"name"`
 	Organizer string `json:"organizer"`
 	Jobs      []Job  `json:"jobs"`
@@ -39,7 +42,7 @@ func (db *Database) CreateEvent(name string, organizer string) (*Database, error
 	if _, err := db.GetEvent(name); err == nil {
 		return db, ErrorEventExists
 	}
-	db.Events = append(db.Events, Event{name, organizer, []Job{}})
+	db.Events = append(db.Events, Event{uint(len(db.Events)), name, organizer, []Job{}})
 	return db, nil
 }
 

@@ -3,10 +3,8 @@ package main
 import (
 	"SDR_Labo1/src/communication/protocol"
 	"SDR_Labo1/src/communication/server/models"
-	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"os"
 	"path/filepath"
@@ -21,31 +19,9 @@ const (
 
 var (
 	nbClients         int = 0
-	db                database
+	db                models.Database
 	messagingProtocol = &protocol.TcpProtocol{}
 )
-
-type database struct {
-	Users  models.Users  `json:"users"`
-	Events models.Events `json:"events"`
-}
-
-func loadConfig(jsonPath string) database {
-	jsonFile, err := os.Open(jsonPath)
-	if err != nil {
-		fmt.Println("Error reading config file:", err.Error())
-		os.Exit(1)
-	}
-	fmt.Println("Successfully opened " + jsonFile.Name())
-	defer jsonFile.Close()
-
-	byteValue, _ := ioutil.ReadAll(jsonFile)
-
-	var conf database
-	json.Unmarshal(byteValue, &conf)
-
-	return conf
-}
 
 func main() {
 	path, err := filepath.Abs(CONFIG_FILE_PATH)
@@ -55,7 +31,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	db = loadConfig(path)
+	db = models.LoadDatabaseFromJson(path)
 
 	// Listen for incoming connections.
 	l, err := net.Listen(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
@@ -118,7 +94,7 @@ func handleRequest(client *client) {
 			fmt.Print("name: ", name)
 			fmt.Println(" password: ", password)
 
-			result, err := db.Users.Login(name, password)
+			result, err := db.Login(name, password)
 			if err != nil {
 				fmt.Println("Error logging in: ", err.Error())
 				client.Write(messagingProtocol.NewError(err.Error()))
@@ -143,7 +119,7 @@ func handleRequest(client *client) {
 			organizerName := data.Data[1]
 			password := data.Data[2]
 
-			result, err := db.Users.Login(organizerName, password)
+			result, err := db.Login(organizerName, password)
 			if err != nil {
 				fmt.Println("Error logging in: ", err.Error())
 				client.Write(messagingProtocol.NewError(err.Error()))
@@ -155,7 +131,7 @@ func handleRequest(client *client) {
 				continue
 			}
 
-			db.Events.CreateEvent(eventName, organizerName)
+			db.CreateEvent(eventName, organizerName)
 		case protocol.STOP:
 			fmt.Println("user wants to stop the server")
 		default:

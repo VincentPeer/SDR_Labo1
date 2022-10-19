@@ -29,18 +29,15 @@
     ],
     "events" : [
         {
-            "id" : "1",
             "name" : "Festival de la bière",
             "organizer" : "Sarah Croche",
             "jobs" : [
                 {
-                    "id" : "1",
                     "name" : "Bière",
                     "required" : 2,
                     "volunteers" : ["Alex Terrieur"]
                 },
                 {
-                    "id" : "2",
                     "name" : "Café",
                     "required" : 1,
                     "volunteers" : ["Alain Terrieur"]
@@ -48,18 +45,15 @@
             ]
         },
         {
-            "id" : "2",
             "name" : "Baleinev",
             "organizer" : "Ondine Akeleur",
             "jobs" : [
                 {
-                    "id" : "3",
                     "name" : "Bière",
                     "required" : 2,
                     "volunteers" : ["Alex Terrieur"]
                 },
                 {
-                    "id" : "4",
                     "name" : "Musique",
                     "required" : 2,
                     "volunteers" : ["Alain Terrieur"]

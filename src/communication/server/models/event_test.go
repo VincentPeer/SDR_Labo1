@@ -1,23 +1,23 @@
-package main
+package models
 
 import (
-	"SDR_Labo1/src/communication/server/models"
+	"SDR_Labo1/src/communication/server/tests"
 	"reflect"
 	"testing"
 )
 
 func TestCreateEvent(t *testing.T) {
-	db := loadConfig(getTestData(t)).Events
-	testDb, err := db.CreateEvent("Test", "3")
+	db := LoadDatabaseFromJson(tests.GetTestData(t))
+	testDb, err := db.CreateEvent("Test", "Sarah Croche")
 	if err != nil {
 		t.Error(err)
 	}
-	got := testDb
-	want := []models.Event{
+	got := testDb.Events
+	want := Events{
 		{
 			Name:      "Festival de la musique",
-			Organizer: "3",
-			Jobs: []models.Job{
+			Organizer: "Sarah Croche",
+			Jobs: []Job{
 				{
 					Name:     "Buvette",
 					Required: 2,
@@ -34,8 +34,8 @@ func TestCreateEvent(t *testing.T) {
 		},
 		{
 			Name:      "Fête de la science",
-			Organizer: "4",
-			Jobs: []models.Job{
+			Organizer: "Ondine Akeleur",
+			Jobs: []Job{
 				{
 					Name:       "Buvette",
 					Required:   2,
@@ -50,8 +50,8 @@ func TestCreateEvent(t *testing.T) {
 		},
 		{
 			Name:      "Test",
-			Organizer: "3",
-			Jobs:      []models.Job{},
+			Organizer: "Sarah Croche",
+			Jobs:      []Job{},
 		},
 	}
 
@@ -61,48 +61,48 @@ func TestCreateEvent(t *testing.T) {
 }
 
 func TestCreateEventErrorIfIdExists(t *testing.T) {
-	db := loadConfig(getTestData(t)).Events
-	_, err := db.CreateEvent("Festival de la musique", "3")
-	if err == nil {
+	db := LoadDatabaseFromJson(tests.GetTestData(t))
+	_, err := db.CreateEvent("Festival de la musique", "Sarah Croche")
+	if err != ErrorEventExists {
 		t.Error("Error not raised")
 	}
 }
 
 func TestCreateEventErrorIfNameIsEmpty(t *testing.T) {
-	db := loadConfig(getTestData(t)).Events
-	_, err := db.CreateEvent("", "3")
-	if err == nil {
+	db := LoadDatabaseFromJson(tests.GetTestData(t))
+	_, err := db.CreateEvent("", "Sarah Croche")
+	if err != ErrorEventNameEmpty {
 		t.Error("Error not raised")
 	}
 }
 
 func TestCreateEventErrorIfOrganizerDoesntExist(t *testing.T) {
-	db := loadConfig(getTestData(t)).Events
-	_, err := db.CreateEvent("Test", "5")
-	if err == nil {
+	db := LoadDatabaseFromJson(tests.GetTestData(t))
+	_, err := db.CreateEvent("Test", "Bob")
+	if err != ErrorUserNotFound {
 		t.Error("Error not raised")
 	}
 }
 
 func TestCreateEventErrorIfOrganizerIsEmpty(t *testing.T) {
-	db := loadConfig(getTestData(t)).Events
+	db := LoadDatabaseFromJson(tests.GetTestData(t))
 	_, err := db.CreateEvent("Test", "")
-	if err == nil {
+	if err != ErrorOrganizerEmpty {
 		t.Error("Error not raised")
 	}
 }
 
 func TestGetEvent(t *testing.T) {
-	db := loadConfig(getTestData(t)).Events
-	testDb, err := db.GetEvent("1")
+	db := LoadDatabaseFromJson(tests.GetTestData(t))
+	testDb, err := db.GetEvent("Festival de la musique")
 	if err != nil {
 		t.Error(err)
 	}
 	got := testDb
-	want := models.Event{
+	want := Event{
 		Name:      "Festival de la musique",
-		Organizer: "3",
-		Jobs: []models.Job{
+		Organizer: "Sarah Croche",
+		Jobs: []Job{
 			{
 				Name:     "Buvette",
 				Required: 2,
@@ -124,25 +124,25 @@ func TestGetEvent(t *testing.T) {
 }
 
 func TestGetEventErrorIfIdDoesntExist(t *testing.T) {
-	db := loadConfig(getTestData(t)).Events
-	_, err := db.GetEvent("3")
+	db := LoadDatabaseFromJson(tests.GetTestData(t))
+	_, err := db.GetEvent("Bob's party")
 	if err == nil {
 		t.Error("Error not raised")
 	}
 }
 
 func TestCreateJob(t *testing.T) {
-	db := loadConfig(getTestData(t)).Events
-	testDb, err := db[0].CreateJob("Test", 3)
+	db := LoadDatabaseFromJson(tests.GetTestData(t))
+	_, err := db.Events[0].CreateJob("Test", 3)
 	if err != nil {
 		t.Error(err)
 	}
-	got := testDb
-	want := []models.Event{
+	got := db.Events
+	want := Events{
 		{
 			Name:      "Festival de la musique",
-			Organizer: "3",
-			Jobs: []models.Job{
+			Organizer: "Sarah Croche",
+			Jobs: []Job{
 				{
 					Name:     "Buvette",
 					Required: 2,
@@ -164,8 +164,8 @@ func TestCreateJob(t *testing.T) {
 		},
 		{
 			Name:      "Fête de la science",
-			Organizer: "4",
-			Jobs: []models.Job{
+			Organizer: "Ondine Akeleur",
+			Jobs: []Job{
 				{
 					Name:       "Buvette",
 					Required:   2,
@@ -186,7 +186,7 @@ func TestCreateJob(t *testing.T) {
 }
 
 func TestCreateJobErrorIfIdExists(t *testing.T) {
-	db := loadConfig(getTestData(t)).Events
+	db := LoadDatabaseFromJson(tests.GetTestData(t)).Events
 	_, err := db[0].CreateJob("Buvette", 3)
 	if err == nil {
 		t.Error("Error not raised")
@@ -194,29 +194,21 @@ func TestCreateJobErrorIfIdExists(t *testing.T) {
 }
 
 func TestCreateJobErrorIfNameIsEmpty(t *testing.T) {
-	db := loadConfig(getTestData(t)).Events
+	db := LoadDatabaseFromJson(tests.GetTestData(t)).Events
 	_, err := db[0].CreateJob("", 3)
 	if err == nil {
 		t.Error("Error not raised")
 	}
 }
 
-func TestCreateJobErrorIfRequiredIsNegative(t *testing.T) {
-	db := loadConfig(getTestData(t)).Events
-	_, err := db[0].CreateJob("Test", -1)
-	if err == nil {
-		t.Error("Error not raised")
-	}
-}
-
 func TestGetJob(t *testing.T) {
-	db := loadConfig(getTestData(t)).Events
+	db := LoadDatabaseFromJson(tests.GetTestData(t)).Events
 	testDb, err := db[0].GetJob("Buvette")
 	if err != nil {
 		t.Error(err)
 	}
 	got := testDb
-	want := models.Job{
+	want := &Job{
 		Name:     "Buvette",
 		Required: 2,
 		Volunteers: []string{
@@ -230,25 +222,25 @@ func TestGetJob(t *testing.T) {
 }
 
 func TestGetJobErrorIfIdDoesntExist(t *testing.T) {
-	db := loadConfig(getTestData(t)).Events
-	_, err := db[0].GetJob("3")
+	db := LoadDatabaseFromJson(tests.GetTestData(t)).Events
+	_, err := db[0].GetJob("Test")
 	if err == nil {
 		t.Error("Error not raised")
 	}
 }
 
 func TestAddVolunteer(t *testing.T) {
-	db := loadConfig(getTestData(t)).Events
-	testDb, err := db[0].Jobs[0].AddVolunteer("2")
+	db := LoadDatabaseFromJson(tests.GetTestData(t))
+	_, err := db.Events[0].Jobs[0].AddVolunteer("Alain Terrieur")
 	if err != nil {
 		t.Error(err)
 	}
-	got := testDb
-	want := []models.Event{
+	got := db.Events
+	want := Events{
 		{
 			Name:      "Festival de la musique",
-			Organizer: "3",
-			Jobs: []models.Job{
+			Organizer: "Sarah Croche",
+			Jobs: []Job{
 				{
 					Name:     "Buvette",
 					Required: 2,
@@ -266,8 +258,8 @@ func TestAddVolunteer(t *testing.T) {
 		},
 		{
 			Name:      "Fête de la science",
-			Organizer: "4",
-			Jobs: []models.Job{
+			Organizer: "Ondine Akeleur",
+			Jobs: []Job{
 				{
 					Name:       "Buvette",
 					Required:   2,
@@ -288,9 +280,9 @@ func TestAddVolunteer(t *testing.T) {
 }
 
 func TestAddVolunteerErrorIfVolunteerAlreadyExists(t *testing.T) {
-	db := loadConfig(getTestData(t)).Events
-	_, err := db[0].Jobs[0].AddVolunteer("1")
-	if err == nil {
+	db := LoadDatabaseFromJson(tests.GetTestData(t)).Events
+	_, err := db[0].Jobs[0].AddVolunteer("Alex Terrieur")
+	if err != ErrorVolunteerExists {
 		t.Error("Error not raised")
 	}
 }

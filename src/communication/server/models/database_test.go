@@ -1,29 +1,15 @@
-package main
+package models
 
 import (
-	"SDR_Labo1/src/communication/server/models"
-	"path/filepath"
+	"SDR_Labo1/src/communication/server/tests"
 	"reflect"
 	"testing"
 )
 
-const (
-	TEST_CONFIG_FILE_PATH = "./config_test.json"
-)
-
-func getTestData(t *testing.T) string {
-	path, err := filepath.Abs(TEST_CONFIG_FILE_PATH)
-
-	if err != nil {
-		t.Error(err)
-	}
-	return path
-}
-
 func TestLoadUsers(t *testing.T) {
 
-	got := loadConfig(getTestData(t)).Users
-	want := []models.User{
+	got := LoadDatabaseFromJson(tests.GetTestData(t)).Users
+	want := Users{
 		{
 			Name:     "Alex Terrieur",
 			Password: "AlexPWD",
@@ -53,12 +39,12 @@ func TestLoadUsers(t *testing.T) {
 
 func TestLoadEvents(t *testing.T) {
 
-	got := loadConfig(getTestData(t)).Events
-	want := []models.Event{
+	got := LoadDatabaseFromJson(tests.GetTestData(t)).Events
+	want := Events{
 		{
 			Name:      "Festival de la musique",
-			Organizer: "3",
-			Jobs: []models.Job{
+			Organizer: "Sarah Croche",
+			Jobs: []Job{
 				{
 					Name:     "Buvette",
 					Required: 2,
@@ -75,8 +61,8 @@ func TestLoadEvents(t *testing.T) {
 		},
 		{
 			Name:      "Fête de la science",
-			Organizer: "4",
-			Jobs: []models.Job{
+			Organizer: "Ondine Akeleur",
+			Jobs: []Job{
 				{
 					Name:       "Buvette",
 					Required:   2,

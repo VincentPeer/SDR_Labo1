@@ -1,19 +1,19 @@
-package main
+package models
 
 import (
-	"SDR_Labo1/src/communication/server/models"
+	"SDR_Labo1/src/communication/server/tests"
 	"reflect"
 	"testing"
 )
 
 func TestCreateUser(t *testing.T) {
-	db := loadConfig(getTestData(t)).Users
-	testDb, err := db.CreateUser("Test", "TestPWD", "volunteer")
+	db := LoadDatabaseFromJson(tests.GetTestData(t))
+	_, err := db.CreateUser("Test", "TestPWD", "volunteer")
 	if err != nil {
 		t.Error(err)
 	}
-	got := testDb
-	want := []models.User{
+	got := db.Users
+	want := Users{
 		{
 			Name:     "Alex Terrieur",
 			Password: "AlexPWD",
@@ -46,18 +46,42 @@ func TestCreateUser(t *testing.T) {
 	}
 }
 
-func TestCreateUserError(t *testing.T) {
-	testDb := loadConfig(getTestData(t)).Users
-	_, err := testDb.CreateUser("Test", "TestPWD", "volunteer")
-	if err == nil {
+func TestCreateUserErrorIfUserAlreadyExist(t *testing.T) {
+	testDb := LoadDatabaseFromJson(tests.GetTestData(t))
+	_, err := testDb.CreateUser("Alex Terrieur", "TestPWD", "volunteer")
+	if err != ErrorUserExists {
+		t.Error("Expected error")
+	}
+}
+
+func TestCreateUserErrorIfUserNameEmpty(t *testing.T) {
+	testDb := LoadDatabaseFromJson(tests.GetTestData(t))
+	_, err := testDb.CreateUser("", "TestPWD", "volunteer")
+	if err != ErrorUserNameEmpty {
+		t.Error("Expected error")
+	}
+}
+
+func TestCreateUserErrorIfPasswordEmpty(t *testing.T) {
+	testDb := LoadDatabaseFromJson(tests.GetTestData(t))
+	_, err := testDb.CreateUser("Test", "", "volunteer")
+	if err != ErrorPasswordEmpty {
+		t.Error("Expected error")
+	}
+}
+
+func TestCreateUserErrorIfFunctionEmpty(t *testing.T) {
+	testDb := LoadDatabaseFromJson(tests.GetTestData(t))
+	_, err := testDb.CreateUser("Test", "TestPWD", "")
+	if err != ErrorFunctionEmpty {
 		t.Error("Expected error")
 	}
 }
 
 func TestGetUser(t *testing.T) {
-	testDb := loadConfig(getTestData(t)).Users
+	testDb := LoadDatabaseFromJson(tests.GetTestData(t))
 	got, _ := testDb.GetUser("Alex Terrieur")
-	want := models.User{
+	want := User{
 		Name:     "Alex Terrieur",
 		Password: "AlexPWD",
 		Function: "volunteer",
@@ -69,7 +93,7 @@ func TestGetUser(t *testing.T) {
 }
 
 func TestGetUserError(t *testing.T) {
-	testDb := loadConfig(getTestData(t)).Users
+	testDb := LoadDatabaseFromJson(tests.GetTestData(t))
 	_, err := testDb.GetUser("Test")
 	if err == nil {
 		t.Errorf("got %v want %v", err, "User not found")
@@ -77,8 +101,7 @@ func TestGetUserError(t *testing.T) {
 }
 
 func TestLogin(t *testing.T) {
-	users := loadConfig(getTestData(t)).Users
-
+	users := LoadDatabaseFromJson(tests.GetTestData(t))
 	got, err := users.Login("Alex Terrieur", "AlexPWD")
 	want := true
 
@@ -101,7 +124,7 @@ func TestLogin(t *testing.T) {
 }
 
 func TestLoginError(t *testing.T) {
-	users := loadConfig(getTestData(t)).Users
+	users := LoadDatabaseFromJson(tests.GetTestData(t))
 
 	_, err := users.Login("Test", "AlexPWD")
 	if err == nil {

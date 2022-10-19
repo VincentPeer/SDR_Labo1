@@ -1,6 +1,11 @@
 {
     "users" : [
         {
+            "name" : "a",
+            "password" : "1",
+            "function" : "organizer"
+        },
+        {
             "name" : "ab",
             "password" : "12",
             "function" : "volunteer"

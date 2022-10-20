@@ -1,4 +1,4 @@
-// This package set up the connection on the client side
+// This package set up the Connection on the client side
 package client
 
 import (
@@ -18,25 +18,25 @@ const (
 	OK        = "OK"
 )
 
-// connection contains buffered readers and writers to allow communication between the client and the a
-type connection struct {
+// Connection contains buffered readers and writers to allow communication between the client and the a
+type Connection struct {
 	conn      net.Conn
 	serverIn  *bufio.Reader
 	serverOut *bufio.Writer
 	protocol  protocol.Protocol
 }
 
-// newConnection establishes a new connection based on our own protocol
-func NewConnection(conn net.Conn, protocol protocol.Protocol) *connection {
-	return &connection{
+// newConnection establishes a new Connection based on our own protocol
+func NewConnection(conn net.Conn, protocol protocol.Protocol) *Connection {
+	return &Connection{
 		serverIn:  bufio.NewReader(conn),
 		serverOut: bufio.NewWriter(conn),
 		protocol:  protocol,
 	}
 }
 
-// Prepare the connection and start a client
-func CreateConnection() *connection {
+// Prepare the Connection and start a client
+func CreateConnection() *Connection {
 
 	conn, err := net.Dial(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
 	if err != nil {
@@ -50,7 +50,7 @@ func CreateConnection() *connection {
 
 // LoginClient ask the user to enter his username and password and check if the login is correct
 // the client is asked to enter his username and password until the login is correct
-func (c *connection) LoginClient(username string, password string) bool {
+func (c *Connection) LoginClient(username string, password string) bool {
 	// Send the login request to the server
 	login := protocol.DataPacket{Type: protocol.LOGIN, Data: []string{username, password}}
 
@@ -59,13 +59,13 @@ func (c *connection) LoginClient(username string, password string) bool {
 }
 
 // createEvent creates a new event makde by an organizer
-func (c *connection) createEvent(jobList []string) bool {
+func (c *Connection) createEvent(jobList []string) bool {
 	event := protocol.DataPacket{Type: protocol.CREATE_EVENT, Data: jobList}
 	response, _ := c.serverRequest(event)
 	return response
 }
 
-func (c *connection) printEvents() {
+func (c *Connection) printEvents() {
 	eventFound, data := c.serverRequest(protocol.DataPacket{Type: protocol.GET_EVENTS})
 
 	if eventFound {
@@ -73,12 +73,12 @@ func (c *connection) printEvents() {
 	}
 }
 
-func (c *connection) volunteerRegistration(eventId int, jobId int) {
+func (c *Connection) volunteerRegistration(eventId int, jobId int) {
 	request := protocol.DataPacket{Type: protocol.EVENT_REG, Data: []string{strconv.Itoa(eventId), strconv.Itoa(jobId)}}
 	c.serverRequest(request)
 }
 
-func (c *connection) listJobs(eventId int) {
+func (c *Connection) listJobs(eventId int) {
 	request := protocol.DataPacket{Type: protocol.GET_EVENTS, Data: []string{strconv.Itoa(eventId)}}
 	response, data := c.serverRequest(request)
 
@@ -87,7 +87,7 @@ func (c *connection) listJobs(eventId int) {
 	}
 }
 
-func (c *connection) volunteerRepartition(eventId int) {
+func (c *Connection) volunteerRepartition(eventId int) {
 	eventId = c.integerReader("Enter event id : ")
 	request := protocol.DataPacket{Type: protocol.GET_JOBS, Data: []string{strconv.Itoa(eventId)}}
 	response, data := c.serverRequest(request)
@@ -97,12 +97,12 @@ func (c *connection) volunteerRepartition(eventId int) {
 	}
 }
 
-func (c *connection) closeEvent(eventId int) {
+func (c *Connection) closeEvent(eventId int) {
 	closeEvent := protocol.DataPacket{Type: protocol.CLOSE_EVENT, Data: []string{strconv.Itoa(eventId)}}
 	c.serverRequest(closeEvent)
 }
 
-func (c *connection) readFromServer() protocol.DataPacket {
+func (c *Connection) readFromServer() protocol.DataPacket {
 	message, err := c.serverIn.ReadString(protocol.DELIMITER)
 	if err != nil {
 		log.Fatal(err)
@@ -114,7 +114,7 @@ func (c *connection) readFromServer() protocol.DataPacket {
 	return data
 }
 
-func (c *connection) writeToServer(data protocol.DataPacket) {
+func (c *Connection) writeToServer(data protocol.DataPacket) {
 	m, e := messagingProtocol.ToSend(data)
 	if e != nil {
 		log.Fatal(e)
@@ -129,7 +129,7 @@ func (c *connection) writeToServer(data protocol.DataPacket) {
 	}
 }
 
-func (c *connection) serverRequest(data protocol.DataPacket) (bool, protocol.DataPacket) {
+func (c *Connection) serverRequest(data protocol.DataPacket) (bool, protocol.DataPacket) {
 	c.writeToServer(data)
 	response := c.readFromServer()
 	if response.Type != protocol.OK {
@@ -138,7 +138,7 @@ func (c *connection) serverRequest(data protocol.DataPacket) (bool, protocol.Dat
 	return response.Type == protocol.OK, response
 }
 
-func (c *connection) Close() {
+func (c *Connection) Close() {
 	c.writeToServer(protocol.DataPacket{Type: protocol.STOP})
 	if c != nil && c.conn != nil {
 		c.conn.Close()

@@ -19,7 +19,7 @@ var consoleIn = bufio.NewReader(os.Stdin)
 
 // UserInterface is the function that communicate with the a,
 // the client can go through each different functionnality
-func UserInterface(c *connection) {
+func UserInterface(c *Connection) {
 	fmt.Println("Welcome!")
 
 	var choice int
@@ -57,7 +57,7 @@ func UserInterface(c *connection) {
 	}
 }
 
-func loginClient(c *connection) {
+func loginClient(c *Connection) {
 	for {
 		username := stringReader("Enter your username : ")
 		password := stringReader("Enter your password : ")
@@ -69,7 +69,7 @@ func loginClient(c *connection) {
 }
 
 // createEvent creates a new event makde by an organizer
-func createEvent(c *connection) bool {
+func createEvent(c *Connection) bool {
 	loginClient(c)
 
 	eventName := stringReader("Enter the event name : ")
@@ -97,11 +97,11 @@ func createEvent(c *connection) bool {
 	return c.createEvent(jobList)
 }
 
-func printEvents(c *connection) {
+func printEvents(c *Connection) {
 	c.printEvents()
 }
 
-func volunteerRegistration(c *connection) {
+func volunteerRegistration(c *Connection) {
 	loginClient(c)
 
 	var eventId int
@@ -114,18 +114,18 @@ func volunteerRegistration(c *connection) {
 	c.volunteerRegistration(eventId, jobId)
 }
 
-func listJobs(c *connection) {
+func listJobs(c *Connection) {
 	eventId := c.integerReader("Enter event id : ")
 	c.listJobs(eventId)
 }
 
-func volunteerRepartition(c *connection) {
+func volunteerRepartition(c *Connection) {
 	var eventId int
 	eventId = c.integerReader("Enter event id : ")
 	c.volunteerRepartition(eventId)
 }
 
-func closeEvent(c *connection) {
+func closeEvent(c *Connection) {
 	loginClient(c)
 	eventId := c.integerReader("Enter event id: ")
 	c.closeEvent(eventId)
@@ -141,11 +141,11 @@ func stringReader(optionalMessage string) string {
 	return strings.TrimRight(message, EOF)
 }
 
-func readFromServer(c *connection) protocol.DataPacket {
+func readFromServer(c *Connection) protocol.DataPacket {
 	return c.readFromServer()
 }
 
-func (c *connection) integerReader(optionalMessage string) int {
+func (c *Connection) integerReader(optionalMessage string) int {
 	fmt.Print(optionalMessage)
 	var n int
 	nbScanned, err := fmt.Fscan(consoleIn, &n)
@@ -161,13 +161,13 @@ func (c *connection) integerReader(optionalMessage string) int {
 	return n
 }
 
-//func writeToServer(c *connection, data protocol.DataPacket) {
+//func writeToServer(c *Connection, data protocol.DataPacket) {
 //	c.writeToServer(data)
 //}
 
 // serverRequest send a DataPacket to the server and return a boolean to know if the request was successful
 // with a DataPacket containing the data response
-//func serverRequest(c *connection, data protocol.DataPacket) (bool, protocol.DataPacket) {
+//func serverRequest(c *Connection, data protocol.DataPacket) (bool, protocol.DataPacket) {
 //	return c.serverRequest(data)
 //}
 

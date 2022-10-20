@@ -64,6 +64,14 @@ func (c *client) Write(data protocol.DataPacket) error {
 	return err
 }
 
+func (c *client) SendError(message string) error {
+	return c.Write(c.server.messagingProtocol.NewError(message))
+}
+
+func (c *client) SendSuccess(message string) error {
+	return c.Write(c.server.messagingProtocol.NewSuccess(message))
+}
+
 func (c *client) Close() { // TODO goroutine safe
 	(*c.conn).Close()
 }

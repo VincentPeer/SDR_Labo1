@@ -27,20 +27,18 @@ func NewClient(server *Server, conn *net.Conn) *Client {
 	}
 }
 
-// Read reads a message from the client
+// Read reads data the client sent and parse it to a DataPacket object.
 func (c *Client) Read() (protocol.DataPacket, error) {
-	// Read the message
 	message, err := c.bufin.ReadString(c.server.messagingProtocol.GetDelimiter())
 
 	if err != nil {
 		return protocol.DataPacket{}, err
 	} else {
-		// Parse the message
 		return c.server.messagingProtocol.Receive(message)
 	}
 }
 
-// Write writes a message to the client
+// Write writes a message to the client by converting the DataPacket object to a string.
 func (c *Client) Write(data protocol.DataPacket) error {
 	message, err := c.server.messagingProtocol.ToSend(data)
 
@@ -51,30 +49,37 @@ func (c *Client) Write(data protocol.DataPacket) error {
 	return err
 }
 
+// SendError format an error as a packet and send it to the client.
 func (c *Client) SendError(message string) error {
 	return c.Write(c.server.messagingProtocol.NewError(message))
 }
 
+// SendSuccess format a success packet and send it to the client.
 func (c *Client) SendSuccess(message string) error {
 	return c.Write(c.server.messagingProtocol.NewSuccess(message))
 }
 
-func (c *Client) Close() { // TODO goroutine safe
+// Close closes the client connection properly.
+func (c *Client) Close() {
 	(*c.conn).Close()
 }
 
+// isLogged returns true if the client is logged in.
 func (c *Client) isLogged() bool {
 	return c.connectedUser != ""
 }
 
+// Login sets a user as connected
 func (c *Client) Login(username string) {
 	c.connectedUser = username
 }
 
+// Logout sets the client as disconnected.
 func (c *Client) Logout() {
 	c.connectedUser = ""
 }
 
+// GetConnected get the username connected to the client
 func (c *Client) GetConnected() string {
 	return c.connectedUser
 }

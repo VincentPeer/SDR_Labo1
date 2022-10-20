@@ -25,6 +25,7 @@ type Server struct {
 }
 
 // NewServer returns a ready to use TCP server
+//
 // If debug is true, the server will print debug messages
 func NewServer(isDebug bool) *Server {
 	path, err := filepath.Abs(CONFIG_FILE_PATH)

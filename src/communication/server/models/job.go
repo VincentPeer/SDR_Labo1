@@ -17,6 +17,7 @@ var (
 
 type Jobs []Job
 
+// Job holds the jobs' data
 type Job struct {
 	ID         uint     `json:"id"`
 	Name       string   `json:"name"`
@@ -24,6 +25,7 @@ type Job struct {
 	Volunteers []string `json:"volunteers"`
 }
 
+// ToMap converts the json structure to a map of jobs
 func (jobs *Jobs) ToMap() map[uint]*Job {
 	jobsMap := make(map[uint]*Job)
 	for i := 0; i < len(*jobs); i++ {
@@ -32,8 +34,9 @@ func (jobs *Jobs) ToMap() map[uint]*Job {
 	return jobsMap
 }
 
-// Get a volunteer from the database
-// Returns an error if the volunteer does not exist
+// GetVolunteer returns the volunteer with the given name
+//
+// Complexity: O(n)
 func (job *Job) GetVolunteer(name string) (string, error) {
 	if name == "" {
 		return "", ErrorVolunteerEmpty
@@ -46,9 +49,7 @@ func (job *Job) GetVolunteer(name string) (string, error) {
 	return "", ErrorVolunteerNotFound
 }
 
-// Remove a volunteer from the database
-// Returns an error if the volunteer does not exist
-// Otherwise returns the new state of the database
+// RemoveVolunteer removes the volunteer with the given name
 func (job *Job) RemoveVolunteer(name string) (*Job, error) {
 	if name == "" {
 		return nil, ErrorVolunteerEmpty
@@ -62,6 +63,7 @@ func (job *Job) RemoveVolunteer(name string) (*Job, error) {
 	return nil, ErrorVolunteerNotFound
 }
 
+// ToString converts the job to a string
 func (job *Job) ToString() string {
 	return fmt.Sprintf("%d | %s | %d", job.ID, job.Name, job.Required)
 }

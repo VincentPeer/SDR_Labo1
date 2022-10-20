@@ -36,7 +36,7 @@ func NewConnection(conn net.Conn, protocol protocol.Protocol) *Connection {
 }
 
 // Prepare the Connection and start a client
-func CreateConnection() *Connection {
+func CreateConnection(isDebug bool) *Connection {
 
 	conn, err := net.Dial(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
 	if err != nil {
@@ -45,7 +45,15 @@ func CreateConnection() *Connection {
 
 	client := NewConnection(conn, &protocol.TcpProtocol{})
 
+	if isDebug {
+		client.sendDebugRequest()
+	}
+
 	return client
+}
+
+func (c *Connection) sendDebugRequest() {
+	c.writeToServer(protocol.DataPacket{Type: protocol.DEBUG})
 }
 
 // LoginClient ask the user to enter his username and password and check if the login is correct

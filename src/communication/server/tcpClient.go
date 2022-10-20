@@ -26,17 +26,19 @@ type Client struct {
 	conn          *net.Conn
 	connectedUser string
 	server        *Server
+	isDebug       bool
 }
 
 // NewClient creates a new client
 func NewClient(server *Server, conn *net.Conn) *Client {
 	return &Client{
-		ID:     server.getNextClientId(),
-		state:  greeting,
-		bufin:  bufio.NewReader(*conn),
-		bufout: bufio.NewWriter(*conn),
-		conn:   conn,
-		server: server,
+		ID:      server.getNextClientId(),
+		state:   greeting,
+		bufin:   bufio.NewReader(*conn),
+		bufout:  bufio.NewWriter(*conn),
+		conn:    conn,
+		server:  server,
+		isDebug: false,
 	}
 }
 

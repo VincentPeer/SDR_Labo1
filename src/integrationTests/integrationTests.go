@@ -9,8 +9,8 @@ import (
 func main() {
 	fmt.Println("Running integration tests")
 
-	go server.NewServer().Start()
-	conn := client.CreateConnection()
+	go server.NewServer(false).Start()
+	conn := client.CreateConnection(false)
 	fmt.Println("Client created...")
 	fmt.Println("Starting tests...")
 

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"strconv"
+	"time"
 )
 
 type DatabaseManager struct {
@@ -40,6 +41,10 @@ func (dbm *DatabaseManager) Start() {
 }
 
 func (dbm *DatabaseManager) handleRequest(request DatabaseRequest) {
+	if request.sender.isDebug {
+		time.Sleep(5 * time.Second)
+	}
+
 	switch request.payload.Type {
 	case protocol.LOGIN:
 		if checkDatapacket(request.payload, 2, 2, request.sender) {

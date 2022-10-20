@@ -21,9 +21,10 @@ type Server struct {
 	clients           map[int]*Client
 	dbm               *DatabaseManager
 	messagingProtocol protocol.TcpProtocol
+	isDebug           bool
 }
 
-func NewServer() *Server {
+func NewServer(isDebug bool) *Server {
 	path, err := filepath.Abs(CONFIG_FILE_PATH)
 
 	if err != nil {
@@ -35,6 +36,7 @@ func NewServer() *Server {
 		clients:           make(map[int]*Client),
 		dbm:               NewDatabaseManager(models.LoadDatabaseFromJson(path)),
 		messagingProtocol: protocol.TcpProtocol{},
+		isDebug:           isDebug,
 	}
 }
 
@@ -90,6 +92,11 @@ func (server *Server) handleRequest(client *Client) {
 		}
 
 		fmt.Println("Data :", data)
+
+		if data.Type == protocol.DEBUG && server.isDebug {
+			client.isDebug = true
+		}
+
 		server.dbm.RequestChannel <- *NewDatabaseRequest(client, data)
 
 	}

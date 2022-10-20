@@ -24,6 +24,10 @@ var (
 	messagingProtocol = &protocol.TcpProtocol{}
 )
 
+func CreateServer() {
+	main()
+}
+
 func main() {
 	path, err := filepath.Abs(CONFIG_FILE_PATH)
 

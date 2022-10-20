@@ -11,6 +11,7 @@ var (
 	ErrorEventNameEmpty = errors.New("event name cannot be empty")
 	ErrorOrganizerEmpty = errors.New("organizer name cannot be empty")
 	ErrorNotOrganizer   = errors.New("user is not an organizer")
+	ErrorEventIsClosed  = errors.New("event is closed")
 )
 
 type Event struct {
@@ -26,7 +27,7 @@ type jsonEvent struct {
 	Name      string `json:"name"`
 	Organizer string `json:"organizer"`
 	Jobs      Jobs   `json:"jobs"`
-	isOpen    bool   `json:"isOpen"`
+	IsOpen    bool   `json:"isOpen"`
 }
 
 type jsonEvents []jsonEvent
@@ -35,7 +36,7 @@ type Events []Event
 func (event *jsonEvents) ToMap() map[uint]*Event {
 	events := make(map[uint]*Event)
 	for i := 0; i < len(*event); i++ {
-		events[(*event)[i].ID] = &Event{(*event)[i].ID, (*event)[i].Name, (*event)[i].Organizer, (*event)[i].Jobs.ToMap(), (*event)[i].isOpen}
+		events[(*event)[i].ID] = &Event{(*event)[i].ID, (*event)[i].Name, (*event)[i].Organizer, (*event)[i].Jobs.ToMap(), (*event)[i].IsOpen}
 	}
 	return events
 }
@@ -59,9 +60,6 @@ func (event *Event) CreateJob(name string, required uint) (*Event, error) {
 // Returns an error if the job does not exist
 // Otherwise returns the job
 func (event *Event) GetJob(id uint) (*Job, error) {
-	//	if id == "" {
-	//		return nil, ErrorJobNameEmpty
-	//	}
 	job, found := event.Jobs[id]
 	if !found {
 		return nil, ErrorJobNotFound
@@ -112,12 +110,15 @@ func (event *Event) GetJobsRepartitionTable() []string {
 // Returns an error if the job does not exist
 // Otherwise returns the new state of the database
 func (event *Event) AddVolunteer(jobId uint, name string) (*Job, error) {
+	if name == "" {
+		return nil, ErrorVolunteerEmpty
+	}
 	job, err := event.GetJob(jobId)
 	if err != nil {
 		return nil, err
 	}
-	if name == "" {
-		return nil, ErrorVolunteerEmpty
+	if !event.isOpen {
+		return nil, ErrorEventIsClosed
 	}
 	if job.Required == uint(len(job.Volunteers)) {
 		return nil, ErrorVolunteerAboveMaximum
@@ -145,4 +146,8 @@ func (event *Event) RemoveVolunteer(name string) error {
 		}
 	}
 	return nil
+}
+
+func (event *Event) Close() {
+	event.isOpen = false
 }

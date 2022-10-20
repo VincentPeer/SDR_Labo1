@@ -289,7 +289,7 @@ func handleRequest(client *client) {
 			}
 			fmt.Println(event.GetJobsRepartitionTable())
 			fmt.Println(job)
-			_, err = job.AddVolunteer(client.GetConnected())
+			_, err = event.AddVolunteer(job.ID, client.GetConnected())
 			if err != nil {
 				fmt.Println("Error adding volunteer: ", err.Error())
 				client.Write(messagingProtocol.NewError(err.Error()))
@@ -299,12 +299,52 @@ func handleRequest(client *client) {
 			fmt.Println("Volunteer added")
 			fmt.Println(event.GetJobsRepartitionTable())
 			fmt.Println(job)
-			client.Write(messagingProtocol.NewSuccess(""))
+			client.Write(messagingProtocol.NewSuccess("Volunteer added"))
+			client.Logout()
+
+		case protocol.CLOSE_EVENT:
+			fmt.Println("user wants to close an event")
+
+			if len(data.Data) != 1 {
+				fmt.Println("Invalid number of arguments")
+				client.Write(messagingProtocol.NewError("Invalid number of arguments"))
+				continue
+			}
+
+			if client.state != connected {
+				fmt.Println("User is not logged in")
+				client.Write(messagingProtocol.NewError("You must be logged in to join an event"))
+				continue
+			}
+
+			eventId, err := strconv.ParseUint(data.Data[0], 10, 32)
+			if err != nil {
+				fmt.Println("Invalid eventId: ", data.Data[0])
+				client.Write(messagingProtocol.NewError("Invalid eventId: is not a uint64"))
+				continue
+			}
+
+			event, err := db.GetEvent(uint(eventId))
+			if err != nil {
+				fmt.Println("Error getting event: ", err.Error())
+				client.Write(messagingProtocol.NewError(err.Error()))
+				continue
+			}
+
+			if event.Organizer != client.GetConnected() {
+				fmt.Println("User is not the organizer")
+				client.Write(messagingProtocol.NewError("You are not the organizer of this event"))
+				continue
+			}
+
+			event.Close()
+			client.Write(messagingProtocol.NewSuccess("Event closed"))
 			client.Logout()
 
 		case protocol.STOP:
 			fmt.Println("user wants to stop the a")
 			return
+
 		default:
 			fmt.Println("Unknown command")
 		}

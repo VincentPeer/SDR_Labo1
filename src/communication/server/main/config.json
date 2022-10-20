@@ -50,7 +50,8 @@
                     "required" : 1,
                     "volunteers" : ["Alain Terrieur"]
                 }
-            ]
+            ],
+            "isOpen": true
         },
         {
             "id" : 1,
@@ -69,7 +70,8 @@
                     "required" : 2,
                     "volunteers" : ["Alain Terrieur"]
                 }
-            ]
+            ],
+            "isOpen": true
         }
     ]
 

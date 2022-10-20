@@ -86,6 +86,6 @@ func (db *Database) CreateEvent(name string, organizer string) (*Database, error
 		return db, ErrorEventExists
 	}
 	id := uint(len(db.Events))
-	db.Events[id] = &Event{id, name, organizer, make(map[uint]*Job)}
+	db.Events[id] = &Event{id, name, organizer, make(map[uint]*Job), true}
 	return db, nil
 }

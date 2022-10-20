@@ -22,7 +22,6 @@ type Job struct {
 	Name       string   `json:"name"`
 	Required   uint     `json:"required"`
 	Volunteers []string `json:"volunteers"`
-	EventId    uint     `json:"event_id"`
 }
 
 func (jobs *Jobs) ToMap() map[uint]*Job {
@@ -47,21 +46,20 @@ func (job *Job) GetVolunteer(name string) (string, error) {
 	return "", ErrorVolunteerNotFound
 }
 
-// Adds a volunteer to a job
-// Returns an error if the job does not exist
+// Remove a volunteer from the database
+// Returns an error if the volunteer does not exist
 // Otherwise returns the new state of the database
-func (job *Job) AddVolunteer(name string) (*Job, error) {
+func (job *Job) RemoveVolunteer(name string) (*Job, error) {
 	if name == "" {
 		return nil, ErrorVolunteerEmpty
 	}
-	if job.Required == uint(len(job.Volunteers)) {
-		return nil, ErrorVolunteerAboveMaximum
+	for i, volunteer := range job.Volunteers {
+		if volunteer == name {
+			job.Volunteers = append(job.Volunteers[:i], job.Volunteers[i+1:]...)
+			return job, nil
+		}
 	}
-	if _, err := job.GetVolunteer(name); err != ErrorVolunteerNotFound {
-		return job, ErrorVolunteerExists
-	}
-	job.Volunteers = append(job.Volunteers, name)
-	return job, nil
+	return nil, ErrorVolunteerNotFound
 }
 
 func (job *Job) ToString() string {

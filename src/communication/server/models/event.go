@@ -11,6 +11,7 @@ var (
 	ErrorEventNameEmpty = errors.New("event name cannot be empty")
 	ErrorOrganizerEmpty = errors.New("organizer name cannot be empty")
 	ErrorNotOrganizer   = errors.New("user is not an organizer")
+	ErrorEventIsClosed  = errors.New("event is closed")
 )
 
 type Event struct {
@@ -18,6 +19,7 @@ type Event struct {
 	Name      string
 	Organizer string
 	Jobs      map[uint]*Job
+	isOpen    bool
 }
 
 type jsonEvent struct {
@@ -25,6 +27,7 @@ type jsonEvent struct {
 	Name      string `json:"name"`
 	Organizer string `json:"organizer"`
 	Jobs      Jobs   `json:"jobs"`
+	IsOpen    bool   `json:"isOpen"`
 }
 
 type jsonEvents []jsonEvent
@@ -33,7 +36,7 @@ type Events []Event
 func (event *jsonEvents) ToMap() map[uint]*Event {
 	events := make(map[uint]*Event)
 	for i := 0; i < len(*event); i++ {
-		events[(*event)[i].ID] = &Event{(*event)[i].ID, (*event)[i].Name, (*event)[i].Organizer, (*event)[i].Jobs.ToMap()}
+		events[(*event)[i].ID] = &Event{(*event)[i].ID, (*event)[i].Name, (*event)[i].Organizer, (*event)[i].Jobs.ToMap(), (*event)[i].IsOpen}
 	}
 	return events
 }
@@ -49,7 +52,7 @@ func (event *Event) CreateJob(name string, required uint) (*Event, error) {
 		return event, ErrorJobExists
 	}
 	id := uint(len(event.Jobs))
-	event.Jobs[id] = &Job{ID: id, Name: name, Required: required, Volunteers: []string{}, EventId: event.ID}
+	event.Jobs[id] = &Job{ID: id, Name: name, Required: required, Volunteers: []string{}}
 	return event, nil
 }
 
@@ -57,9 +60,6 @@ func (event *Event) CreateJob(name string, required uint) (*Event, error) {
 // Returns an error if the job does not exist
 // Otherwise returns the job
 func (event *Event) GetJob(id uint) (*Job, error) {
-	//	if id == "" {
-	//		return nil, ErrorJobNameEmpty
-	//	}
 	job, found := event.Jobs[id]
 	if !found {
 		return nil, ErrorJobNotFound
@@ -83,7 +83,11 @@ func (event *Event) GetJobByName(name string) (*Job, error) {
 }
 
 func (event *Event) ToString() string {
-	return fmt.Sprintf("%d | %s | %s", event.ID, event.Name, event.Organizer)
+	openStatus := "open"
+	if !event.isOpen {
+		openStatus = "closed"
+	}
+	return fmt.Sprintf("%d | %s | %s | %s", event.ID, event.Name, event.Organizer, openStatus)
 }
 
 func (event *Event) GetJobsAsStringArray() []string {
@@ -104,4 +108,50 @@ func (event *Event) GetJobsRepartitionTable() []string {
 		table = append(table, line)
 	}
 	return table
+}
+
+// Adds a volunteer to a job
+// Returns an error if the job does not exist
+// Otherwise returns the new state of the database
+func (event *Event) AddVolunteer(jobId uint, name string) (*Job, error) {
+	if name == "" {
+		return nil, ErrorVolunteerEmpty
+	}
+	job, err := event.GetJob(jobId)
+	if err != nil {
+		return nil, err
+	}
+	if !event.isOpen {
+		return nil, ErrorEventIsClosed
+	}
+	if job.Required == uint(len(job.Volunteers)) {
+		return nil, ErrorVolunteerAboveMaximum
+	}
+	if _, err := job.GetVolunteer(name); err != ErrorVolunteerNotFound {
+		return job, ErrorVolunteerExists
+	}
+	err = event.RemoveVolunteer(name)
+	if err != nil {
+		return nil, err
+	}
+	job.Volunteers = append(job.Volunteers, name)
+	return job, nil
+}
+
+// Removes a volunteer from all jobs
+// Returns an error if the volunteer does not exist
+func (event *Event) RemoveVolunteer(name string) error {
+	if name == "" {
+		return ErrorVolunteerEmpty
+	}
+	for _, job := range event.Jobs {
+		if _, err := job.GetVolunteer(name); err == nil {
+			job.RemoveVolunteer(name)
+		}
+	}
+	return nil
+}
+
+func (event *Event) Close() {
+	event.isOpen = false
 }

@@ -57,29 +57,29 @@ func TestAddVolunteer(t *testing.T) {
 		t.Error(err)
 	}
 	got := db.Events[0]
-	want := Event{
-		ID:        0,
-		Name:      "Festival de la musique",
-		Organizer: "Sarah Croche",
-		Jobs: []Job{
-			{
-				ID:       0,
-				Name:     "Buvette",
-				Required: 2,
-				Volunteers: []string{
-					"Alex Terrieur",
-					"Alain Terrieur",
-				},
-			},
-			{
-				ID:         1,
-				Name:       "Sécurité",
-				Required:   3,
-				Volunteers: []string{},
-			},
-		},
-	}
-
+	//	want := Event{
+	//		ID:        0,
+	//		Name:      "Festival de la musique",
+	//		Organizer: "Sarah Croche",
+	//		Jobs: []Job{
+	//			{
+	//				ID:       0,
+	//				Name:     "Buvette",
+	//				Required: 2,
+	//				Volunteers: []string{
+	//					"Alex Terrieur",
+	//					"Alain Terrieur",
+	//				},
+	//			},
+	//			{
+	//				ID:         1,
+	//				Name:       "Sécurité",
+	//				Required:   3,
+	//				Volunteers: []string{},
+	//			},
+	//		},
+	//	}
+	want := 0
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got %v want %v", got, want)
 	}

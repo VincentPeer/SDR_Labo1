@@ -14,18 +14,26 @@ var (
 )
 
 type Event struct {
+	ID        uint
+	Name      string
+	Organizer string
+	Jobs      map[uint]*Job
+}
+
+type jsonEvent struct {
 	ID        uint   `json:"id"`
 	Name      string `json:"name"`
 	Organizer string `json:"organizer"`
-	Jobs      []Job  `json:"jobs"`
+	Jobs      Jobs   `json:"jobs"`
 }
 
+type jsonEvents []jsonEvent
 type Events []Event
 
-func (event *Events) ToMap() map[uint]*Event {
+func (event *jsonEvents) ToMap() map[uint]*Event {
 	events := make(map[uint]*Event)
 	for i := 0; i < len(*event); i++ {
-		events[(*event)[i].ID] = &(*event)[i]
+		events[(*event)[i].ID] = &Event{(*event)[i].ID, (*event)[i].Name, (*event)[i].Organizer, (*event)[i].Jobs.ToMap()}
 	}
 	return events
 }
@@ -40,8 +48,8 @@ func (event *Event) CreateJob(name string, required uint) (*Event, error) {
 	if _, err := event.GetJobByName(name); err == nil {
 		return event, ErrorJobExists
 	}
-
-	event.Jobs = append(event.Jobs, Job{uint(len(event.Jobs)), name, required, []string{}, event.ID})
+	id := uint(len(event.Jobs))
+	event.Jobs[id] = &Job{ID: id, Name: name, Required: required, Volunteers: []string{}, EventId: event.ID}
 	return event, nil
 }
 
@@ -52,12 +60,11 @@ func (event *Event) GetJob(id uint) (*Job, error) {
 	//	if id == "" {
 	//		return nil, ErrorJobNameEmpty
 	//	}
-	for _, job := range event.Jobs {
-		if job.ID == id {
-			return &job, nil
-		}
+	job, found := event.Jobs[id]
+	if !found {
+		return nil, ErrorJobNotFound
 	}
-	return &Job{}, ErrorJobNotFound
+	return job, nil
 }
 
 // Get a job from the database
@@ -69,7 +76,7 @@ func (event *Event) GetJobByName(name string) (*Job, error) {
 	}
 	for _, job := range event.Jobs {
 		if job.Name == name {
-			return &job, nil
+			return job, nil
 		}
 	}
 	return &Job{}, ErrorJobNotFound

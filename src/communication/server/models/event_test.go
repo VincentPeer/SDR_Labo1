@@ -17,33 +17,33 @@ func TestCreateJob(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	want := &Event{
-		ID:        0,
-		Name:      "Festival de la musique",
-		Organizer: "Sarah Croche",
-		Jobs: []Job{
-			{
-				ID:       0,
-				Name:     "Buvette",
-				Required: 2,
-				Volunteers: []string{
-					"Alex Terrieur",
-				},
-			},
-			{
-				ID:         1,
-				Name:       "Sécurité",
-				Required:   3,
-				Volunteers: []string{},
-			},
-			{
-				ID:         2,
-				Name:       "Test",
-				Required:   3,
-				Volunteers: []string{},
-			},
-		},
-	}
+	want := 0
+	//want := &Event{
+	//	ID:        0,
+	//	Name:      "Festival de la musique",
+	//	Organizer: "Sarah Croche",
+	//	Jobs: make(map[uint]*Job {
+	//		0 : {
+	//				ID:       0,
+	//				Name:     "Buvette",
+	//				Required: 2,
+	//				Volunteers: []string{
+	//					"Alex Terrieur",
+	//				},
+	//			},
+	//			1: {
+	//				ID:         1,
+	//				Name:       "Sécurité",
+	//				Required:   3,
+	//				Volunteers: []string{},
+	//			},
+	//			2: {
+	//				ID:         2,
+	//				Name:       "Test",
+	//				Required:   3,
+	//				Volunteers: []string{},
+	//			}})
+	//		}
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got %v want %v", got, want)
 	}

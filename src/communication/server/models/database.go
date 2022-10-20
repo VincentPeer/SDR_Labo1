@@ -13,8 +13,8 @@ type Database struct {
 }
 
 type jsonDatabase struct {
-	Events Events `json:"events"`
-	Users  Users  `json:"users"`
+	Events jsonEvents `json:"events"`
+	Users  Users      `json:"users"`
 }
 
 func LoadDatabaseFromJson(jsonPath string) Database {
@@ -86,6 +86,6 @@ func (db *Database) CreateEvent(name string, organizer string) (*Database, error
 		return db, ErrorEventExists
 	}
 	id := uint(len(db.Events))
-	db.Events[id] = &Event{id, name, organizer, []Job{}}
+	db.Events[id] = &Event{id, name, organizer, make(map[uint]*Job)}
 	return db, nil
 }

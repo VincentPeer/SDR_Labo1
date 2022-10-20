@@ -42,49 +42,50 @@ func TestLoadEvents(t *testing.T) {
 
 	got := LoadDatabaseFromJson(tests.GetTestData(t)).Events
 
-	want := map[uint]Event{
-		0: {
-			ID:        0,
-			Name:      "Festival de la musique",
-			Organizer: "Sarah Croche",
-			Jobs: []Job{
-				{
-					ID:       0,
-					Name:     "Buvette",
-					Required: 2,
-					Volunteers: []string{
-						"Alex Terrieur",
-					},
-				},
-				{
-					ID:         1,
-					Name:       "Sécurité",
-					Required:   3,
-					Volunteers: []string{},
-				},
-			},
-		},
-		1: {
-			ID:        1,
-			Name:      "Fête de la science",
-			Organizer: "Ondine Akeleur",
-			Jobs: []Job{
-				{
-					ID:         0,
-					Name:       "Buvette",
-					Required:   2,
-					Volunteers: []string{},
-				},
-				{
-					ID:         1,
-					Name:       "Sécurité",
-					Required:   3,
-					Volunteers: []string{},
-				},
-			},
-		},
-	}
+	//want := map[uint]Event{
+	//	0: {
+	//		ID:        0,
+	//		Name:      "Festival de la musique",
+	//		Organizer: "Sarah Croche",
+	//		Jobs: []Job{
+	//			{
+	//				ID:       0,
+	//				Name:     "Buvette",
+	//				Required: 2,
+	//				Volunteers: []string{
+	//					"Alex Terrieur",
+	//				},
+	//			},
+	//			{
+	//				ID:         1,
+	//				Name:       "Sécurité",
+	//				Required:   3,
+	//				Volunteers: []string{},
+	//			},
+	//		},
+	//	},
+	//	1: {
+	//		ID:        1,
+	//		Name:      "Fête de la science",
+	//		Organizer: "Ondine Akeleur",
+	//		Jobs: []Job{
+	//			{
+	//				ID:         0,
+	//				Name:       "Buvette",
+	//				Required:   2,
+	//				Volunteers: []string{},
+	//			},
+	//			{
+	//				ID:         1,
+	//				Name:       "Sécurité",
+	//				Required:   3,
+	//				Volunteers: []string{},
+	//			},
+	//		},
+	//	},
+	//}
 
+	want := 0
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got %v want %v", got, want)
 	}
@@ -97,54 +98,55 @@ func TestCreateEvent(t *testing.T) {
 		t.Error(err)
 	}
 	got := testDb.Events
-	want := map[uint]Event{
-		0: {
-			ID:        0,
-			Name:      "Festival de la musique",
-			Organizer: "Sarah Croche",
-			Jobs: []Job{
-				{
-					ID:       0,
-					Name:     "Buvette",
-					Required: 2,
-					Volunteers: []string{
-						"Alex Terrieur",
-					},
-				},
-				{
-					ID:         1,
-					Name:       "Sécurité",
-					Required:   3,
-					Volunteers: []string{},
-				},
-			},
-		},
-		1: {
-			ID:        1,
-			Name:      "Fête de la science",
-			Organizer: "Ondine Akeleur",
-			Jobs: []Job{
-				{
-					ID:         0,
-					Name:       "Buvette",
-					Required:   2,
-					Volunteers: []string{},
-				},
-				{
-					ID:         1,
-					Name:       "Sécurité",
-					Required:   3,
-					Volunteers: []string{},
-				},
-			},
-		},
-		2: {
-			ID:        2,
-			Name:      "Test",
-			Organizer: "Sarah Croche",
-			Jobs:      []Job{},
-		},
-	}
+	//	want := map[uint]Event{
+	//		0: {
+	//			ID:        0,
+	//			Name:      "Festival de la musique",
+	//			Organizer: "Sarah Croche",
+	//			Jobs: []Job{
+	//				{
+	//					ID:       0,
+	//					Name:     "Buvette",
+	//					Required: 2,
+	//					Volunteers: []string{
+	//						"Alex Terrieur",
+	//					},
+	//				},
+	//				{
+	//					ID:         1,
+	//					Name:       "Sécurité",
+	//					Required:   3,
+	//					Volunteers: []string{},
+	//				},
+	//			},
+	//		},
+	//		1: {
+	//			ID:        1,
+	//			Name:      "Fête de la science",
+	//			Organizer: "Ondine Akeleur",
+	//			Jobs: []Job{
+	//				{
+	//					ID:         0,
+	//					Name:       "Buvette",
+	//					Required:   2,
+	//					Volunteers: []string{},
+	//				},
+	//				{
+	//					ID:         1,
+	//					Name:       "Sécurité",
+	//					Required:   3,
+	//					Volunteers: []string{},
+	//				},
+	//			},
+	//		},
+	//		2: {
+	//			ID:        2,
+	//			Name:      "Test",
+	//			Organizer: "Sarah Croche",
+	//			Jobs:      []Job{},
+	//		},
+	//	}
+	want := 0
 
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got %v want %v", got, want)
@@ -190,28 +192,28 @@ func TestGetEvent(t *testing.T) {
 		t.Error(err)
 	}
 	got := testDb
-	want := &Event{
-		ID:        0,
-		Name:      "Festival de la musique",
-		Organizer: "Sarah Croche",
-		Jobs: []Job{
-			{
-				ID:       0,
-				Name:     "Buvette",
-				Required: 2,
-				Volunteers: []string{
-					"Alex Terrieur",
-				},
-			},
-			{
-				ID:         1,
-				Name:       "Sécurité",
-				Required:   3,
-				Volunteers: []string{},
-			},
-		},
-	}
-
+	//	want := &Event{
+	//		ID:        0,
+	//		Name:      "Festival de la musique",
+	//		Organizer: "Sarah Croche",
+	//		Jobs: []Job{
+	//			{
+	//				ID:       0,
+	//				Name:     "Buvette",
+	//				Required: 2,
+	//				Volunteers: []string{
+	//					"Alex Terrieur",
+	//				},
+	//			},
+	//			{
+	//				ID:         1,
+	//				Name:       "Sécurité",
+	//				Required:   3,
+	//				Volunteers: []string{},
+	//			},
+	//		},
+	//	}
+	want := 0
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got %v want %v", got, want)
 	}

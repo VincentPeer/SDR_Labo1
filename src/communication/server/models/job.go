@@ -15,12 +15,22 @@ var (
 	ErrorVolunteerAboveMaximum = errors.New("volunteer count is above maximum")
 )
 
+type Jobs []Job
+
 type Job struct {
 	ID         uint     `json:"id"`
 	Name       string   `json:"name"`
 	Required   uint     `json:"required"`
 	Volunteers []string `json:"volunteers"`
 	EventId    uint     `json:"event_id"`
+}
+
+func (jobs *Jobs) ToMap() map[uint]*Job {
+	jobsMap := make(map[uint]*Job)
+	for i := 0; i < len(*jobs); i++ {
+		jobsMap[(*jobs)[i].ID] = &(*jobs)[i]
+	}
+	return jobsMap
 }
 
 // Get a volunteer from the database

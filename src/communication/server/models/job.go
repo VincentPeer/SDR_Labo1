@@ -22,7 +22,6 @@ type Job struct {
 	Name       string   `json:"name"`
 	Required   uint     `json:"required"`
 	Volunteers []string `json:"volunteers"`
-	EventId    uint     `json:"event_id"`
 }
 
 func (jobs *Jobs) ToMap() map[uint]*Job {

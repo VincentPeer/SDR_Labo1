@@ -52,7 +52,7 @@ func (event *Event) CreateJob(name string, required uint) (*Event, error) {
 		return event, ErrorJobExists
 	}
 	id := uint(len(event.Jobs))
-	event.Jobs[id] = &Job{ID: id, Name: name, Required: required, Volunteers: []string{}, EventId: event.ID}
+	event.Jobs[id] = &Job{ID: id, Name: name, Required: required, Volunteers: []string{}}
 	return event, nil
 }
 
@@ -83,7 +83,11 @@ func (event *Event) GetJobByName(name string) (*Job, error) {
 }
 
 func (event *Event) ToString() string {
-	return fmt.Sprintf("%d | %s | %s", event.ID, event.Name, event.Organizer)
+	openStatus := "open"
+	if !event.isOpen {
+		openStatus = "closed"
+	}
+	return fmt.Sprintf("%d | %s | %s | %s", event.ID, event.Name, event.Organizer, openStatus)
 }
 
 func (event *Event) GetJobsAsStringArray() []string {

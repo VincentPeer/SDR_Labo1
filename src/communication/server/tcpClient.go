@@ -6,34 +6,19 @@ import (
 	"net"
 )
 
-type clientState int
-
-const (
-	greeting clientState = iota
-	connected
-	creatingEvent
-	registeringForEvent
-	registeringForJob
-	shutdown
-)
-
-// Client represents a Client connected to the main
+// Client represent a client communicating with the server
 type Client struct {
-	state         clientState
-	ID            uint
 	bufin         *bufio.Reader
 	bufout        *bufio.Writer
 	conn          *net.Conn
-	connectedUser string
-	server        *Server
+	connectedUser string  // name of the user identified by the client
+	server        *Server // server the client is connected to
 	isDebug       bool
 }
 
 // NewClient creates a new client
 func NewClient(server *Server, conn *net.Conn) *Client {
 	return &Client{
-		ID:      server.getNextClientId(),
-		state:   greeting,
 		bufin:   bufio.NewReader(*conn),
 		bufout:  bufio.NewWriter(*conn),
 		conn:    conn,
@@ -78,18 +63,16 @@ func (c *Client) Close() { // TODO goroutine safe
 	(*c.conn).Close()
 }
 
-func (c *Client) GetState() clientState {
-	return c.state
+func (c *Client) isLogged() bool {
+	return c.connectedUser != ""
 }
 
 func (c *Client) Login(username string) {
 	c.connectedUser = username
-	c.state = connected
 }
 
 func (c *Client) Logout() {
 	c.connectedUser = ""
-	c.state = greeting
 }
 
 func (c *Client) GetConnected() string {

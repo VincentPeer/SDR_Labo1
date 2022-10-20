@@ -259,7 +259,7 @@ func (dbm *DatabaseManager) logInUser(client *Client, username string, password 
 }
 
 func checkIfConnected(client *Client) bool {
-	if client.state != connected {
+	if !client.isLogged() {
 		client.SendError("You must be logged in to do this")
 		return false
 	}

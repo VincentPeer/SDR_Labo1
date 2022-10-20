@@ -17,27 +17,15 @@ const (
 	CONFIG_FILE_PATH = "./config.json"
 )
 
-func (server *Server) IsDebug() bool {
-	return server.isDebug
-}
-
-type Debuggable interface {
-	IsDebug() bool
-}
-
-func Debug(source Debuggable, message string) {
-	if source.IsDebug() {
-		fmt.Println("DEBUG: ", message)
-	}
-}
-
+// Server listens for incoming connections on a given port and forwards them to the database manager
 type Server struct {
-	clients           map[int]*Client
 	dbm               *DatabaseManager
 	messagingProtocol protocol.TcpProtocol
 	isDebug           bool
 }
 
+// NewServer returns a ready to use TCP server
+// If debug is true, the server will print debug messages
 func NewServer(isDebug bool) *Server {
 	path, err := filepath.Abs(CONFIG_FILE_PATH)
 
@@ -47,13 +35,18 @@ func NewServer(isDebug bool) *Server {
 	}
 
 	return &Server{
-		clients:           make(map[int]*Client),
 		dbm:               NewDatabaseManager(models.LoadDatabaseFromJson(path), isDebug),
 		messagingProtocol: protocol.TcpProtocol{},
 		isDebug:           isDebug,
 	}
 }
 
+// IsDebug returns true if the server is in debug mode
+func (server *Server) IsDebug() bool {
+	return server.isDebug
+}
+
+// Start listening for incoming connections. Will block unless an error occurs.
 func (server *Server) Start() {
 
 	go server.dbm.Start()
@@ -79,16 +72,13 @@ func (server *Server) Start() {
 	}
 }
 
-func (server *Server) getNextClientId() uint {
-	return uint(len(server.clients))
-}
-
+// closeRequest closes the connection with the client and removes it from the list of clients
 func (server *Server) closeRequest(client *Client) {
 	Debug(server, "Closing client connection")
 	client.Close()
 }
 
-// Handles incoming requests.
+// handleRequest handles incoming requests from clients and forwards database access requests to the database manager
 func (server *Server) handleRequest(client *Client) {
 	Debug(server, "Now we dialogue with client")
 	defer server.closeRequest(client)
@@ -96,7 +86,7 @@ func (server *Server) handleRequest(client *Client) {
 	for {
 		data, err := client.Read()
 		if err != nil {
-			if err == io.EOF {
+			if err == io.EOF { // Client disconnected
 				Debug(server, "Client disconnected")
 				break
 			} else {
@@ -105,11 +95,11 @@ func (server *Server) handleRequest(client *Client) {
 			}
 		}
 
-		if data.Type == protocol.DEBUG && server.isDebug {
+		if data.Type == protocol.DEBUG && server.isDebug { // Client sent a debug command so we set him to debug mode
 			client.isDebug = true
 		}
 
-		server.dbm.RequestChannel <- *NewDatabaseRequest(client, data)
+		server.dbm.RequestChannel <- *NewDatabaseRequest(client, data) // Forward the request to the database manager
 
 	}
 

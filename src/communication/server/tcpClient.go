@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"SDR_Labo1/src/communication/protocol"
@@ -17,7 +17,7 @@ const (
 	shutdown
 )
 
-// client represents a client connected to the server
+// client represents a client connected to the main
 type client struct {
 	state         clientState
 	ID            int

@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-// constants needed to connect to the server
+// constants needed to connect to the a
 const (
 	CONN_HOST = "localhost"
 	CONN_PORT = "3333"
@@ -17,7 +17,7 @@ const (
 	OK        = "OK"
 )
 
-// connection contains buffered readers and writers to allow communication between the client and the server
+// connection contains buffered readers and writers to allow communication between the client and the a
 type connection struct {
 	consoleIn *bufio.Reader
 	serverIn  *bufio.Reader

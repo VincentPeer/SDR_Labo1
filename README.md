@@ -25,9 +25,8 @@ le serveur et le(s) client(s).
 Le mode debug permet de voir les messages échangés entre le serveur et le client.
 Pour l'activer, il suffit de lancer le serveur avec l'argument `-d`.
 
-Pour tester les races conditions, il suffit de lancer le client avec l'argument `-r` également.
-Les clients accès au ressources par des clients lancés de cette manière sont bloqués pendant 5 secondes,
-permettant de tester le conditions de concurrence.
+Pour tester les races conditions, il suffit de lancer le client avec l'argument `-d` également.
+L'accès au ressources par des clients lancés de cette manière est bloqué pendant 5 secondes, permettant de tester le conditions de concurrence.
 
 ### Utilitaire godoc
 Afin d'avoir une documentation claire de nos packages, fonctions et l'ensemble
@@ -40,4 +39,4 @@ Ensuite, à partir d'un terminal dans le dossier *SDR_Labo1*, tapez la commande
 `godoc -http=:6060`  
 Dans votre navigateur, entrez l'URL  
 `http://localhost:6060/pkg/SDR_Labo1/`  
-Vous pouvez alors parcourir notre documentation.
+Vous pouvez alors parcourir notre documentation. 

@@ -11,24 +11,21 @@ import (
 )
 
 var messagingProtocol = &protocol.TcpProtocol{}
-
-const EOF = "\r\n"
-
 var consoleIn = bufio.NewReader(os.Stdin)
 
-// UserInterface is the function that communicate with the a,
-// the client can go through each different functionnality
-func UserInterface(c *Connection) {
+// userInterface is the main function for the user interface,
+// the client can go through each different functionality
+func userInterface(c *Connection) {
 	fmt.Println("Welcome!")
 
 	var choice int
 	for {
-		fmt.Println("Choose one of the following functionnality")
+		fmt.Println("Choose one of the following functionality")
 		fmt.Println("[1] Create a new event")
 		fmt.Println("[2] Register to an event as a volunteer")
 		fmt.Println("[3] List all current events")
 		fmt.Println("[4] List all jobs for a specific event")
-		fmt.Println("[5] List the volunteers repartiton for a specific event")
+		fmt.Println("[5] List the volunteers repartition for a specific event")
 		fmt.Println("[6] To close an event")
 		fmt.Println("[7] To terminate the process")
 
@@ -56,6 +53,8 @@ func UserInterface(c *Connection) {
 	}
 }
 
+// loginClient allow the user to log in
+// If the login is invalid, the user has to try again
 func loginClient(c *Connection) {
 	for {
 		username := stringReader("Enter your username : ")
@@ -68,6 +67,7 @@ func loginClient(c *Connection) {
 }
 
 // createEvent creates a new event made by an organizer
+// The user has to log in and must be an organizer
 func createEvent(c *Connection) {
 	loginClient(c)
 
@@ -96,10 +96,13 @@ func createEvent(c *Connection) {
 	c.CreateEvent(jobList)
 }
 
+// printEvents prints all the events
 func printEvents(c *Connection) {
 	c.PrintEvents()
 }
 
+// volunteerRegistration allows a volunteer to register to an event
+// The user has to log in
 func volunteerRegistration(c *Connection) {
 	loginClient(c)
 
@@ -113,23 +116,28 @@ func volunteerRegistration(c *Connection) {
 	c.VolunteerRegistration(eventId, jobId)
 }
 
+// listJobs prints all the jobs for a specific event
 func listJobs(c *Connection) {
 	eventId := c.integerReader("Enter event id : ")
 	c.ListJobs(eventId)
 }
 
+// volunteerRepartition prints the volunteer repartition for a specific event
 func volunteerRepartition(c *Connection) {
 	var eventId int
 	eventId = c.integerReader("Enter event id : ")
 	c.VolunteerRepartition(eventId)
 }
 
+// closeEvent closes an event
+// The user has to log in and must be the organizer of the event
 func closeEvent(c *Connection) {
 	loginClient(c)
 	eventId := c.integerReader("Enter event id: ")
 	c.CloseEvent(eventId)
 }
 
+// stringReader reads a string from the console
 func stringReader(optionalMessage string) string {
 	fmt.Print(optionalMessage)
 
@@ -137,13 +145,10 @@ func stringReader(optionalMessage string) string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return strings.TrimRight(message, EOF)
+	return strings.TrimRight(message, "\r\n")
 }
 
-func readFromServer(c *Connection) protocol.DataPacket {
-	return c.readFromServer()
-}
-
+// integerReader reads an integer from the console and returns it
 func (c *Connection) integerReader(optionalMessage string) int {
 	fmt.Print(optionalMessage)
 	var n int
@@ -160,16 +165,7 @@ func (c *Connection) integerReader(optionalMessage string) int {
 	return n
 }
 
-//func writeToServer(c *Connection, data protocol.DataPacket) {
-//	c.writeToServer(data)
-//}
-
-// serverRequest send a DataPacket to the server and return a boolean to know if the request was successful
-// with a DataPacket containing the data response
-//func serverRequest(c *Connection, data protocol.DataPacket) (bool, protocol.DataPacket) {
-//	return c.serverRequest(data)
-//}
-
+// printDataPacket prints the content of a data packet
 func printDataPacket(data protocol.DataPacket) {
 	for i := 0; i < len(data.Data); i++ {
 		fmt.Println(data.Data[i])

@@ -16,6 +16,6 @@ func main() {
 
 	conn := client.CreateConnection(debug) // Establish a new connection with the server
 
-	client.UserInterface(conn) // Start the user interface
+	client.StartUI(conn) // Start the user interface
 
 }

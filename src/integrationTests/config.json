@@ -47,6 +47,7 @@
             "id" : 0,
             "name" : "Festival de la bière",
             "organizer" : "Sarah Croche",
+            "isOpen" : true,
             "jobs" : [
                 {
                     "id" : 0,

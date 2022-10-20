@@ -81,10 +81,6 @@ func (db *Database) CreateEvent(name string, organizer string) (*Database, error
 	if user.Function != "organizer" {
 		return nil, ErrorNotOrganizer
 	}
-
-	if _, err := db.GetEventByName(name); err == nil {
-		return db, ErrorEventExists
-	}
 	id := uint(len(db.Events))
 	db.Events[id] = &Event{id, name, organizer, make(map[uint]*Job), true}
 	return db, nil

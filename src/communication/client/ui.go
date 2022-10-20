@@ -94,11 +94,11 @@ func createEvent(c *Connection) bool {
 
 		jobList = append(jobList, jobName, fmt.Sprint(nbVolunteers))
 	}
-	return c.createEvent(jobList)
+	return c.CreateEvent(jobList)
 }
 
 func printEvents(c *Connection) {
-	c.printEvents()
+	c.PrintEvents()
 }
 
 func volunteerRegistration(c *Connection) {
@@ -111,24 +111,24 @@ func volunteerRegistration(c *Connection) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	c.volunteerRegistration(eventId, jobId)
+	c.VolunteerRegistration(eventId, jobId)
 }
 
 func listJobs(c *Connection) {
 	eventId := c.integerReader("Enter event id : ")
-	c.listJobs(eventId)
+	c.ListJobs(eventId)
 }
 
 func volunteerRepartition(c *Connection) {
 	var eventId int
 	eventId = c.integerReader("Enter event id : ")
-	c.volunteerRepartition(eventId)
+	c.VolunteerRepartition(eventId)
 }
 
 func closeEvent(c *Connection) {
 	loginClient(c)
 	eventId := c.integerReader("Enter event id: ")
-	c.closeEvent(eventId)
+	c.CloseEvent(eventId)
 }
 
 func stringReader(optionalMessage string) string {

@@ -59,13 +59,13 @@ func (c *Connection) LoginClient(username string, password string) bool {
 }
 
 // createEvent creates a new event makde by an organizer
-func (c *Connection) createEvent(jobList []string) bool {
+func (c *Connection) CreateEvent(jobList []string) bool {
 	event := protocol.DataPacket{Type: protocol.CREATE_EVENT, Data: jobList}
 	response, _ := c.serverRequest(event)
 	return response
 }
 
-func (c *Connection) printEvents() {
+func (c *Connection) PrintEvents() {
 	eventFound, data := c.serverRequest(protocol.DataPacket{Type: protocol.GET_EVENTS})
 
 	if eventFound {
@@ -73,12 +73,12 @@ func (c *Connection) printEvents() {
 	}
 }
 
-func (c *Connection) volunteerRegistration(eventId int, jobId int) {
+func (c *Connection) VolunteerRegistration(eventId int, jobId int) {
 	request := protocol.DataPacket{Type: protocol.EVENT_REG, Data: []string{strconv.Itoa(eventId), strconv.Itoa(jobId)}}
 	c.serverRequest(request)
 }
 
-func (c *Connection) listJobs(eventId int) {
+func (c *Connection) ListJobs(eventId int) {
 	request := protocol.DataPacket{Type: protocol.GET_EVENTS, Data: []string{strconv.Itoa(eventId)}}
 	response, data := c.serverRequest(request)
 
@@ -87,8 +87,7 @@ func (c *Connection) listJobs(eventId int) {
 	}
 }
 
-func (c *Connection) volunteerRepartition(eventId int) {
-	eventId = c.integerReader("Enter event id : ")
+func (c *Connection) VolunteerRepartition(eventId int) {
 	request := protocol.DataPacket{Type: protocol.GET_JOBS, Data: []string{strconv.Itoa(eventId)}}
 	response, data := c.serverRequest(request)
 
@@ -97,7 +96,7 @@ func (c *Connection) volunteerRepartition(eventId int) {
 	}
 }
 
-func (c *Connection) closeEvent(eventId int) {
+func (c *Connection) CloseEvent(eventId int) {
 	closeEvent := protocol.DataPacket{Type: protocol.CLOSE_EVENT, Data: []string{strconv.Itoa(eventId)}}
 	c.serverRequest(closeEvent)
 }

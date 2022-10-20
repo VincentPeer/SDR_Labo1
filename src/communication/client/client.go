@@ -87,8 +87,7 @@ func (c *Connection) ListJobs(eventId int) {
 	}
 }
 
-func (c *Connection) volunteerRepartition(eventId int) {
-	eventId = c.integerReader("Enter event id : ")
+func (c *Connection) VolunteerRepartition(eventId int) {
 	request := protocol.DataPacket{Type: protocol.GET_JOBS, Data: []string{strconv.Itoa(eventId)}}
 	response, data := c.serverRequest(request)
 

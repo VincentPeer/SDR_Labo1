@@ -122,7 +122,7 @@ func listJobs(c *Connection) {
 func volunteerRepartition(c *Connection) {
 	var eventId int
 	eventId = c.integerReader("Enter event id : ")
-	c.volunteerRepartition(eventId)
+	c.VolunteerRepartition(eventId)
 }
 
 func closeEvent(c *Connection) {

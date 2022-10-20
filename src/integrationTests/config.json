@@ -26,9 +26,9 @@
             "function" : "volunteer"
         },
         {
-            "name" : "Alain Terrieur",
+            "name" : "Alain Du Bois",
             "password" : "123456",
-            "function" : "volunteer"
+            "function" : "organizer"
         }, 
         {
             "name" : "Sarah Croche",
@@ -67,6 +67,27 @@
             "id" : 1,
             "name" : "Baleinev",
             "organizer" : "Ondine Akeleur",
+            "isOpen" : true,
+            "jobs" : [
+                {
+                    "id": 0,
+                    "name" : "Bière",
+                    "required" : 2,
+                    "volunteers" : ["Alex Terrieur"]
+                },
+                {
+                    "id" : 1,
+                    "name" : "Musique",
+                    "required" : 2,
+                    "volunteers" : ["Alain Terrieur"]
+                }
+            ]
+        },
+        {
+            "id" : 2,
+            "name" : "Foot",
+            "organizer" : "Alain Du Bois",
+            "isOpen" : true,
             "jobs" : [
                 {
                     "id": 0,

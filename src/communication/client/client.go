@@ -4,7 +4,7 @@ package client
 import (
 	"SDR_Labo1/src/communication/protocol"
 	"bufio"
-	"fmt"
+	"log"
 	"net"
 	"os"
 )
@@ -40,11 +40,9 @@ func Createclient() {
 
 	conn, err := net.Dial(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
 	if err != nil {
-		fmt.Println(err)
-		return
-	} else {
-		fmt.Println("Connection done!")
+		log.Fatal(err)
 	}
+
 	defer conn.Close()
 
 	consoleReader := bufio.NewReader(os.Stdin)

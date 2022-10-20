@@ -105,9 +105,7 @@ func (c *connection) printEvents() {
 	eventFound, data := c.serverRequest(protocol.DataPacket{Type: protocol.GET_EVENTS})
 
 	if eventFound {
-		for i := 0; i < len(data.Data); i++ {
-			fmt.Println(data.Data[i])
-		}
+		printDataPacket(data)
 	}
 }
 
@@ -126,37 +124,29 @@ func (c *connection) volunteerRegistration() {
 }
 
 func (c *connection) listJobs() {
-	var eventId int
-	input := c.stringReader("Enter event id : ")
-	_, err := fmt.Sscan(input, &eventId)
-	if err != nil {
-		log.Fatal(err)
-	}
+	eventId := c.integerReader("Enter event id : ")
 	request := protocol.DataPacket{Type: protocol.GET_EVENTS, Data: []string{strconv.Itoa(eventId)}}
 	response, data := c.serverRequest(request)
 
 	if response {
-		for i := 0; i < len(data.Data); i++ {
-			fmt.Println(data.Data[i])
-		}
+		printDataPacket(data)
 	}
 }
 
 func (c *connection) volunteerRepartition() {
 	var eventId int
-	eventId = c.integerReader("Enter the event id : ")
+	eventId = c.integerReader("Enter event id : ")
 	request := protocol.DataPacket{Type: protocol.GET_JOBS, Data: []string{strconv.Itoa(eventId)}}
 	response, data := c.serverRequest(request)
 
 	if response {
-		for i := 0; i < len(data.Data); i++ {
-			fmt.Println(data.Data[i])
-		}
+		printDataPacket(data)
 	}
 }
 
 func (c *connection) closeEvent() {
-	eventId := c.integerReader("Enter the id of the events you want to close : ")
+	c.loginClient()
+	eventId := c.integerReader("Enter event id: ")
 	closeEvent := protocol.DataPacket{Type: protocol.CLOSE_EVENT, Data: []string{strconv.Itoa(eventId)}}
 	c.serverRequest(closeEvent)
 }
@@ -192,7 +182,10 @@ func (c *connection) integerReader(optionalMessage string) int {
 	} else if nbScanned != 1 {
 		log.Fatal("Expected one argument, actual : " + strconv.Itoa(nbScanned))
 	}
-	c.consoleIn.ReadString('\n') // clean the buffer
+	_, e := c.consoleIn.ReadString('\n') // clean the buffer
+	if e != nil {
+		log.Fatal(e)
+	}
 	return n
 }
 
@@ -216,6 +209,14 @@ func (c *connection) writeToServer(data protocol.DataPacket) {
 func (c *connection) serverRequest(data protocol.DataPacket) (bool, protocol.DataPacket) {
 	c.writeToServer(data)
 	response := c.readFromServer()
-	fmt.Println(response.Data) // print the server response
+	if response.Type != protocol.OK {
+		fmt.Println(response.Data)
+	}
 	return response.Type == protocol.OK, response
+}
+
+func printDataPacket(data protocol.DataPacket) {
+	for i := 0; i < len(data.Data); i++ {
+		fmt.Println(data.Data[i])
+	}
 }

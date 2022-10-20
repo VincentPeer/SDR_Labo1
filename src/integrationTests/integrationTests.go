@@ -14,7 +14,7 @@ func RunTest() {
 	fmt.Println("Running integration tests")
 
 	client.Createclient()
-	server.CreateServer()
+	server.NewServer().Start()
 }
 
 func loginClient() {

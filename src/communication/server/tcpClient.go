@@ -20,42 +20,42 @@ const (
 // client represents a client connected to the main
 type client struct {
 	state         clientState
-	ID            int
+	ID            uint
 	bufin         *bufio.Reader
 	bufout        *bufio.Writer
 	conn          *net.Conn
-	protocol      protocol.Protocol
 	connectedUser string
+	server        *Server
 }
 
 // NewClient creates a new client
-func NewClient(id int, conn *net.Conn, protocol protocol.Protocol) *client {
+func NewClient(server *Server, conn *net.Conn) *client {
 	return &client{
-		ID:       id,
-		state:    greeting,
-		bufin:    bufio.NewReader(*conn),
-		bufout:   bufio.NewWriter(*conn),
-		conn:     conn,
-		protocol: protocol,
+		ID:     server.getNextClientId(),
+		state:  greeting,
+		bufin:  bufio.NewReader(*conn),
+		bufout: bufio.NewWriter(*conn),
+		conn:   conn,
+		server: server,
 	}
 }
 
 // Read reads a message from the client
 func (c *client) Read() (protocol.DataPacket, error) {
 	// Read the message
-	message, err := c.bufin.ReadString(c.protocol.GetDelimiter())
+	message, err := c.bufin.ReadString(c.server.messagingProtocol.GetDelimiter())
 
 	if err != nil {
 		return protocol.DataPacket{}, err
 	} else {
 		// Parse the message
-		return c.protocol.Receive(message)
+		return c.server.messagingProtocol.Receive(message)
 	}
 }
 
 // Write writes a message to the client
 func (c *client) Write(data protocol.DataPacket) error {
-	message, err := c.protocol.ToSend(data)
+	message, err := c.server.messagingProtocol.ToSend(data)
 
 	if err == nil {
 		_, err = c.bufout.WriteString(message)

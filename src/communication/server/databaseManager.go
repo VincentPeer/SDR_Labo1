@@ -72,7 +72,7 @@ func (dbm *DatabaseManager) handleRequest(request DatabaseRequest) {
 				event.CreateJob(request.payload.Data[i], uint(nbVolunteers))
 			}
 			request.sender.SendSuccess("Event created")
-			fmt.Println("Jobs created")
+			fmt.Println("Event created")
 		}
 	case protocol.GET_EVENTS:
 		fmt.Println("user wants to get events")

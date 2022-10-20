@@ -95,46 +95,46 @@ func volunteerRegistration(conn *client.Connection) {
 }
 
 func createEvent(conn *client.Connection) {
-	fmt.Println("Test type : Creation should fail without login")
+	fmt.Println("Test type : Event creation should fail without login")
 	event := []string{"eventName", "job1", "2", "job2", "2"}
-	loginStat := conn.CreateEvent(event)
-	fmt.Println(loginStat, "\n")
+	conn.CreateEvent(event)
+	fmt.Println("\n")
 
-	fmt.Println("Test type : Creation should fail with volunteer login")
+	fmt.Println("Test type : Event creation should fail with volunteer login")
 	conn.LoginClient("James", "12345")
 	event = []string{"eventName", "job1", "2", "job2", "2"}
-	loginStat = conn.CreateEvent(event)
-	fmt.Println(loginStat, "\n")
+	conn.CreateEvent(event)
+	fmt.Println("\n")
 
-	fmt.Println("Test type : Creation should succeed with organizer login")
+	fmt.Println("Test type : Event creation should succeed with organizer login")
 	conn.LoginClient("John", "123")
 	event = []string{"eventName", "job1", "2", "job2", "2"}
-	loginStat = conn.CreateEvent(event)
-	fmt.Println(loginStat, "\n")
+	conn.CreateEvent(event)
+	fmt.Println("\n")
 
-	fmt.Println("Test type : Creation should fail with empty fields")
+	fmt.Println("Test type : Event creation should fail with empty fields")
 	conn.LoginClient("John", "123")
 	event = []string{""}
-	loginStat = conn.CreateEvent(event)
-	fmt.Println(loginStat, "\n")
+	conn.CreateEvent(event)
+	fmt.Println("\n")
 
-	fmt.Println("Test type : Creation should succeed with name but without jobs")
+	fmt.Println("Test type : Event creation should succeed with name but without jobs")
 	conn.LoginClient("John", "123")
 	event = []string{"eventName"}
-	loginStat = conn.CreateEvent(event)
-	fmt.Println(loginStat, "\n")
+	conn.CreateEvent(event)
+	fmt.Println("\n")
 
-	fmt.Println("Test type : Creation should succeed with name and one job")
+	fmt.Println("Test type : Event creation should succeed with name and one job")
 	conn.LoginClient("John", "123")
 	event = []string{"eventName", "job1", "3"}
-	loginStat = conn.CreateEvent(event)
-	fmt.Println(loginStat, "\n")
+	conn.CreateEvent(event)
+	fmt.Println("\n")
 
-	fmt.Println("Test type : Creation should succeed with name and many jobs")
+	fmt.Println("Test type : Event creation should succeed with name and many jobs")
 	conn.LoginClient("John", "123")
 	event = []string{"eventName", "job1", "3", "job2", "2", "job3", "13"}
-	loginStat = conn.CreateEvent(event)
-	fmt.Println(loginStat, "\n")
+	conn.CreateEvent(event)
+	fmt.Println("\n")
 }
 
 func listEvents(conn *client.Connection) {

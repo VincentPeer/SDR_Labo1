@@ -17,6 +17,20 @@ const (
 	CONFIG_FILE_PATH = "./config.json"
 )
 
+func (server *Server) IsDebug() bool {
+	return server.isDebug
+}
+
+type Debuggable interface {
+	IsDebug() bool
+}
+
+func Debug(source Debuggable, message string) {
+	if source.IsDebug() {
+		fmt.Println("DEBUG: ", message)
+	}
+}
+
 type Server struct {
 	clients           map[int]*Client
 	dbm               *DatabaseManager
@@ -34,7 +48,7 @@ func NewServer(isDebug bool) *Server {
 
 	return &Server{
 		clients:           make(map[int]*Client),
-		dbm:               NewDatabaseManager(models.LoadDatabaseFromJson(path)),
+		dbm:               NewDatabaseManager(models.LoadDatabaseFromJson(path), isDebug),
 		messagingProtocol: protocol.TcpProtocol{},
 		isDebug:           isDebug,
 	}
@@ -46,17 +60,17 @@ func (server *Server) Start() {
 	// Listen for incoming connections.
 	l, err := net.Listen(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
 	if err != nil {
-		fmt.Println("Error listening:", err.Error())
+		Debug(server, "Error listening: "+err.Error())
 		os.Exit(1)
 	}
 	// Close the listener when the application closes.
 	defer l.Close()
-	fmt.Println("Listening on " + CONN_HOST + ":" + CONN_PORT)
+	Debug(server, "Listening on "+CONN_HOST+":"+CONN_PORT)
 	for {
 		// Listen for an incoming connection.
 		conn, err := l.Accept()
 		if err != nil {
-			fmt.Println("Error accepting: ", err.Error())
+			Debug(server, "Error accepting: "+err.Error())
 			os.Exit(1)
 		}
 		newClient := NewClient(server, &conn)
@@ -69,29 +83,27 @@ func (server *Server) getNextClientId() uint {
 	return uint(len(server.clients))
 }
 
-func closeRequest(client *Client) {
-	fmt.Println("Closing client")
+func (server *Server) closeRequest(client *Client) {
+	Debug(server, "Closing client connection")
 	client.Close()
 }
 
 // Handles incoming requests.
 func (server *Server) handleRequest(client *Client) {
-	fmt.Println("Now we dialogue with client")
-	defer closeRequest(client)
+	Debug(server, "Now we dialogue with client")
+	defer server.closeRequest(client)
 
 	for {
 		data, err := client.Read()
 		if err != nil {
 			if err == io.EOF {
-				fmt.Println("Client disconnected")
+				Debug(server, "Client disconnected")
 				break
 			} else {
-				fmt.Println("Error reading:", err.Error())
+				Debug(server, "Error reading from client: "+err.Error())
 				break
 			}
 		}
-
-		fmt.Println("Data :", data)
 
 		if data.Type == protocol.DEBUG && server.isDebug {
 			client.isDebug = true

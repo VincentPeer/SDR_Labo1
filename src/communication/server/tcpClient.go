@@ -17,8 +17,8 @@ const (
 	shutdown
 )
 
-// client represents a client connected to the main
-type client struct {
+// Client represents a Client connected to the main
+type Client struct {
 	state         clientState
 	ID            uint
 	bufin         *bufio.Reader
@@ -29,8 +29,8 @@ type client struct {
 }
 
 // NewClient creates a new client
-func NewClient(server *Server, conn *net.Conn) *client {
-	return &client{
+func NewClient(server *Server, conn *net.Conn) *Client {
+	return &Client{
 		ID:     server.getNextClientId(),
 		state:  greeting,
 		bufin:  bufio.NewReader(*conn),
@@ -41,7 +41,7 @@ func NewClient(server *Server, conn *net.Conn) *client {
 }
 
 // Read reads a message from the client
-func (c *client) Read() (protocol.DataPacket, error) {
+func (c *Client) Read() (protocol.DataPacket, error) {
 	// Read the message
 	message, err := c.bufin.ReadString(c.server.messagingProtocol.GetDelimiter())
 
@@ -54,7 +54,7 @@ func (c *client) Read() (protocol.DataPacket, error) {
 }
 
 // Write writes a message to the client
-func (c *client) Write(data protocol.DataPacket) error {
+func (c *Client) Write(data protocol.DataPacket) error {
 	message, err := c.server.messagingProtocol.ToSend(data)
 
 	if err == nil {
@@ -64,24 +64,32 @@ func (c *client) Write(data protocol.DataPacket) error {
 	return err
 }
 
-func (c *client) Close() { // TODO goroutine safe
+func (c *Client) SendError(message string) error {
+	return c.Write(c.server.messagingProtocol.NewError(message))
+}
+
+func (c *Client) SendSuccess(message string) error {
+	return c.Write(c.server.messagingProtocol.NewSuccess(message))
+}
+
+func (c *Client) Close() { // TODO goroutine safe
 	(*c.conn).Close()
 }
 
-func (c *client) GetState() clientState {
+func (c *Client) GetState() clientState {
 	return c.state
 }
 
-func (c *client) Login(username string) {
+func (c *Client) Login(username string) {
 	c.connectedUser = username
 	c.state = connected
 }
 
-func (c *client) Logout() {
+func (c *Client) Logout() {
 	c.connectedUser = ""
 	c.state = greeting
 }
 
-func (c *client) GetConnected() string {
+func (c *Client) GetConnected() string {
 	return c.connectedUser
 }

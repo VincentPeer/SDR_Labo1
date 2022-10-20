@@ -23,7 +23,7 @@ func LoadDatabaseFromJson(jsonPath string) Database {
 		fmt.Println("Error reading config file:", err.Error())
 		os.Exit(1)
 	}
-	//fmt.Println("Successfully opened " + jsonFile.Name())
+
 	defer jsonFile.Close()
 
 	byteValue, _ := ioutil.ReadAll(jsonFile)

@@ -8,7 +8,6 @@ import (
 	"net"
 	"os"
 	"path/filepath"
-	"strconv"
 )
 
 const (
@@ -19,8 +18,8 @@ const (
 )
 
 type Server struct {
-	clients           map[int]*client
-	db                models.Database
+	clients           map[int]*Client
+	dbm               *DatabaseManager
 	messagingProtocol protocol.TcpProtocol
 }
 
@@ -33,14 +32,15 @@ func NewServer() *Server {
 	}
 
 	return &Server{
-		clients:           make(map[int]*client),
-		db:                models.LoadDatabaseFromJson(path),
+		clients:           make(map[int]*Client),
+		dbm:               NewDatabaseManager(models.LoadDatabaseFromJson(path)),
 		messagingProtocol: protocol.TcpProtocol{},
 	}
 }
 
 func (server *Server) Start() {
 
+	go server.dbm.Start()
 	// Listen for incoming connections.
 	l, err := net.Listen(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
 	if err != nil {
@@ -67,13 +67,13 @@ func (server *Server) getNextClientId() uint {
 	return uint(len(server.clients))
 }
 
-func closeRequest(client *client) {
+func closeRequest(client *Client) {
 	fmt.Println("Closing client")
 	client.Close()
 }
 
 // Handles incoming requests.
-func (server *Server) handleRequest(client *client) {
+func (server *Server) handleRequest(client *Client) {
 	fmt.Println("Now we dialogue with client")
 	defer closeRequest(client)
 
@@ -90,270 +90,8 @@ func (server *Server) handleRequest(client *client) {
 		}
 
 		fmt.Println("Data :", data)
+		server.dbm.RequestChannel <- *NewDatabaseRequest(client, data)
 
-		switch data.Type {
-		case protocol.LOGIN:
-			if len(data.Data) != 2 {
-				client.Write(server.messagingProtocol.NewError("Invalid number of arguments"))
-				continue
-			}
-
-			name := data.Data[0]
-			password := data.Data[1]
-
-			fmt.Println("user wants to login")
-			fmt.Print("name: ", name)
-			fmt.Println(" password: ", password)
-
-			result, err := server.db.Login(name, password)
-			if err != nil {
-				fmt.Println("Error logging in: ", err.Error())
-				client.Write(server.messagingProtocol.NewError(err.Error()))
-				continue
-			}
-			if result {
-				fmt.Println("Login successful")
-				client.Login(name)
-				client.Write(server.messagingProtocol.NewSuccess(""))
-			} else {
-				fmt.Println("Login failed")
-				client.Write(server.messagingProtocol.NewError("Login failed"))
-			}
-		case protocol.CREATE_EVENT:
-			fmt.Println("user wants to create an event")
-
-			if len(data.Data) < 1 {
-				fmt.Println("Invalid number of arguments")
-				client.Write(server.messagingProtocol.NewError("Invalid number of arguments"))
-				continue
-			}
-			if client.state != connected {
-				fmt.Println("User is not logged in")
-				client.Write(server.messagingProtocol.NewError("You must be logged in to create an event"))
-				continue
-			}
-
-			eventName := data.Data[0]
-
-			_, err := server.db.CreateEvent(eventName, client.GetConnected())
-			if err != nil {
-				fmt.Println("Error creating event: ", err.Error())
-				client.Write(server.messagingProtocol.NewError(err.Error()))
-				continue
-			}
-			fmt.Println("Event created")
-			event, err := server.db.GetEventByName(eventName)
-			if err != nil {
-				fmt.Println("Error creating event: ", err.Error())
-				client.Write(server.messagingProtocol.NewError(err.Error()))
-				continue
-			}
-			for i := 1; i < len(data.Data)-1; i += 2 {
-				nbVolunteers, err := strconv.ParseUint(data.Data[i+1], 10, 32)
-				if err != nil {
-					fmt.Println("Error parsing number of volunteers: ", err.Error())
-					client.Write(server.messagingProtocol.NewError(err.Error()))
-					continue
-				}
-				event.CreateJob(data.Data[i], uint(nbVolunteers))
-			}
-			fmt.Println("Jobs created")
-			client.Write(server.messagingProtocol.NewSuccess(""))
-			client.Logout()
-
-		case protocol.GET_EVENTS:
-			fmt.Println("user wants to get events")
-
-			if len(data.Data) == 0 { // GET all events
-
-				err := client.Write(protocol.DataPacket{
-					Type: protocol.OK,
-					Data: server.db.GetEventsAsStringArray(),
-				})
-
-				if err != nil {
-					fmt.Println("Error sending events: ", err.Error())
-					client.Write(server.messagingProtocol.NewError(err.Error()))
-					continue
-				} else {
-					fmt.Println("Events sent")
-					for _, event := range server.db.GetEventsAsStringArray() {
-						fmt.Println("Event: ", event)
-					}
-				}
-			} else if len(data.Data) == 1 { // GET all jobs for an event
-				eventId, err := strconv.ParseUint(data.Data[0], 10, 32)
-				if err != nil {
-					fmt.Println("Invalid eventId: ", data.Data[0])
-					client.Write(server.messagingProtocol.NewError("Invalid eventId: is not a uint64"))
-					continue
-				}
-
-				event, err := server.db.GetEvent(uint(eventId))
-				if err != nil {
-					client.Write(server.messagingProtocol.NewError(err.Error()))
-					fmt.Println("Error getting event: ", err.Error())
-					continue
-				}
-				err = client.Write(protocol.DataPacket{
-					Type: protocol.OK,
-					Data: event.GetJobsAsStringArray(),
-				})
-
-				if err != nil {
-					fmt.Println("Error getting events: ", err.Error())
-					client.Write(server.messagingProtocol.NewError(err.Error()))
-					continue
-				} else {
-					fmt.Println("events sent")
-					for _, jobID := range event.GetJobsAsStringArray() {
-						fmt.Println("eventID: ", jobID)
-					}
-				}
-			} else {
-				fmt.Println("ERROR: wrong number of arguments")
-				client.Write(server.messagingProtocol.NewError("Incorrect number of arguments.\nNeed 0 or 1 (eventID)"))
-			}
-
-		case protocol.GET_JOBS:
-			fmt.Println("user wants to get jobs")
-
-			if len(data.Data) != 1 {
-				fmt.Println("Invalid number of arguments")
-				client.Write(server.messagingProtocol.NewError("Invalid number of arguments"))
-				continue
-			}
-
-			eventId, err := strconv.ParseUint(data.Data[0], 10, 32)
-			if err != nil {
-				fmt.Println("Invalid eventId: ", data.Data[0])
-				client.Write(server.messagingProtocol.NewError("Invalid eventId: is not a uint64"))
-				continue
-			}
-
-			event, err := server.db.GetEvent(uint(eventId))
-			if err != nil {
-				fmt.Println("Error getting event: ", err.Error())
-				client.Write(server.messagingProtocol.NewError(err.Error()))
-				continue
-			}
-
-			err = client.Write(protocol.DataPacket{
-				Type: protocol.OK,
-				Data: event.GetJobsRepartitionTable(),
-			})
-
-			if err != nil {
-				fmt.Println("Error sending jobs: ", err.Error())
-				client.Write(server.messagingProtocol.NewError(err.Error()))
-				continue
-			} else {
-				fmt.Println("Jobs sent")
-				for _, job := range event.GetJobsRepartitionTable() {
-					fmt.Println("Job: ", job)
-				}
-			}
-
-		case protocol.EVENT_REG:
-			fmt.Println("user wants to join an event")
-
-			if len(data.Data) != 2 {
-				fmt.Println("Invalid number of arguments")
-				client.Write(server.messagingProtocol.NewError("Invalid number of arguments"))
-				continue
-			}
-
-			if client.state != connected {
-				fmt.Println("User is not logged in")
-				client.Write(server.messagingProtocol.NewError("You must be logged in to join an event"))
-				continue
-			}
-
-			eventId, err := strconv.ParseUint(data.Data[0], 10, 32)
-			if err != nil {
-				client.Write(server.messagingProtocol.NewError("Argument 1 (eventId) is not a uint64"))
-				fmt.Println(err.Error())
-				continue
-			}
-			jobId, err := strconv.ParseUint(data.Data[1], 10, 32)
-			if err != nil {
-				fmt.Println("Invalid eventId: ", data.Data[0])
-				client.Write(server.messagingProtocol.NewError("Invalid eventId: is not a uint64"))
-				continue
-			}
-			event, err := server.db.GetEvent(uint(eventId))
-			if err != nil {
-				fmt.Println("Error getting event: ", err.Error())
-				client.Write(server.messagingProtocol.NewError(err.Error()))
-				continue
-			}
-
-			job, err := event.GetJob(uint(jobId))
-			if err != nil {
-				fmt.Println("Error getting job: ", err.Error())
-				client.Write(server.messagingProtocol.NewError(err.Error()))
-				continue
-			}
-			fmt.Println(event.GetJobsRepartitionTable())
-			fmt.Println(job)
-			_, err = event.AddVolunteer(job.ID, client.GetConnected())
-			if err != nil {
-				fmt.Println("Error adding volunteer: ", err.Error())
-				client.Write(server.messagingProtocol.NewError(err.Error()))
-				continue
-			}
-
-			fmt.Println("Volunteer added")
-			fmt.Println(event.GetJobsRepartitionTable())
-			fmt.Println(job)
-			client.Write(server.messagingProtocol.NewSuccess("Volunteer added"))
-			client.Logout()
-
-		case protocol.CLOSE_EVENT:
-			fmt.Println("user wants to close an event")
-
-			if len(data.Data) != 1 {
-				fmt.Println("Invalid number of arguments")
-				client.Write(server.messagingProtocol.NewError("Invalid number of arguments"))
-				continue
-			}
-
-			if client.state != connected {
-				fmt.Println("User is not logged in")
-				client.Write(server.messagingProtocol.NewError("You must be logged in to join an event"))
-				continue
-			}
-
-			eventId, err := strconv.ParseUint(data.Data[0], 10, 32)
-			if err != nil {
-				fmt.Println("Invalid eventId: ", data.Data[0])
-				client.Write(server.messagingProtocol.NewError("Invalid eventId: is not a uint64"))
-				continue
-			}
-
-			event, err := server.db.GetEvent(uint(eventId))
-			if err != nil {
-				fmt.Println("Error getting event: ", err.Error())
-				client.Write(server.messagingProtocol.NewError(err.Error()))
-				continue
-			}
-
-			if event.Organizer != client.GetConnected() {
-				fmt.Println("User is not the organizer")
-				client.Write(server.messagingProtocol.NewError("You are not the organizer of this event"))
-				continue
-			}
-
-			event.Close()
-			client.Write(server.messagingProtocol.NewSuccess("Event closed"))
-			client.Logout()
-
-		case protocol.STOP:
-			fmt.Println("user wants to stop the a")
-			return
-
-		default:
-			fmt.Println("Unknown command")
-		}
 	}
+
 }

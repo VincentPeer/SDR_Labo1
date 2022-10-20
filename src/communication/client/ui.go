@@ -2,8 +2,10 @@ package client
 
 import (
 	"SDR_Labo1/src/communication/protocol"
+	"bufio"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -12,9 +14,12 @@ var messagingProtocol = &protocol.TcpProtocol{}
 
 const EOF = "\r\n"
 
-// userInterface is the function that communicate with the a,
+var consoleOut = bufio.NewWriter(os.Stdin)
+var consoleIn = bufio.NewReader(os.Stdin)
+
+// UserInterface is the function that communicate with the a,
 // the client can go through each different functionnality
-func userInterface(c *connection) {
+func UserInterface(c *connection) {
 	fmt.Println("Welcome!")
 
 	var choice int
@@ -31,19 +36,19 @@ func userInterface(c *connection) {
 		choice = c.integerReader("")
 		switch choice {
 		case 1:
-			c.createEvent()
+			createEvent(c)
 		case 2:
-			c.volunteerRegistration()
+			volunteerRegistration(c)
 		case 3:
-			c.printEvents()
+			printEvents(c)
 		case 4:
-			c.listJobs()
+			listJobs(c)
 		case 5:
-			c.volunteerRepartition()
+			volunteerRepartition(c)
 		case 6:
-			c.closeEvent()
+			closeEvent(c)
 		case 7:
-			c.writeToServer(protocol.DataPacket{Type: protocol.STOP})
+			c.Close()
 			return
 		default:
 			fmt.Println("You have entered a bad request")
@@ -52,29 +57,22 @@ func userInterface(c *connection) {
 	}
 }
 
-// loginClient ask the user to enter his username and password and check if the login is correct
-// the client is asked to enter his username and password until the login is correct
-func (c *connection) loginClient() {
+func loginClient(c *connection) {
 	for {
-		username := c.stringReader("Enter your username : ")
-		password := c.stringReader("Enter your password : ")
+		username := stringReader("Enter your username : ")
+		password := stringReader("Enter your password : ")
 
-		// Send the login request to the a
-		login := protocol.DataPacket{Type: protocol.LOGIN, Data: []string{username, password}}
-
-		// Manage the login request with the a
-		response, _ := c.serverRequest(login)
-		if response {
+		if c.LoginClient(username, password) {
 			break
 		}
 	}
 }
 
 // createEvent creates a new event makde by an organizer
-func (c *connection) createEvent() bool {
-	c.loginClient()
+func createEvent(c *connection) bool {
+	loginClient(c)
 
-	eventName := c.stringReader("Enter the event name : ")
+	eventName := stringReader("Enter the event name : ")
 	fmt.Println("List all job's name followed by the number of volunteers needed\n" +
 		"(tap STOP when ended) : ")
 
@@ -83,137 +81,95 @@ func (c *connection) createEvent() bool {
 	var i = 0
 	for {
 		i++
-		jobName := c.stringReader("Insert a name for Job " + strconv.Itoa(i) + ": ")
+		jobName := stringReader("Insert a name for Job " + strconv.Itoa(i) + ": ")
 		if strings.Compare(jobName, "STOP") == 0 {
 			break
 		}
 
 		fmt.Print("Number of volunteers needed : ")
-		nbVolunteers, err := strconv.ParseInt(c.stringReader(""), 10, 32)
+		nbVolunteers, err := strconv.ParseInt(stringReader(""), 10, 32)
 		if err != nil {
 			log.Fatal(err)
 		}
 
 		jobList = append(jobList, jobName, fmt.Sprint(nbVolunteers))
 	}
-	event := protocol.DataPacket{Type: protocol.CREATE_EVENT, Data: jobList}
-	response, _ := c.serverRequest(event)
-	return response
+	return c.createEvent(jobList)
 }
 
-func (c *connection) printEvents() {
-	eventFound, data := c.serverRequest(protocol.DataPacket{Type: protocol.GET_EVENTS})
-
-	if eventFound {
-		printDataPacket(data)
-	}
+func printEvents(c *connection) {
+	c.printEvents()
 }
 
-func (c *connection) volunteerRegistration() {
-	c.loginClient()
+func volunteerRegistration(c *connection) {
+	loginClient(c)
 
 	var eventId int
 	var jobId int
-	input := c.stringReader("Enter [event id] [job id] : ")
+	input := stringReader("Enter [event id] [job id] : ")
 	_, err := fmt.Sscan(input, &eventId, &jobId)
 	if err != nil {
 		log.Fatal(err)
 	}
-	request := protocol.DataPacket{Type: protocol.EVENT_REG, Data: []string{strconv.Itoa(eventId), strconv.Itoa(jobId)}}
-	c.serverRequest(request)
+	c.volunteerRegistration(eventId, jobId)
 }
 
-func (c *connection) listJobs() {
+func listJobs(c *connection) {
 	eventId := c.integerReader("Enter event id : ")
-	request := protocol.DataPacket{Type: protocol.GET_EVENTS, Data: []string{strconv.Itoa(eventId)}}
-	response, data := c.serverRequest(request)
-
-	if response {
-		printDataPacket(data)
-	}
+	c.listJobs(eventId)
 }
 
-func (c *connection) volunteerRepartition() {
+func volunteerRepartition(c *connection) {
 	var eventId int
 	eventId = c.integerReader("Enter event id : ")
-	request := protocol.DataPacket{Type: protocol.GET_JOBS, Data: []string{strconv.Itoa(eventId)}}
-	response, data := c.serverRequest(request)
-
-	if response {
-		printDataPacket(data)
-	}
+	c.volunteerRepartition(eventId)
 }
 
-func (c *connection) closeEvent() {
-	c.loginClient()
+func closeEvent(c *connection) {
+	loginClient(c)
 	eventId := c.integerReader("Enter event id: ")
-	closeEvent := protocol.DataPacket{Type: protocol.CLOSE_EVENT, Data: []string{strconv.Itoa(eventId)}}
-	c.serverRequest(closeEvent)
+	c.closeEvent(eventId)
 }
 
-func (c *connection) stringReader(optionalMessage string) string {
+func stringReader(optionalMessage string) string {
 	fmt.Print(optionalMessage)
 
-	message, err := c.consoleIn.ReadString('\n')
+	message, err := consoleIn.ReadString('\n')
 	if err != nil {
 		log.Fatal(err)
 	}
 	return strings.TrimRight(message, EOF)
 }
 
-func (c *connection) readFromServer() protocol.DataPacket {
-	message, err := c.serverIn.ReadString(protocol.DELIMITER)
-	if err != nil {
-		log.Fatal(err)
-	}
-	data, e := messagingProtocol.Receive(message)
-	if e != nil {
-		log.Fatal(e)
-	}
-	return data
+func readFromServer(c *connection) protocol.DataPacket {
+	return c.readFromServer()
 }
 
 func (c *connection) integerReader(optionalMessage string) int {
 	fmt.Print(optionalMessage)
 	var n int
-	nbScanned, err := fmt.Fscan(c.consoleIn, &n)
+	nbScanned, err := fmt.Fscan(consoleIn, &n)
 	if err != nil {
 		log.Fatal(err)
 	} else if nbScanned != 1 {
 		log.Fatal("Expected one argument, actual : " + strconv.Itoa(nbScanned))
 	}
-	_, e := c.consoleIn.ReadString('\n') // clean the buffer
+	_, e := consoleIn.ReadString('\n') // clean the buffer
 	if e != nil {
 		log.Fatal(e)
 	}
 	return n
 }
 
-func (c *connection) writeToServer(data protocol.DataPacket) {
-	m, e := messagingProtocol.ToSend(data)
-	if e != nil {
-		log.Fatal(e)
-	}
-	_, writtingError := c.serverOut.WriteString(m)
-	if writtingError != nil {
-		log.Fatal(writtingError)
-	}
-	flushError := c.serverOut.Flush()
-	if flushError != nil {
-		log.Fatal(flushError)
-	}
-}
+//func writeToServer(c *connection, data protocol.DataPacket) {
+//	c.writeToServer(data)
+//}
 
 // serverRequest send a DataPacket to the server and return a boolean to know if the request was successful
 // with a DataPacket containing the data response
-func (c *connection) serverRequest(data protocol.DataPacket) (bool, protocol.DataPacket) {
-	c.writeToServer(data)
-	response := c.readFromServer()
-	if response.Type != protocol.OK {
-		fmt.Println(response.Data)
-	}
-	return response.Type == protocol.OK, response
-}
+//func serverRequest(c *connection, data protocol.DataPacket) (bool, protocol.DataPacket) {
+//	return c.serverRequest(data)
+//}
 
 func printDataPacket(data protocol.DataPacket) {
 	for i := 0; i < len(data.Data); i++ {

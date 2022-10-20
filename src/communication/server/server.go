@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"SDR_Labo1/src/communication/protocol"
@@ -25,10 +25,6 @@ var (
 )
 
 func CreateServer() {
-	main()
-}
-
-func main() {
 	path, err := filepath.Abs(CONFIG_FILE_PATH)
 
 	if err != nil {
@@ -307,7 +303,7 @@ func handleRequest(client *client) {
 			client.Logout()
 
 		case protocol.STOP:
-			fmt.Println("user wants to stop the server")
+			fmt.Println("user wants to stop the a")
 			return
 		default:
 			fmt.Println("Unknown command")

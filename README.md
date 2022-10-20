@@ -25,7 +25,7 @@ le serveur et le(s) client(s).
 Le mode debug permet de voir les messages échangés entre le serveur et le client.
 Pour l'activer, il suffit de lancer le serveur avec l'argument `-d`.
 
-Pour tester les races conditions, il suffit de lancer le client avec l'argument `-r` également.
+Pour tester les races conditions, il suffit de lancer le client avec l'argument `-d` également.
 Les clients accès au ressources par des clients lancés de cette manière sont bloqués pendant 5 secondes,
 permettant de tester le conditions de concurrence.
 

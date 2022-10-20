@@ -39,4 +39,4 @@ Ensuite, à partir d'un terminal dans le dossier *SDR_Labo1*, tapez la commande
 `godoc -http=:6060`  
 Dans votre navigateur, entrez l'URL  
 `http://localhost:6060/pkg/SDR_Labo1/`  
-Vous pouvez alors parcourir notre documentation.
+Vous pouvez alors parcourir notre documentation. 

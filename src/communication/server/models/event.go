@@ -18,6 +18,7 @@ type Event struct {
 	Name      string
 	Organizer string
 	Jobs      map[uint]*Job
+	isOpen    bool
 }
 
 type jsonEvent struct {
@@ -25,6 +26,7 @@ type jsonEvent struct {
 	Name      string `json:"name"`
 	Organizer string `json:"organizer"`
 	Jobs      Jobs   `json:"jobs"`
+	isOpen    bool   `json:"isOpen"`
 }
 
 type jsonEvents []jsonEvent
@@ -33,7 +35,7 @@ type Events []Event
 func (event *jsonEvents) ToMap() map[uint]*Event {
 	events := make(map[uint]*Event)
 	for i := 0; i < len(*event); i++ {
-		events[(*event)[i].ID] = &Event{(*event)[i].ID, (*event)[i].Name, (*event)[i].Organizer, (*event)[i].Jobs.ToMap()}
+		events[(*event)[i].ID] = &Event{(*event)[i].ID, (*event)[i].Name, (*event)[i].Organizer, (*event)[i].Jobs.ToMap(), (*event)[i].isOpen}
 	}
 	return events
 }
@@ -104,4 +106,43 @@ func (event *Event) GetJobsRepartitionTable() []string {
 		table = append(table, line)
 	}
 	return table
+}
+
+// Adds a volunteer to a job
+// Returns an error if the job does not exist
+// Otherwise returns the new state of the database
+func (event *Event) AddVolunteer(jobId uint, name string) (*Job, error) {
+	job, err := event.GetJob(jobId)
+	if err != nil {
+		return nil, err
+	}
+	if name == "" {
+		return nil, ErrorVolunteerEmpty
+	}
+	if job.Required == uint(len(job.Volunteers)) {
+		return nil, ErrorVolunteerAboveMaximum
+	}
+	if _, err := job.GetVolunteer(name); err != ErrorVolunteerNotFound {
+		return job, ErrorVolunteerExists
+	}
+	err = event.RemoveVolunteer(name)
+	if err != nil {
+		return nil, err
+	}
+	job.Volunteers = append(job.Volunteers, name)
+	return job, nil
+}
+
+// Removes a volunteer from all jobs
+// Returns an error if the volunteer does not exist
+func (event *Event) RemoveVolunteer(name string) error {
+	if name == "" {
+		return ErrorVolunteerEmpty
+	}
+	for _, job := range event.Jobs {
+		if _, err := job.GetVolunteer(name); err == nil {
+			job.RemoveVolunteer(name)
+		}
+	}
+	return nil
 }

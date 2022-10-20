@@ -289,7 +289,7 @@ func handleRequest(client *client) {
 			}
 			fmt.Println(event.GetJobsRepartitionTable())
 			fmt.Println(job)
-			_, err = job.AddVolunteer(client.GetConnected())
+			_, err = event.AddVolunteer(job.ID, client.GetConnected())
 			if err != nil {
 				fmt.Println("Error adding volunteer: ", err.Error())
 				client.Write(messagingProtocol.NewError(err.Error()))

@@ -25,7 +25,8 @@ func userInterface(c *connection) {
 		fmt.Println("[3] List all current events")
 		fmt.Println("[4] List all jobs for a specific event")
 		fmt.Println("[5] List the volunteers repartiton for a specific event")
-		fmt.Println("[6] To terminate the process")
+		fmt.Println("[6] To close an event")
+		fmt.Println("[7] To terminate the process")
 
 		choice = c.integerReader()
 		switch choice {
@@ -40,6 +41,8 @@ func userInterface(c *connection) {
 		case 5:
 			c.volunteerRepartition()
 		case 6:
+			c.closeEvent()
+		case 7:
 			c.writeToServer(protocol.DataPacket{Type: protocol.STOP})
 			return
 		default:
@@ -56,22 +59,17 @@ func (c *connection) loginClient() {
 		password := c.stringReader("Enter your password : ")
 
 		// Send the login request to the server
-		result := protocol.DataPacket{Type: protocol.LOGIN, Data: []string{username, password}}
-		c.writeToServer(result)
+		login := protocol.DataPacket{Type: protocol.LOGIN, Data: []string{username, password}}
 
-		// Read the response from the server and treat it
-		response := c.readFromServer()
-		if response.Type == protocol.OK {
-			fmt.Println("Welcome " + username + "!")
-			return
-		} else {
-			fmt.Println("You have entered an invalid username or password")
-			continue
+		// Manage the login request with the server
+		response, _ := c.serverRequest(login, "Welcome "+username+"!", "Invalid username or password")
+		if response {
+			break
 		}
 	}
 }
 
-// createEvent creates a new event with an organizer
+// createEvent creates a new event makde by an organizer
 func (c *connection) createEvent() bool {
 	c.loginClient()
 
@@ -97,25 +95,17 @@ func (c *connection) createEvent() bool {
 
 		jobList = append(jobList, jobName, fmt.Sprint(nbVolunteers))
 	}
-
-	eventResult := protocol.DataPacket{Type: protocol.CREATE_EVENT, Data: jobList}
-	c.writeToServer(eventResult)
-	response := c.readFromServer()
-	fmt.Println("response from server : ", response)
-	if response.Type == protocol.OK {
-		fmt.Println("Event registrated, thank you!")
-		return true
-	} else {
-		return false
-	}
+	event := protocol.DataPacket{Type: protocol.CREATE_EVENT, Data: jobList}
+	response, _ := c.serverRequest(event, "Event registrated, thank you!", "")
+	return response
 }
 
 func (c *connection) printEvents() {
-	c.writeToServer(protocol.DataPacket{Type: protocol.GET_EVENTS})
-	response := c.readFromServer()
-	if response.Type == protocol.OK {
-		for i := 0; i < len(response.Data); i++ {
-			fmt.Println(response.Data[i])
+	eventFound, data := c.serverRequest(protocol.DataPacket{Type: protocol.GET_EVENTS}, "", "No event found")
+
+	if eventFound {
+		for i := 0; i < len(data.Data); i++ {
+			fmt.Println(data.Data[i])
 		}
 	} else {
 		fmt.Println("No event found")
@@ -127,56 +117,62 @@ func (c *connection) volunteerRegistration() {
 
 	var eventId int
 	var jobId int
-	for {
-		fmt.Println("Choose one of the following functionnality")
-		fmt.Println("[1] List all open events with their jobs")
-		fmt.Println("[2] Register to an event as a volunteer")
-		fmt.Println("[3] To terminate the process")
 
-		choice := c.integerReader()
-		switch choice {
-		case 1:
-			c.printEvents()
-		case 2:
-			fmt.Println("Enter the id of the event you want to register to : ")
-			eventId = c.integerReader()
-			fmt.Println("Enter the id of the job you want to register to : ")
-			jobId = c.integerReader()
-			registration := protocol.DataPacket{Type: protocol.EVENT_REG, Data: []string{strconv.Itoa(eventId), strconv.Itoa(jobId)}}
-			c.writeToServer(registration)
-			response := c.readFromServer()
-			if response.Type == protocol.OK {
-				fmt.Println("Registration successful")
-				return
-			} else {
-				fmt.Println("Registration failed")
-				continue
-			}
-		case 3:
-			c.writeToServer(protocol.DataPacket{Type: protocol.STOP})
-			return
-		}
-	}
+	fmt.Println("Enter the event id : ")
+	eventId = c.integerReader()
+	fmt.Println("Enter the job id : ")
+	jobId = c.integerReader()
+	registration := protocol.DataPacket{Type: protocol.EVENT_REG, Data: []string{strconv.Itoa(eventId), strconv.Itoa(jobId)}}
+	c.serverRequest(registration, "Registration successful", "Registration failed")
 }
 
 func (c *connection) listJobs() {
 	var eventId int
-	fmt.Println("Enter the jobsToList id : ")
-	eventId = c.integerReader()
-	jobsToList := protocol.DataPacket{Type: protocol.GET_JOBS, Data: []string{strconv.Itoa(eventId)}}
-	c.writeToServer(jobsToList)
-	response := c.readFromServer()
-	if response.Type == protocol.OK {
-		for i := 0; i < len(response.Data); i++ {
-			fmt.Println(response.Data[i])
+	var jobId int
+	input := c.stringReader("Enter the event id followed by the job id : ")
+	_, err := fmt.Sscan(input, &eventId, &jobId)
+	if err != nil {
+		log.Fatal(err)
+	}
+	request := protocol.DataPacket{Type: protocol.GET_EVENTS, Data: []string{strconv.Itoa(eventId), strconv.Itoa(jobId)}}
+	response, data := c.serverRequest(request, "", "No event found")
+
+	if response {
+		for i := 0; i < len(data.Data); i++ {
+			fmt.Println(data.Data[i])
 		}
 	} else {
-		fmt.Println("No job found")
+		return
 	}
 }
 
 func (c *connection) volunteerRepartition() {
+	var eventId int
+	eventId = c.integerReader()
+	request := protocol.DataPacket{Type: protocol.VOLUNTEER_REPARTITION, Data: []string{strconv.Itoa(eventId)}}
+	response, data := c.serverRequest(request, "", "No event found")
 
+	if response {
+		for i := 0; i < len(data.Data); i++ {
+			fmt.Println(data.Data[i])
+		}
+	} else {
+		return
+	}
+}
+
+func (c *connection) closeEvent() {
+	fmt.Println("Enter the id of the events you want to close : ")
+	eventId := c.integerReader()
+	closeevent := protocol.DataPacket{Type: protocol.CLOSE_EVENT, Data: []string{strconv.Itoa(eventId)}}
+	c.writeToServer(closeevent)
+	response := c.readFromServer()
+	if response.Type == protocol.OK {
+		fmt.Println("Event closed successfully")
+	} else {
+		fmt.Println("Event not found")
+		return
+	}
 }
 
 func (c *connection) stringReader(optionalMessage string) string {
@@ -203,7 +199,8 @@ func (c *connection) readFromServer() protocol.DataPacket {
 	return data
 }
 
-func (c *connection) integerReader() int {
+func (c *connection) integerReader(optionalMessage string) int {
+	fmt.Println(optionalMessage)
 	var n int
 	nbScanned, err := fmt.Fscan(c.consoleIn, &n)
 	if err != nil {
@@ -228,5 +225,17 @@ func (c *connection) writeToServer(data protocol.DataPacket) {
 	flushError := c.serverOut.Flush()
 	if flushError != nil {
 		log.Fatal(flushError)
+	}
+}
+
+func (c *connection) serverRequest(data protocol.DataPacket, onSuccessMessage string, onErrorMessage string) (bool, protocol.DataPacket) {
+	c.writeToServer(data)
+	response := c.readFromServer()
+	if response.Type == protocol.OK {
+		fmt.Println(onSuccessMessage)
+		return true, response
+	} else {
+		fmt.Println(onErrorMessage)
+		return false, response
 	}
 }

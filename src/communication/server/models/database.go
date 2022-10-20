@@ -8,13 +8,13 @@ import (
 )
 
 type Database struct {
-	Events map[uint]Event
-	Users  map[string]User
+	Events map[uint]*Event
+	Users  map[string]*User
 }
 
 type jsonDatabase struct {
-	Events Events `json:"events"`
-	Users  Users  `json:"users"`
+	Events jsonEvents `json:"events"`
+	Users  Users      `json:"users"`
 }
 
 func LoadDatabaseFromJson(jsonPath string) Database {
@@ -40,7 +40,7 @@ func LoadDatabaseFromJson(jsonPath string) Database {
 func (db *Database) GetEventByName(name string) (*Event, error) {
 	for _, event := range db.Events {
 		if event.Name == name {
-			return &event, nil
+			return event, nil
 		}
 	}
 	return nil, ErrorEventNotFound
@@ -51,7 +51,7 @@ func (db *Database) GetEventByName(name string) (*Event, error) {
 // Otherwise returns the event
 func (db *Database) GetEvent(id uint) (*Event, error) {
 	if event, ok := db.Events[id]; ok {
-		return &event, nil
+		return event, nil
 	}
 	return nil, ErrorEventNotFound
 }
@@ -86,6 +86,6 @@ func (db *Database) CreateEvent(name string, organizer string) (*Database, error
 		return db, ErrorEventExists
 	}
 	id := uint(len(db.Events))
-	db.Events[id] = Event{id, name, organizer, []Job{}}
+	db.Events[id] = &Event{id, name, organizer, make(map[uint]*Job)}
 	return db, nil
 }

@@ -98,7 +98,10 @@ func handleRequest(client *client) {
 			fmt.Println("user wants to login")
 			fmt.Print("name: ", name)
 			fmt.Println(" password: ", password)
-
+			for _, user := range db.Users {
+				fmt.Println("username : ", user.Name)
+				fmt.Println("userpass : ", user.Password)
+			}
 			result, err := db.Login(name, password)
 			if err != nil {
 				fmt.Println("Error logging in: ", err.Error())
@@ -158,21 +161,57 @@ func handleRequest(client *client) {
 		case protocol.GET_EVENTS:
 			fmt.Println("user wants to get events")
 
-			err := client.Write(protocol.DataPacket{
-				Type: protocol.OK,
-				Data: db.GetEventsAsStringArray(),
-			})
+			if len(data.Data) == 0 { // GET all events
 
-			if err != nil {
-				fmt.Println("Error sending events: ", err.Error())
-				client.Write(messagingProtocol.NewError(err.Error()))
-				continue
-			} else {
-				fmt.Println("Events sent")
-				for _, event := range db.GetEventsAsStringArray() {
-					fmt.Println("Event: ", event)
+				err := client.Write(protocol.DataPacket{
+					Type: protocol.OK,
+					Data: db.GetEventsAsStringArray(),
+				})
+
+				if err != nil {
+					fmt.Println("Error sending events: ", err.Error())
+					client.Write(messagingProtocol.NewError(err.Error()))
+					continue
+				} else {
+					fmt.Println("Events sent")
+					for _, event := range db.GetEventsAsStringArray() {
+						fmt.Println("Event: ", event)
+					}
 				}
+			} else if len(data.Data) == 1 { // GET all jobs for an event
+				eventId, err := strconv.ParseUint(data.Data[0], 10, 32)
+				if err != nil {
+					fmt.Println("Invalid eventId: ", data.Data[0])
+					client.Write(messagingProtocol.NewError("Invalid eventId: is not a uint64"))
+					continue
+				}
+
+				event, err := db.GetEvent(uint(eventId))
+				if err != nil {
+					client.Write(messagingProtocol.NewError(err.Error()))
+					fmt.Println("Error getting event: ", err.Error())
+					continue
+				}
+				err = client.Write(protocol.DataPacket{
+					Type: protocol.OK,
+					Data: event.GetJobsAsStringArray(),
+				})
+
+				if err != nil {
+					fmt.Println("Error getting events: ", err.Error())
+					client.Write(messagingProtocol.NewError(err.Error()))
+					continue
+				} else {
+					fmt.Println("events sent")
+					for _, jobID := range event.GetJobsAsStringArray() {
+						fmt.Println("eventID: ", jobID)
+					}
+				}
+			} else {
+				fmt.Println("ERROR: wrong number of arguments")
+				client.Write(messagingProtocol.NewError("Incorrect number of arguments.\nNeed 0 or 1 (eventID)"))
 			}
+
 		case protocol.GET_JOBS:
 			fmt.Println("user wants to get jobs")
 
@@ -182,9 +221,14 @@ func handleRequest(client *client) {
 				continue
 			}
 
-			eventName := data.Data[0]
+			eventId, err := strconv.ParseUint(data.Data[0], 10, 32)
+			if err != nil {
+				fmt.Println("Invalid eventId: ", data.Data[0])
+				client.Write(messagingProtocol.NewError("Invalid eventId: is not a uint64"))
+				continue
+			}
 
-			event, err := db.GetEventByName(eventName)
+			event, err := db.GetEvent(uint(eventId))
 			if err != nil {
 				fmt.Println("Error getting event: ", err.Error())
 				client.Write(messagingProtocol.NewError(err.Error()))
@@ -193,7 +237,7 @@ func handleRequest(client *client) {
 
 			err = client.Write(protocol.DataPacket{
 				Type: protocol.OK,
-				Data: event.GetJobsAsStringArray(),
+				Data: event.GetJobsRepartitionTable(),
 			})
 
 			if err != nil {
@@ -202,12 +246,12 @@ func handleRequest(client *client) {
 				continue
 			} else {
 				fmt.Println("Jobs sent")
-				for _, job := range event.GetJobsAsStringArray() {
+				for _, job := range event.GetJobsRepartitionTable() {
 					fmt.Println("Job: ", job)
 				}
 			}
 
-		case protocol.JOIN_EVENT:
+		case protocol.EVENT_REG:
 			fmt.Println("user wants to join an event")
 
 			if len(data.Data) != 2 {
@@ -222,23 +266,33 @@ func handleRequest(client *client) {
 				continue
 			}
 
-			eventName := data.Data[0]
-			jobName := data.Data[1]
-
-			event, err := db.GetEventByName(eventName)
+			eventId, err := strconv.ParseUint(data.Data[0], 10, 32)
+			if err != nil {
+				client.Write(messagingProtocol.NewError("Argument 1 (eventId) is not a uint64"))
+				fmt.Println(err.Error())
+				continue
+			}
+			jobId, err := strconv.ParseUint(data.Data[1], 10, 32)
+			if err != nil {
+				fmt.Println("Invalid eventId: ", data.Data[0])
+				client.Write(messagingProtocol.NewError("Invalid eventId: is not a uint64"))
+				continue
+			}
+			event, err := db.GetEvent(uint(eventId))
 			if err != nil {
 				fmt.Println("Error getting event: ", err.Error())
 				client.Write(messagingProtocol.NewError(err.Error()))
 				continue
 			}
 
-			job, err := event.GetJob(jobName)
+			job, err := event.GetJob(uint(jobId))
 			if err != nil {
 				fmt.Println("Error getting job: ", err.Error())
 				client.Write(messagingProtocol.NewError(err.Error()))
 				continue
 			}
-
+			fmt.Println(event.GetJobsRepartitionTable())
+			fmt.Println(job)
 			_, err = job.AddVolunteer(client.GetConnected())
 			if err != nil {
 				fmt.Println("Error adding volunteer: ", err.Error())
@@ -247,6 +301,8 @@ func handleRequest(client *client) {
 			}
 
 			fmt.Println("Volunteer added")
+			fmt.Println(event.GetJobsRepartitionTable())
+			fmt.Println(job)
 			client.Write(messagingProtocol.NewSuccess(""))
 			client.Logout()
 

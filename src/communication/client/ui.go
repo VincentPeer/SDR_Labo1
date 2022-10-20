@@ -111,7 +111,7 @@ func volunteerRegistration(c *Connection) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	c.volunteerRegistration(eventId, jobId)
+	c.VolunteerRegistration(eventId, jobId)
 }
 
 func listJobs(c *Connection) {

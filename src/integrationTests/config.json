@@ -53,12 +53,12 @@
                     "id" : 0,
                     "name" : "Bière",
                     "required" : 2,
-                    "volunteers" : ["Alex Terrieur"]
+                    "volunteers" : ["Alex"]
                 },
                 {
                     "id" : 1,
                     "name" : "Café",
-                    "required" : 1,
+                    "required" : 2,
                     "volunteers" : ["Alain Terrieur"]
                 }
             ]
@@ -73,7 +73,7 @@
                     "id": 0,
                     "name" : "Bière",
                     "required" : 2,
-                    "volunteers" : ["Alex Terrieur"]
+                    "volunteers" : ["Alex"]
                 },
                 {
                     "id" : 1,
@@ -88,6 +88,26 @@
             "name" : "Foot",
             "organizer" : "Alain Du Bois",
             "isOpen" : true,
+            "jobs" : [
+                {
+                    "id": 0,
+                    "name" : "Bière",
+                    "required" : 2,
+                    "volunteers" : ["Alex Terrieur"]
+                },
+                {
+                    "id" : 1,
+                    "name" : "Musique",
+                    "required" : 2,
+                    "volunteers" : ["Alain"]
+                }
+            ]
+        },
+        {
+            "id" : 3,
+            "name" : "Hockey",
+            "organizer" : "John",
+            "isOpen" : false,
             "jobs" : [
                 {
                     "id": 0,

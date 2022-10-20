@@ -17,6 +17,9 @@ func main() {
 	// Login tests
 	loginTest(conn)
 
+	// Registration tests
+	volunteerRegistration(conn)
+
 	// Create event tests
 	createEvent(conn)
 
@@ -59,6 +62,36 @@ func loginTest(conn *client.Connection) {
 	fmt.Println("Test type : Login should succeed for an organizer")
 	loginStat = conn.LoginClient("John", "123")
 	fmt.Println(loginStat, "\n")
+}
+
+func volunteerRegistration(conn *client.Connection) {
+	// Registration tests with event 0, volunteer James
+	fmt.Println("Test type : A volunteer should be able to register to an event")
+	conn.LoginClient("James", "12345")
+	conn.VolunteerRegistration(0, 0)
+	conn.VolunteerRepartition(0)
+	fmt.Println("\n")
+
+	fmt.Println("Test type : Registering twice should remove the first registration and add to the second")
+	conn.LoginClient("James", "12345")
+	conn.VolunteerRegistration(0, 1)
+	conn.VolunteerRepartition(0)
+	fmt.Println("\n")
+
+	fmt.Println("Test type : Registering should fail when the job is already full")
+	conn.LoginClient("James", "12345")
+	conn.VolunteerRegistration(0, 1)
+	conn.VolunteerRepartition(0)
+	fmt.Println("\n")
+
+	fmt.Println("Test type : Registering should fail when the event is closed")
+	conn.LoginClient("John", "123")
+	conn.CloseEvent(3)
+	conn.LoginClient("James", "12345")
+	conn.VolunteerRegistration(3, 0)
+	conn.VolunteerRepartition(3)
+	fmt.Println("\n")
+
 }
 
 func createEvent(conn *client.Connection) {
@@ -174,5 +207,11 @@ func closeEvent(conn *client.Connection) {
 	conn.LoginClient("Alain Du Bois", "123456")
 	conn.CloseEvent(2)
 	conn.PrintEvents()
+	fmt.Println("\n")
+
+	fmt.Println("Test type : Closing an event should fail when closing unexist event")
+	fmt.Println("Closing event 55")
+	conn.LoginClient("Sarah Croche", "123456")
+	conn.CloseEvent(55)
 	fmt.Println("\n")
 }

@@ -73,7 +73,7 @@ func (c *Connection) PrintEvents() {
 	}
 }
 
-func (c *Connection) volunteerRegistration(eventId int, jobId int) {
+func (c *Connection) VolunteerRegistration(eventId int, jobId int) {
 	request := protocol.DataPacket{Type: protocol.EVENT_REG, Data: []string{strconv.Itoa(eventId), strconv.Itoa(jobId)}}
 	c.serverRequest(request)
 }

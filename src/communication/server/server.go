@@ -104,10 +104,7 @@ func (server *Server) handleRequest(client *client) {
 			fmt.Println("user wants to login")
 			fmt.Print("name: ", name)
 			fmt.Println(" password: ", password)
-			for _, user := range server.db.Users {
-				fmt.Println("username : ", user.Name)
-				fmt.Println("userpass : ", user.Password)
-			}
+
 			result, err := server.db.Login(name, password)
 			if err != nil {
 				fmt.Println("Error logging in: ", err.Error())

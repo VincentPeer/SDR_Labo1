@@ -22,10 +22,10 @@ type Event struct {
 
 type Events []Event
 
-func (event *Events) ToMap() map[uint]Event {
-	events := make(map[uint]Event)
-	for _, event := range *event {
-		events[event.ID] = event
+func (event *Events) ToMap() map[uint]*Event {
+	events := make(map[uint]*Event)
+	for i := 0; i < len(*event); i++ {
+		events[(*event)[i].ID] = &(*event)[i]
 	}
 	return events
 }
@@ -37,7 +37,7 @@ func (event *Event) CreateJob(name string, required uint) (*Event, error) {
 	if name == "" {
 		return nil, ErrorJobNameEmpty
 	}
-	if _, err := event.GetJob(name); err == nil {
+	if _, err := event.GetJobByName(name); err == nil {
 		return event, ErrorJobExists
 	}
 
@@ -48,7 +48,22 @@ func (event *Event) CreateJob(name string, required uint) (*Event, error) {
 // Get a job from the database
 // Returns an error if the job does not exist
 // Otherwise returns the job
-func (event *Event) GetJob(name string) (*Job, error) {
+func (event *Event) GetJob(id uint) (*Job, error) {
+	//	if id == "" {
+	//		return nil, ErrorJobNameEmpty
+	//	}
+	for _, job := range event.Jobs {
+		if job.ID == id {
+			return &job, nil
+		}
+	}
+	return &Job{}, ErrorJobNotFound
+}
+
+// Get a job from the database
+// Returns an error if the job does not exist
+// Otherwise returns the job
+func (event *Event) GetJobByName(name string) (*Job, error) {
 	if name == "" {
 		return nil, ErrorJobNameEmpty
 	}
@@ -70,4 +85,16 @@ func (event *Event) GetJobsAsStringArray() []string {
 		jobs = append(jobs, job.ToString())
 	}
 	return jobs
+}
+
+func (event *Event) GetJobsRepartitionTable() []string {
+	var table []string
+	for _, job := range event.Jobs {
+		line := fmt.Sprintf(" %d : ", job.ID)
+		for _, volunteer := range job.Volunteers {
+			line += fmt.Sprintf("%s - ", volunteer)
+		}
+		table = append(table, line)
+	}
+	return table
 }

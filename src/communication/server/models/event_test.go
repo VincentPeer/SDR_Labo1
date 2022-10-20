@@ -79,7 +79,7 @@ func TestGetJob(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	got, err := event.GetJob("Buvette")
+	got, err := event.GetJob(0)
 	if err != nil {
 		t.Error(err)
 	}
@@ -103,7 +103,7 @@ func TestGetJobErrorIfIdDoesntExist(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	_, err = event.GetJob("Test")
+	_, err = event.GetJobByName("Test")
 	if !errors.Is(err, ErrorJobNotFound) {
 		t.Error("Error not raised")
 	}
@@ -115,7 +115,7 @@ func TestGetJobErrorIfNameIsEmpty(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	_, err = event.GetJob("")
+	_, err = event.GetJobByName("")
 	if !errors.Is(err, ErrorJobNameEmpty) {
 		t.Error("Error not raised")
 	}

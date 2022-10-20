@@ -1,6 +1,9 @@
 package models
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 var (
 	ErrorUserNotFound  = errors.New("user not found")
@@ -18,11 +21,13 @@ type User struct {
 
 type Users []User
 
-func (users *Users) ToMap() map[string]User {
-	usersMap := make(map[string]User)
-	for _, user := range *users {
-		usersMap[user.Name] = user
+func (users *Users) ToMap() map[string]*User {
+	usersMap := make(map[string]*User)
+	for i, _ := range *users {
+		fmt.Println((*users)[i].Name)
+		usersMap[(*users)[i].Name] = &(*users)[i]
 	}
+	fmt.Println(usersMap)
 	return usersMap
 }
 
@@ -42,21 +47,22 @@ func (db *Database) CreateUser(name string, password string, function string) (*
 	if _, err := db.GetUser(name); err == nil {
 		return nil, ErrorUserExists
 	}
-	db.Users[name] = User{name, password, function}
+	usr := User{name, password, function}
+	db.Users[name] = &usr
 	return db, nil
 }
 
 // Get a user from the database
 // Returns an error if the user does not exist
 // Otherwise returns the user
-func (db *Database) GetUser(name string) (User, error) {
+func (db *Database) GetUser(name string) (*User, error) {
 	if name == "" {
-		return User{}, ErrorUserNameEmpty
+		return &User{}, ErrorUserNameEmpty
 	}
 	if user, ok := db.Users[name]; ok {
 		return user, nil
 	}
-	return User{}, ErrorUserNotFound
+	return &User{}, ErrorUserNotFound
 }
 
 // Confirm the password of a user

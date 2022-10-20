@@ -3,7 +3,6 @@ package models
 import (
 	"errors"
 	"fmt"
-	"strings"
 )
 
 var (
@@ -56,5 +55,5 @@ func (job *Job) AddVolunteer(name string) (*Job, error) {
 }
 
 func (job *Job) ToString() string {
-	return fmt.Sprintf("%d | %s | %d | %s", job.ID, job.Name, job.Required, strings.Join(job.Volunteers, " - "))
+	return fmt.Sprintf("%d | %s | %d", job.ID, job.Name, job.Required)
 }

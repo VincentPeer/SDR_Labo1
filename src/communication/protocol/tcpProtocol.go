@@ -12,7 +12,6 @@ const (
 	LOGIN        = "LOGIN"
 	CREATE_EVENT = "CREATE_EVENT"
 	EVENT_REG    = "EVENT_REG"
-	JOIN_EVENT   = "JOIN_EVENT"
 	GET_EVENTS   = "GET_EVENTS"
 	GET_JOBS     = "GET_JOBS"
 	STOP         = "STOP"

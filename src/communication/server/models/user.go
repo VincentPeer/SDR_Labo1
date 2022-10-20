@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"fmt"
 )
 
 var (
@@ -24,10 +23,8 @@ type Users []User
 func (users *Users) ToMap() map[string]*User {
 	usersMap := make(map[string]*User)
 	for i, _ := range *users {
-		fmt.Println((*users)[i].Name)
 		usersMap[(*users)[i].Name] = &(*users)[i]
 	}
-	fmt.Println(usersMap)
 	return usersMap
 }
 

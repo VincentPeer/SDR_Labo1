@@ -9,10 +9,15 @@ import (
 func main() {
 	fmt.Println("Running integration tests")
 
-	server.CreateServer()
-	conn := client.Createclient()
-	conn.LoginClient("admin", "admin")
+	go server.CreateServer()
+	conn := client.CreateConnection()
+	fmt.Println("Client created...")
+	fmt.Println("Starting tests...")
+	loginStat := conn.LoginClient("a", "1")
+	fmt.Println(loginStat)
 	loginClient()
+
+	conn.Close()
 }
 
 func loginClient() {

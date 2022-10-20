@@ -2,8 +2,10 @@ package client
 
 import (
 	"SDR_Labo1/src/communication/protocol"
+	"bufio"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -12,9 +14,12 @@ var messagingProtocol = &protocol.TcpProtocol{}
 
 const EOF = "\r\n"
 
-// userInterface is the function that communicate with the a,
+var consoleOut = bufio.NewWriter(os.Stdin)
+var consoleIn = bufio.NewReader(os.Stdin)
+
+// UserInterface is the function that communicate with the a,
 // the client can go through each different functionnality
-func userInterface(c *connection) {
+func UserInterface(c *connection) {
 	fmt.Println("Welcome!")
 
 	var choice int
@@ -43,7 +48,7 @@ func userInterface(c *connection) {
 		case 6:
 			closeEvent(c)
 		case 7:
-			c.writeToServer(protocol.DataPacket{Type: protocol.STOP})
+			c.Close()
 			return
 		default:
 			fmt.Println("You have entered a bad request")
@@ -54,8 +59,8 @@ func userInterface(c *connection) {
 
 func loginClient(c *connection) {
 	for {
-		username := c.stringReader("Enter your username : ")
-		password := c.stringReader("Enter your password : ")
+		username := stringReader("Enter your username : ")
+		password := stringReader("Enter your password : ")
 
 		if c.LoginClient(username, password) {
 			break
@@ -67,7 +72,7 @@ func loginClient(c *connection) {
 func createEvent(c *connection) bool {
 	loginClient(c)
 
-	eventName := c.stringReader("Enter the event name : ")
+	eventName := stringReader("Enter the event name : ")
 	fmt.Println("List all job's name followed by the number of volunteers needed\n" +
 		"(tap STOP when ended) : ")
 
@@ -76,13 +81,13 @@ func createEvent(c *connection) bool {
 	var i = 0
 	for {
 		i++
-		jobName := c.stringReader("Insert a name for Job " + strconv.Itoa(i) + ": ")
+		jobName := stringReader("Insert a name for Job " + strconv.Itoa(i) + ": ")
 		if strings.Compare(jobName, "STOP") == 0 {
 			break
 		}
 
 		fmt.Print("Number of volunteers needed : ")
-		nbVolunteers, err := strconv.ParseInt(c.stringReader(""), 10, 32)
+		nbVolunteers, err := strconv.ParseInt(stringReader(""), 10, 32)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -101,7 +106,7 @@ func volunteerRegistration(c *connection) {
 
 	var eventId int
 	var jobId int
-	input := c.stringReader("Enter [event id] [job id] : ")
+	input := stringReader("Enter [event id] [job id] : ")
 	_, err := fmt.Sscan(input, &eventId, &jobId)
 	if err != nil {
 		log.Fatal(err)
@@ -126,10 +131,10 @@ func closeEvent(c *connection) {
 	c.closeEvent(eventId)
 }
 
-func (c *connection) stringReader(optionalMessage string) string {
+func stringReader(optionalMessage string) string {
 	fmt.Print(optionalMessage)
 
-	message, err := c.consoleIn.ReadString('\n')
+	message, err := consoleIn.ReadString('\n')
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -143,13 +148,13 @@ func readFromServer(c *connection) protocol.DataPacket {
 func (c *connection) integerReader(optionalMessage string) int {
 	fmt.Print(optionalMessage)
 	var n int
-	nbScanned, err := fmt.Fscan(c.consoleIn, &n)
+	nbScanned, err := fmt.Fscan(consoleIn, &n)
 	if err != nil {
 		log.Fatal(err)
 	} else if nbScanned != 1 {
 		log.Fatal("Expected one argument, actual : " + strconv.Itoa(nbScanned))
 	}
-	_, e := c.consoleIn.ReadString('\n') // clean the buffer
+	_, e := consoleIn.ReadString('\n') // clean the buffer
 	if e != nil {
 		log.Fatal(e)
 	}

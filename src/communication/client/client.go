@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"os"
 	"strconv"
 )
 
@@ -21,39 +20,30 @@ const (
 
 // connection contains buffered readers and writers to allow communication between the client and the a
 type connection struct {
-	consoleIn *bufio.Reader
+	conn      net.Conn
 	serverIn  *bufio.Reader
 	serverOut *bufio.Writer
 	protocol  protocol.Protocol
 }
 
 // newConnection establishes a new connection based on our own protocol
-func NewConnection(consoleIn *bufio.Reader, serverIn *bufio.Reader, serverOut *bufio.Writer, protocol protocol.Protocol) *connection {
+func NewConnection(conn net.Conn, protocol protocol.Protocol) *connection {
 	return &connection{
-		consoleIn: consoleIn,
-		serverIn:  serverIn,
-		serverOut: serverOut,
+		serverIn:  bufio.NewReader(conn),
+		serverOut: bufio.NewWriter(conn),
 		protocol:  protocol,
 	}
 }
 
 // Prepare the connection and start a client
-func Createclient() *connection {
+func CreateConnection() *connection {
 
 	conn, err := net.Dial(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	defer conn.Close()
-
-	consoleReader := bufio.NewReader(os.Stdin)
-	serverReader := bufio.NewReader(conn)
-	serverWriter := bufio.NewWriter(conn)
-	client := NewConnection(consoleReader, serverReader, serverWriter, &protocol.TcpProtocol{})
-
-	// Start the client
-	userInterface(client)
+	client := NewConnection(conn, &protocol.TcpProtocol{})
 
 	return client
 }
@@ -61,10 +51,9 @@ func Createclient() *connection {
 // LoginClient ask the user to enter his username and password and check if the login is correct
 // the client is asked to enter his username and password until the login is correct
 func (c *connection) LoginClient(username string, password string) bool {
-	// Send the login request to the a
+	// Send the login request to the server
 	login := protocol.DataPacket{Type: protocol.LOGIN, Data: []string{username, password}}
 
-	// Manage the login request with the a
 	response, _ := c.serverRequest(login)
 	return response
 }
@@ -147,4 +136,11 @@ func (c *connection) serverRequest(data protocol.DataPacket) (bool, protocol.Dat
 		fmt.Println(response.Data)
 	}
 	return response.Type == protocol.OK, response
+}
+
+func (c *connection) Close() {
+	c.writeToServer(protocol.DataPacket{Type: protocol.STOP})
+	if c != nil && c.conn != nil {
+		c.conn.Close()
+	}
 }

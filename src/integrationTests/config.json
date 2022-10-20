@@ -1,0 +1,76 @@
+{
+    "users" : [
+        {
+            "name" : "a",
+            "password" : "1",
+            "function" : "organizer"
+        },
+        {
+            "name" : "ab",
+            "password" : "12",
+            "function" : "volunteer"
+        },
+        {
+            "name" : "Alex Terrieur",
+            "password" : "123456",
+            "function" : "volunteer"
+        },
+        {
+            "name" : "Alain Terrieur",
+            "password" : "123456",
+            "function" : "volunteer"
+        }, 
+        {
+            "name" : "Sarah Croche",
+            "password" : "123456",
+            "function" : "organizer"
+        },
+        {
+            "name" : "Ondine Akeleur",
+            "password" : "123456",
+            "function" : "organizer"
+        }
+        
+    ],
+    "events" : [
+        {
+            "id" : 0,
+            "name" : "Festival de la bière",
+            "organizer" : "Sarah Croche",
+            "jobs" : [
+                {
+                    "id" : 0,
+                    "name" : "Bière",
+                    "required" : 2,
+                    "volunteers" : ["Alex Terrieur"]
+                },
+                {
+                    "id" : 1,
+                    "name" : "Café",
+                    "required" : 1,
+                    "volunteers" : ["Alain Terrieur"]
+                }
+            ]
+        },
+        {
+            "id" : 1,
+            "name" : "Baleinev",
+            "organizer" : "Ondine Akeleur",
+            "jobs" : [
+                {
+                    "id": 0,
+                    "name" : "Bière",
+                    "required" : 2,
+                    "volunteers" : ["Alex Terrieur"]
+                },
+                {
+                    "id" : 1,
+                    "name" : "Musique",
+                    "required" : 2,
+                    "volunteers" : ["Alain Terrieur"]
+                }
+            ]
+        }
+    ]
+
+}

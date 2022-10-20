@@ -7,16 +7,15 @@ import (
 )
 
 func main() {
-	RunTest()
-}
-
-func RunTest() {
 	fmt.Println("Running integration tests")
 
-	client.Createclient()
 	server.CreateServer()
+	conn := client.Createclient()
+	conn.LoginClient("admin", "admin")
+	loginClient()
 }
 
 func loginClient() {
 	fmt.Println("Checking login")
+
 }

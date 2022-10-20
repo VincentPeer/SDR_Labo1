@@ -14,7 +14,6 @@ var messagingProtocol = &protocol.TcpProtocol{}
 
 const EOF = "\r\n"
 
-var consoleOut = bufio.NewWriter(os.Stdin)
 var consoleIn = bufio.NewReader(os.Stdin)
 
 // UserInterface is the function that communicate with the a,
@@ -68,8 +67,8 @@ func loginClient(c *Connection) {
 	}
 }
 
-// createEvent creates a new event makde by an organizer
-func createEvent(c *Connection) bool {
+// createEvent creates a new event made by an organizer
+func createEvent(c *Connection) {
 	loginClient(c)
 
 	eventName := stringReader("Enter the event name : ")
@@ -94,7 +93,7 @@ func createEvent(c *Connection) bool {
 
 		jobList = append(jobList, jobName, fmt.Sprint(nbVolunteers))
 	}
-	return c.CreateEvent(jobList)
+	c.CreateEvent(jobList)
 }
 
 func printEvents(c *Connection) {

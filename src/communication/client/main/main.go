@@ -5,6 +5,7 @@ import (
 	"os"
 )
 
+// Main function that start a new client
 func main() {
 
 	// If the program is started with -d as the first argument, the client will run in debug mode
@@ -13,8 +14,8 @@ func main() {
 		debug = true
 	}
 
-	conn := client.CreateConnection(debug)
-	client.UserInterface(conn)
+	conn := client.CreateConnection(debug) // Establish a new connection with the server
 
-	//conn.Close()
+	client.UserInterface(conn) // Start the user interface
+
 }

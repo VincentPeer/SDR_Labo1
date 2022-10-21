@@ -27,7 +27,7 @@ type Server struct {
 	isDebug           bool
 }
 
-// NewServer returns a ready to use TCP server
+// NewServer returns a ready to use TCP server and starts it
 //
 // If debug is true, the server will print debug messages
 func NewServer(isDebug bool) *Server {
@@ -38,11 +38,13 @@ func NewServer(isDebug bool) *Server {
 		os.Exit(1)
 	}
 
-	return &Server{
+	srv := &Server{
 		dbm:               NewDatabaseManager(models.LoadDatabaseFromJson(path), isDebug),
 		messagingProtocol: protocol.SDRProtocol{},
 		isDebug:           isDebug,
 	}
+	srv.start()
+	return srv
 }
 
 // IsDebug returns true if the server is in debug mode
@@ -50,8 +52,8 @@ func (server *Server) IsDebug() bool {
 	return server.isDebug
 }
 
-// Start listening for incoming connections. Will block unless an error occurs.
-func (server *Server) Start() {
+// start listening for incoming connections. Will block unless an error occurs.
+func (server *Server) start() {
 
 	go server.dbm.Start()
 	// Listen for incoming connections.

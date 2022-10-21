@@ -59,4 +59,5 @@ non exportées.
 * Lors de l'affichage des manifestations et des postes, l'ordre affiché n'est pas ordré par id croissant.
 * Lorsqu'une saisie concerne l'id d'une manifestation ou d'un poste, l'indice commence à 0.
 * Lorsque l'utilisateur doit se loguer, il ne peut plus revenir en arrière et n'a pas d'autre choix que de réussir le log in.
-* Les alignements ces colonnes pour les affichages de manifestation, poste et bénévole fonctionnent tant que 
+* Les alignements des colonnes pour les affichages de manifestation, poste et bénévole fonctionnent tant que
+ l'utilisateur n'entre pas de données extrêmement longues.

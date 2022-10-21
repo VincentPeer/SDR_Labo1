@@ -65,5 +65,5 @@ func (j *job) RemoveVolunteer(name string) (*job, error) {
 
 // ToString converts the j to a string
 func (j *job) ToString() string {
-	return fmt.Sprintf("%d | %s | %d", j.ID, j.Name, j.Required)
+	return fmt.Sprintf("%d | %-10s | %d |", j.ID, j.Name, j.Required)
 }

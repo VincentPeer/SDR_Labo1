@@ -89,10 +89,10 @@ func (e *event) ToString() string {
 	if !e.isOpen {
 		openStatus = "closed"
 	}
-	return fmt.Sprintf("%d | %s | %s | %s", e.ID, e.Name, e.Organizer, openStatus)
+	return fmt.Sprintf("%d | %-20s | %-15s | %-6s |", e.ID, e.Name, e.Organizer, openStatus)
 }
 
-// GetJobAsStringArray returns the jobs as an array of strings
+// GetJobsAsStringArray returns the jobs as an array of strings
 func (e *event) GetJobsAsStringArray() []string {
 	var jobs []string
 	for _, job := range e.Jobs {
@@ -101,21 +101,9 @@ func (e *event) GetJobsAsStringArray() []string {
 	return jobs
 }
 
-// GEtJobsRepartitionTable returns a table with the jobs and which volunteers are assigned to them
+// GetJobsRepartitionTable returns a table with the jobs and which volunteers are assigned to them
 func (e *event) GetJobsRepartitionTable() []string {
-	var table []string
-	for _, job := range e.Jobs {
-		line := fmt.Sprintf(" %d : ", job.ID)
-		for _, volunteer := range job.Volunteers {
-			line += fmt.Sprintf("%s - ", volunteer)
-		}
-		table = append(table, line)
-	}
-	return table
-}
-
-func (e *event) GetJobsRepartitionTable2() []string {
-	head := "| Volunteers    | "
+	head := "| Volunteers     | "
 	for _, job := range e.Jobs {
 		s := fmt.Sprintf("%-10s", job.Name+" "+strconv.Itoa((int)(job.Required))) + " | "
 		head += s
@@ -128,12 +116,12 @@ func (e *event) GetJobsRepartitionTable2() []string {
 		line := fmt.Sprintf("%-16s", "| "+volunteer)
 		for _, job := range e.Jobs {
 			if e.isRegisterToJob(volunteer, job.ID) {
-				line += "|" + fmt.Sprintf("%-5s", "") + "X" + fmt.Sprintf("%-6s", "")
+				line += " |" + fmt.Sprintf("%-5s", "") + "X" + fmt.Sprintf("%-5s", "")
 			} else {
-				line += "|" + fmt.Sprintf("%-12s", " ")
+				line += " |" + fmt.Sprintf("%-11s", " ")
 			}
 		}
-		tab = append(tab, line+"|")
+		tab = append(tab, line+" |")
 	}
 	return tab
 }

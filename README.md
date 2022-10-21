@@ -52,9 +52,11 @@ Ensuite, à partir d'un terminal dans le dossier *SDR_Labo1*, tapez la commande
 `godoc -http=:6060`  
 Dans votre navigateur, entrez l'URL  
 `http://localhost:6060/pkg/SDR_Labo1/`  
-Vous pouvez alors parcourir notre documentation. 
+Vous pouvez alors parcourir notre documentation. Les packages main ne sont pas visibles, ainsi que les fonctions
+non exportées.
 
 ### Détails d'implémentation
 * Lors de l'affichage des manifestations et des postes, l'ordre affiché n'est pas ordré par id croissant.
-* Lorsque l'utilisateur doit entrer un id, nous traitons les entiers saisis, qu'ils soient valides ou non, mais si 
-  l'utilisateur entre un type différent d'un entier, une erreur se produit et le client est déconnecté.
+* Lorsqu'une saisie concerne l'id d'une manifestation ou d'un poste, l'indice commence à 0.
+* Lorsque l'utilisateur doit se loguer, il ne peut plus revenir en arrière et n'a pas d'autre choix que de réussir le log in.
+* Les alignements ces colonnes pour les affichages de manifestation, poste et bénévole fonctionnent tant que 

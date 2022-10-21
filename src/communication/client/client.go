@@ -12,12 +12,7 @@ import (
 	"strconv"
 )
 
-// Constants needed to connect to the server
-const (
-	CONN_HOST = "localhost"
-	CONN_PORT = "3333"
-	CONN_TYPE = "tcp"
-)
+const connType = "tcp"
 
 // Connection contains buffered readers and writers to allow communication between the client and the server
 type Connection struct {
@@ -37,8 +32,8 @@ func NewConnection(conn net.Conn, protocol protocol.Protocol) *Connection {
 }
 
 // CreateConnection prepare the Connection and start a client
-func CreateConnection(isDebug bool) *Connection {
-	conn, err := net.Dial(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
+func CreateConnection(host string, port string, isDebug bool) *Connection {
+	conn, err := net.Dial(connType, host+":"+port)
 	if err != nil {
 		log.Fatal(err)
 	}

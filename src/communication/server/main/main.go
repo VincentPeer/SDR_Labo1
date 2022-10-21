@@ -5,12 +5,30 @@ import (
 	"os"
 )
 
+var (
+	connHost   = "localhost"
+	connPort   = "3333"
+	configPath = "./config.json"
+)
+
 func main() {
-	// If the program is started with -d as the first argument, the server will run in debug mode
-	debug := false
-	if len(os.Args) > 1 && os.Args[1] == "-d" {
-		debug = true
+
+	isDebug := false
+	for i := 1; i < len(os.Args); i++ {
+		switch os.Args[i] {
+		case "-P", "--port":
+			connPort = os.Args[i+1]
+			i++
+		case "-H", "--host":
+			connHost = os.Args[i+1]
+			i++
+		case "-C", "--config":
+			configPath = os.Args[i+1]
+			i++
+		case "-D", "--debug":
+			isDebug = true
+		}
 	}
 
-	server.NewServer(debug)
+	server.NewServer(connHost, connPort, configPath, isDebug)
 }

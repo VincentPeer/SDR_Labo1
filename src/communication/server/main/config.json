@@ -53,13 +53,13 @@
                     "id" : 0,
                     "name" : "Bière",
                     "required" : 2,
-                    "volunteers" : ["Alex"]
+                    "volunteers" : ["Alex Terrieur"]
                 },
                 {
                     "id" : 1,
                     "name" : "Café",
                     "required" : 2,
-                    "volunteers" : ["Alain Terrieur"]
+                    "volunteers" : ["Alain Du Bois"]
                 }
             ]
         },
@@ -73,13 +73,13 @@
                     "id": 0,
                     "name" : "Bière",
                     "required" : 2,
-                    "volunteers" : ["Alex"]
+                    "volunteers" : ["Alex Terrieur"]
                 },
                 {
                     "id" : 1,
                     "name" : "Musique",
                     "required" : 2,
-                    "volunteers" : ["Alain Terrieur"]
+                    "volunteers" : ["Alain Du Bois"]
                 }
             ]
         },
@@ -99,7 +99,7 @@
                     "id" : 1,
                     "name" : "Musique",
                     "required" : 2,
-                    "volunteers" : ["Alain"]
+                    "volunteers" : ["James"]
                 }
             ]
         },
@@ -119,10 +119,9 @@
                     "id" : 1,
                     "name" : "Musique",
                     "required" : 2,
-                    "volunteers" : ["Alain Terrieur"]
+                    "volunteers" : ["Alain Du Bois"]
                 }
             ]
         }
     ]
-
 }

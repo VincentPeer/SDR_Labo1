@@ -12,20 +12,20 @@ var (
 	ErrorFunctionEmpty = errors.New("function cannot be empty")
 )
 
-// User holds the users' data
-type User struct {
+// user holds the users' data
+type user struct {
 	Name     string `json:"name"`
 	Password string `json:"password"`
 	Function string `json:"function"`
 }
 
-type Users []User
+type users []user
 
 // ToMap converts the json structure to a map of users
-func (users *Users) ToMap() map[string]*User {
-	usersMap := make(map[string]*User)
-	for i := range *users {
-		usersMap[(*users)[i].Name] = &(*users)[i]
+func (us *users) ToMap() map[string]*user {
+	usersMap := make(map[string]*user)
+	for i := range *us {
+		usersMap[(*us)[i].Name] = &(*us)[i]
 	}
 	return usersMap
 }

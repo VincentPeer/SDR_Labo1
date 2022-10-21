@@ -12,14 +12,14 @@ import (
 
 // Database is a in memory structure holding event and user data
 type Database struct {
-	Events map[uint]*Event
-	Users  map[string]*User
+	Events map[uint]*event
+	Users  map[string]*user
 }
 
 // jsonDatabase is an helper structure used to serialize/deserialize the database to/from json.
 type jsonDatabase struct {
 	Events jsonEvents `json:"events"`
-	Users  Users      `json:"users"`
+	Users  users      `json:"users"`
 }
 
 // LoadDatabaseFromJson returns the state of the database stored in the json file at path
@@ -37,14 +37,14 @@ func LoadDatabaseFromJson(jsonPath string) Database {
 	var conf jsonDatabase
 	json.Unmarshal(byteValue, &conf)
 
-	return Database{conf.Events.ToMap(), conf.Users.ToMap()}
+	return Database{conf.Events.toMap(), conf.Users.ToMap()}
 }
 
 // GetEventByName returns the event with the name `name`
 //
 // Returns an error if no such event exists
 // Complexity O(n)
-func (db *Database) GetEventByName(name string) (*Event, error) {
+func (db *Database) GetEventByName(name string) (*event, error) {
 	for _, event := range db.Events {
 		if event.Name == name {
 			return event, nil
@@ -57,7 +57,7 @@ func (db *Database) GetEventByName(name string) (*Event, error) {
 //
 // Returns an error if no such event exists
 // Complexity O(1)
-func (db *Database) GetEvent(id uint) (*Event, error) {
+func (db *Database) GetEvent(id uint) (*event, error) {
 	if event, ok := db.Events[id]; ok {
 		return event, nil
 	}
@@ -89,7 +89,7 @@ func (db *Database) CreateEvent(name string, organizer string) (*Database, error
 		return nil, ErrorNotOrganizer
 	}
 	id := uint(len(db.Events))
-	db.Events[id] = &Event{id, name, organizer, make(map[uint]*Job), true}
+	db.Events[id] = &event{id, name, organizer, make(map[uint]*job), true}
 	return db, nil
 }
 
@@ -107,7 +107,7 @@ func (db *Database) CreateUser(name string, password string, function string) (*
 	if _, err := db.GetUser(name); err == nil {
 		return nil, ErrorUserExists
 	}
-	usr := User{name, password, function}
+	usr := user{name, password, function}
 	db.Users[name] = &usr
 	return db, nil
 }
@@ -115,14 +115,14 @@ func (db *Database) CreateUser(name string, password string, function string) (*
 // GetUser returns the user with the given name
 //
 // Complexity: O(1)
-func (db *Database) GetUser(name string) (*User, error) {
+func (db *Database) GetUser(name string) (*user, error) {
 	if name == "" {
-		return &User{}, ErrorUserNameEmpty
+		return &user{}, ErrorUserNameEmpty
 	}
 	if user, ok := db.Users[name]; ok {
 		return user, nil
 	}
-	return &User{}, ErrorUserNotFound
+	return &user{}, ErrorUserNotFound
 }
 
 // Login checks if the user exists and if the password is correct

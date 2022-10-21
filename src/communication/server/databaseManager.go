@@ -7,88 +7,88 @@ import (
 	"time"
 )
 
-// DatabaseManager handles all database requests and updates.
+// databaseManager handles all database requests and updates.
 //
 // It listens to a channel for DatabaseRequest and handles them. This way, only one thread can access them
-type DatabaseManager struct {
+type databaseManager struct {
 	db             models.Database
-	RequestChannel chan DatabaseRequest
-	isDebug        bool
+	requestChannel chan databaseRequest
+	debugFlag      bool
 }
 
-// DatabaseRequest represents an incoming database request
+// databaseRequest represents an incoming database request
 //
 // Client (goroutine) who originated the message, to use in responses
-type DatabaseRequest struct {
+type databaseRequest struct {
 	sender  *clientConnection
 	payload protocol.DataPacket
 }
 
-// NewDatabaseRequest returns a database request initialised with payload as input and the goroutine origin
-func NewDatabaseRequest(client *clientConnection, data protocol.DataPacket) *DatabaseRequest {
-	return &DatabaseRequest{
+// newDatabaseRequest returns a database request initialised with payload as input and the goroutine origin
+func newDatabaseRequest(client *clientConnection, data protocol.DataPacket) *databaseRequest {
+	return &databaseRequest{
 		sender:  client,
 		payload: data,
 	}
 }
 
-// NewDatabaseManager returns a database manager and initiate its channel
-func NewDatabaseManager(db models.Database, isDebug bool) *DatabaseManager {
-	return &DatabaseManager{
+// newDatabaseManager returns a database manager and initiate its channel
+func newDatabaseManager(db models.Database, isDebug bool) *databaseManager {
+	return &databaseManager{
 		db:             db,
-		RequestChannel: make(chan DatabaseRequest),
-		isDebug:        isDebug,
+		requestChannel: make(chan databaseRequest),
+		debugFlag:      isDebug,
 	}
 }
 
 // IsDebug return true if debugging prints should be performed
-func (dbm *DatabaseManager) IsDebug() bool {
-	return dbm.isDebug
+func (dbm *databaseManager) isDebug() bool {
+	return dbm.debugFlag
 }
 
-// Start starts the thread, listening to the user request channel. This is a blocking function.
-func (dbm *DatabaseManager) Start() {
+// start starts the thread, listening to the user request channel. This is a blocking function.
+func (dbm *databaseManager) start() {
 	for {
-		request := <-dbm.RequestChannel
+		request := <-dbm.requestChannel
 		dbm.handleRequest(request)
 	}
 }
 
 // handleRequest handles a request by parsing it and performing the requested action
-func (dbm *DatabaseManager) handleRequest(request DatabaseRequest) {
-	if request.sender.isDebug && dbm.isDebug {
+func (dbm *databaseManager) handleRequest(request databaseRequest) {
+	if request.sender.isDebug && dbm.debugFlag {
 		time.Sleep(5 * time.Second)
 	}
 
 	switch request.payload.Type {
 	case protocol.LOGIN:
-		Debug(dbm, "user wants to login")
+		debug(dbm, "user wants to login")
 		loginHandler(dbm, request)
 	case protocol.CREATE_EVENT:
-		Debug(dbm, "user wants to create an event")
+		debug(dbm, "user wants to create an event")
 		createEventHandler(dbm, request)
 	case protocol.GET_EVENTS:
-		Debug(dbm, "user wants to get events")
+		debug(dbm, "user wants to get events")
 		getEventsHandler(dbm, request)
 	case protocol.GET_JOBS:
-		Debug(dbm, "user wants to get jobs")
+		debug(dbm, "user wants to get jobs")
 		getJobsHandler(dbm, request)
 	case protocol.EVENT_REG:
-		Debug(dbm, "user wants to join an event")
+		debug(dbm, "user wants to join an event")
 		eventRegHandler(dbm, request)
 	case protocol.CLOSE_EVENT:
-		Debug(dbm, "user wants to close an event")
+		debug(dbm, "user wants to close an event")
 		closeEventHandler(dbm, request)
 	case protocol.STOP:
-		Debug(dbm, "user wants to stop the a")
+		debug(dbm, "user wants to stop the a")
 		stopHandler(dbm, request)
 	default:
-		Debug(dbm, "Unknown command")
+		debug(dbm, "Unknown command")
 	}
 	if request.payload.Type != protocol.LOGIN && request.payload.Type != protocol.STOP {
 		request.sender.connectedUser = ""
 	}
-	Debug(dbm, "Request handled")
+	debug(dbm, "Request handled")
 }
 
 // checkDatapacket checks the number of parameters of a request
@@ -105,10 +105,10 @@ func checkDatapacket(data protocol.DataPacket, minNbParams int, maxNbParams int,
 // logInUser checks if a user can login with the given credentials
 //
 // if login is successfull the client connected user is updated. An update tcp message is also sent to the client
-func (dbm *DatabaseManager) logInUser(client *clientConnection, username string, password string) (bool, error) {
-	Debug(dbm, "user wants to login")
-	Debug(dbm, "name: "+username)
-	Debug(dbm, " password: "+password)
+func (dbm *databaseManager) logInUser(client *clientConnection, username string, password string) (bool, error) {
+	debug(dbm, "user wants to login")
+	debug(dbm, "name: "+username)
+	debug(dbm, " password: "+password)
 
 	user, err := dbm.db.GetUser(username)
 	errMsg := "Login failed"
@@ -119,7 +119,7 @@ func (dbm *DatabaseManager) logInUser(client *clientConnection, username string,
 		client.sendSuccess("Login successful")
 		return true, nil
 	}
-	Debug(dbm, errMsg)
+	debug(dbm, errMsg)
 	client.sendError(errMsg)
 	return false, err
 }
@@ -134,7 +134,14 @@ func checkIfConnected(client *clientConnection) bool {
 }
 
 // checkIfOrganizer checks if the connected user to a given client is the organizer of a given event
-func checkIfOrganizer(client *clientConnection, event *models.Event) bool {
+func (dbm *databaseManager) checkIfOrganizer(client *clientConnection, eventId int) bool {
+	event, err := dbm.db.GetEvent(uint(eventId))
+	if err != nil {
+		debug(dbm, "Error getting event: "+err.Error())
+		client.sendError("Error getting event")
+		return false
+	}
+
 	if event.Organizer != client.connectedUser {
 		client.sendError("You are not the organizer of this event")
 		return false

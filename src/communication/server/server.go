@@ -22,9 +22,9 @@ const (
 
 // Server listens for incoming connections on a given port and forwards them to the database manager
 type Server struct {
-	dbm               *DatabaseManager
+	dbm               *databaseManager
 	messagingProtocol protocol.SDRProtocol
-	isDebug           bool
+	debugFlag         bool
 }
 
 // NewServer returns a ready to use TCP server and starts it
@@ -39,37 +39,37 @@ func NewServer(isDebug bool) *Server {
 	}
 
 	srv := &Server{
-		dbm:               NewDatabaseManager(models.LoadDatabaseFromJson(path), isDebug),
+		dbm:               newDatabaseManager(models.LoadDatabaseFromJson(path), isDebug),
 		messagingProtocol: protocol.SDRProtocol{},
-		isDebug:           isDebug,
+		debugFlag:         isDebug,
 	}
 	srv.start()
 	return srv
 }
 
 // IsDebug returns true if the server is in debug mode
-func (server *Server) IsDebug() bool {
-	return server.isDebug
+func (server *Server) isDebug() bool {
+	return server.debugFlag
 }
 
 // start listening for incoming connections. Will block unless an error occurs.
 func (server *Server) start() {
 
-	go server.dbm.Start()
+	go server.dbm.start()
 	// Listen for incoming connections.
 	l, err := net.Listen(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
 	if err != nil {
-		Debug(server, "Error listening: "+err.Error())
+		debug(server, "Error listening: "+err.Error())
 		os.Exit(1)
 	}
 	// Close the listener when the application closes.
 	defer l.Close()
-	Debug(server, "Listening on "+CONN_HOST+":"+CONN_PORT)
+	debug(server, "Listening on "+CONN_HOST+":"+CONN_PORT)
 	for {
 		// Listen for an incoming connection.
 		conn, err := l.Accept()
 		if err != nil {
-			Debug(server, "Error accepting: "+err.Error())
+			debug(server, "Error accepting: "+err.Error())
 			os.Exit(1)
 		}
 		newClient := newClientConnection(server, &conn)
@@ -80,32 +80,32 @@ func (server *Server) start() {
 
 // closeRequest closes the connection with the client and removes it from the list of clients
 func (server *Server) closeRequest(client *clientConnection) {
-	Debug(server, "Closing client connection")
+	debug(server, "Closing client connection")
 	client.close()
 }
 
 // handleRequest handles incoming requests from clients and forwards database access requests to the database manager
 func (server *Server) handleRequest(client *clientConnection) {
-	Debug(server, "Now we dialogue with client")
+	debug(server, "Now we dialogue with client")
 	defer server.closeRequest(client)
 
 	for {
 		data, err := client.read()
 		if err != nil {
 			if err == io.EOF { // Client disconnected
-				Debug(server, "Client disconnected")
+				debug(server, "Client disconnected")
 				break
 			} else {
-				Debug(server, "Error reading from client: "+err.Error())
+				debug(server, "Error reading from client: "+err.Error())
 				break
 			}
 		}
 
-		if data.Type == protocol.DEBUG && server.isDebug { // Client sent a debug command so we set him to debug mode
+		if data.Type == protocol.DEBUG && server.debugFlag { // Client sent a debug command so we set him to debug mode
 			client.isDebug = true
 		}
 
-		server.dbm.RequestChannel <- *NewDatabaseRequest(client, data) // Forward the request to the database manager
+		server.dbm.requestChannel <- *newDatabaseRequest(client, data) // Forward the request to the database manager
 
 	}
 

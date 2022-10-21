@@ -6,19 +6,19 @@ import (
 )
 
 var (
-	ErrorJobNotFound           = errors.New("job not found")
-	ErrorJobExists             = errors.New("job with same id already exists")
-	ErrorJobNameEmpty          = errors.New("job name cannot be empty")
+	ErrorJobNotFound           = errors.New("j not found")
+	ErrorJobExists             = errors.New("j with same id already exists")
+	ErrorJobNameEmpty          = errors.New("j name cannot be empty")
 	ErrorVolunteerNotFound     = errors.New("volunteer not found")
-	ErrorVolunteerExists       = errors.New("volunteer already signed up for this job")
+	ErrorVolunteerExists       = errors.New("volunteer already signed up for this j")
 	ErrorVolunteerEmpty        = errors.New("volunteer name cannot be empty")
 	ErrorVolunteerAboveMaximum = errors.New("volunteer count is above maximum")
 )
 
-type Jobs []Job
+type jobs []job
 
-// Job holds the jobs' data
-type Job struct {
+// job holds the jobs' data
+type job struct {
 	ID         uint     `json:"id"`
 	Name       string   `json:"name"`
 	Required   uint     `json:"required"`
@@ -26,10 +26,10 @@ type Job struct {
 }
 
 // ToMap converts the json structure to a map of jobs
-func (jobs *Jobs) ToMap() map[uint]*Job {
-	jobsMap := make(map[uint]*Job)
-	for i := 0; i < len(*jobs); i++ {
-		jobsMap[(*jobs)[i].ID] = &(*jobs)[i]
+func (js *jobs) ToMap() map[uint]*job {
+	jobsMap := make(map[uint]*job)
+	for i := 0; i < len(*js); i++ {
+		jobsMap[(*js)[i].ID] = &(*js)[i]
 	}
 	return jobsMap
 }
@@ -37,11 +37,11 @@ func (jobs *Jobs) ToMap() map[uint]*Job {
 // GetVolunteer returns the volunteer with the given name
 //
 // Complexity: O(n)
-func (job *Job) GetVolunteer(name string) (string, error) {
+func (j *job) GetVolunteer(name string) (string, error) {
 	if name == "" {
 		return "", ErrorVolunteerEmpty
 	}
-	for _, volunteer := range job.Volunteers {
+	for _, volunteer := range j.Volunteers {
 		if volunteer == name {
 			return volunteer, nil
 		}
@@ -50,20 +50,20 @@ func (job *Job) GetVolunteer(name string) (string, error) {
 }
 
 // RemoveVolunteer removes the volunteer with the given name
-func (job *Job) RemoveVolunteer(name string) (*Job, error) {
+func (j *job) RemoveVolunteer(name string) (*job, error) {
 	if name == "" {
 		return nil, ErrorVolunteerEmpty
 	}
-	for i, volunteer := range job.Volunteers {
+	for i, volunteer := range j.Volunteers {
 		if volunteer == name {
-			job.Volunteers = append(job.Volunteers[:i], job.Volunteers[i+1:]...)
-			return job, nil
+			j.Volunteers = append(j.Volunteers[:i], j.Volunteers[i+1:]...)
+			return j, nil
 		}
 	}
 	return nil, ErrorVolunteerNotFound
 }
 
-// ToString converts the job to a string
-func (job *Job) ToString() string {
-	return fmt.Sprintf("%d | %s | %d", job.ID, job.Name, job.Required)
+// ToString converts the j to a string
+func (j *job) ToString() string {
+	return fmt.Sprintf("%d | %s | %d", j.ID, j.Name, j.Required)
 }

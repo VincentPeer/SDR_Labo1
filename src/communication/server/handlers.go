@@ -33,10 +33,10 @@ func createEventHandler(dbm *databaseManager, request databaseRequest) {
 			nbVolunteers, err := strconv.ParseUint(request.payload.Data[i+1], 10, 32)
 			if err != nil {
 				debug(dbm, "Error parsing number of volunteers: "+err.Error())
-				request.sender.sendError(err.Error())
-				return
+				request.sender.sendError("Error parsing number of volunteers" + err.Error())
+			} else {
+				event.CreateJob(request.payload.Data[i], uint(nbVolunteers))
 			}
-			event.CreateJob(request.payload.Data[i], uint(nbVolunteers))
 		}
 		request.sender.sendSuccess("Event created")
 		debug(dbm, "Event created")

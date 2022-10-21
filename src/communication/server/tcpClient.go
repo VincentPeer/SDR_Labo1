@@ -31,6 +31,10 @@ func newClientConnection(server *Server, conn *net.Conn) *clientConnection {
 func (c *clientConnection) read() (protocol.DataPacket, error) {
 	message, err := c.bufin.ReadString(c.server.messagingProtocol.GetDelimiter())
 
+	if c.server.isDebug() {
+		debug(c.server, "Received message: "+message)
+	}
+
 	if err != nil {
 		return protocol.DataPacket{}, err
 	} else {
@@ -45,6 +49,10 @@ func (c *clientConnection) write(data protocol.DataPacket) error {
 	if err == nil {
 		_, err = c.bufout.WriteString(message)
 		c.bufout.Flush()
+	}
+
+	if c.server.isDebug() {
+		debug(c.server, "Sent message to client: "+message)
 	}
 	return err
 }

@@ -114,15 +114,15 @@ func (e *event) GetJobsRepartitionTable() []string {
 	return table
 }
 
-func (event *Event) GetJobsRepartitionTable2() []string {
+func (e *event) GetJobsRepartitionTable2() []string {
 	head := "| Volunteers | "
-	for _, job := range event.Jobs {
+	for _, job := range e.Jobs {
 		s := fmt.Sprintf("%-15s", job.Name+" "+strconv.Itoa((int)(job.Required))+" |")
 		head += s
 	}
 	var tab []string
 	tab = append(tab, head)
-	for _, job := range event.Jobs {
+	for _, job := range e.Jobs {
 		for _, volunteer := range job.Volunteers {
 			s := fmt.Sprintf("%-10s", volunteer)
 			tab = append(tab, "| "+s+" | ")

@@ -55,7 +55,7 @@ Dans votre navigateur, entrez l'URL
 Vous pouvez alors parcourir notre documentation. Les packages main ne sont pas visibles, ainsi que les fonctions
 non exportées.
 
-### Détails d'implémentation
+### 🔎 Détails d'implémentation
 * Lors de l'affichage des manifestations et des postes, l'ordre affiché n'est pas ordré par id croissant.
 * Lorsqu'une saisie concerne l'id d'une manifestation ou d'un poste, l'indice commence à 0.
 * Lorsque l'utilisateur doit se loguer, il ne peut plus revenir en arrière et n'a pas d'autre choix que de réussir le log in.

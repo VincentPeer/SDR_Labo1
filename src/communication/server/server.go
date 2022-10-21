@@ -1,3 +1,6 @@
+/*
+This package sets up the TCP server and handles incoming requests.
+*/
 package server
 
 import (
@@ -20,11 +23,11 @@ const (
 // Server listens for incoming connections on a given port and forwards them to the database manager
 type Server struct {
 	dbm               *DatabaseManager
-	messagingProtocol protocol.TcpProtocol
+	messagingProtocol protocol.SDRProtocol
 	isDebug           bool
 }
 
-// NewServer returns a ready to use TCP server
+// NewServer returns a ready to use TCP server and starts it
 //
 // If debug is true, the server will print debug messages
 func NewServer(isDebug bool) *Server {
@@ -35,11 +38,13 @@ func NewServer(isDebug bool) *Server {
 		os.Exit(1)
 	}
 
-	return &Server{
+	srv := &Server{
 		dbm:               NewDatabaseManager(models.LoadDatabaseFromJson(path), isDebug),
-		messagingProtocol: protocol.TcpProtocol{},
+		messagingProtocol: protocol.SDRProtocol{},
 		isDebug:           isDebug,
 	}
+	srv.start()
+	return srv
 }
 
 // IsDebug returns true if the server is in debug mode
@@ -47,8 +52,8 @@ func (server *Server) IsDebug() bool {
 	return server.isDebug
 }
 
-// Start listening for incoming connections. Will block unless an error occurs.
-func (server *Server) Start() {
+// start listening for incoming connections. Will block unless an error occurs.
+func (server *Server) start() {
 
 	go server.dbm.Start()
 	// Listen for incoming connections.
@@ -67,25 +72,25 @@ func (server *Server) Start() {
 			Debug(server, "Error accepting: "+err.Error())
 			os.Exit(1)
 		}
-		newClient := NewClient(server, &conn)
+		newClient := newClientConnection(server, &conn)
 		// Handle connections in a new goroutine.
 		go server.handleRequest(newClient)
 	}
 }
 
 // closeRequest closes the connection with the client and removes it from the list of clients
-func (server *Server) closeRequest(client *Client) {
+func (server *Server) closeRequest(client *clientConnection) {
 	Debug(server, "Closing client connection")
-	client.Close()
+	client.close()
 }
 
 // handleRequest handles incoming requests from clients and forwards database access requests to the database manager
-func (server *Server) handleRequest(client *Client) {
+func (server *Server) handleRequest(client *clientConnection) {
 	Debug(server, "Now we dialogue with client")
 	defer server.closeRequest(client)
 
 	for {
-		data, err := client.Read()
+		data, err := client.read()
 		if err != nil {
 			if err == io.EOF { // Client disconnected
 				Debug(server, "Client disconnected")

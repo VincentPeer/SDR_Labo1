@@ -1,9 +1,12 @@
+/*
+This package provides the models used to store the data
+*/
 package models
 
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 )
 
@@ -29,7 +32,7 @@ func LoadDatabaseFromJson(jsonPath string) Database {
 
 	defer jsonFile.Close()
 
-	byteValue, _ := ioutil.ReadAll(jsonFile)
+	byteValue, _ := io.ReadAll(jsonFile)
 
 	var conf jsonDatabase
 	json.Unmarshal(byteValue, &conf)

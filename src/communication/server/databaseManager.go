@@ -3,9 +3,7 @@ package server
 import (
 	"SDR_Labo1/src/communication/protocol"
 	"SDR_Labo1/src/communication/server/models"
-	"math"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -22,12 +20,12 @@ type DatabaseManager struct {
 //
 // Client (goroutine) who originated the message, to use in responses
 type DatabaseRequest struct {
-	sender  *Client
+	sender  *clientConnection
 	payload protocol.DataPacket
 }
 
 // NewDatabaseRequest returns a database request initialised with payload as input and the goroutine origin
-func NewDatabaseRequest(client *Client, data protocol.DataPacket) *DatabaseRequest {
+func NewDatabaseRequest(client *clientConnection, data protocol.DataPacket) *DatabaseRequest {
 	return &DatabaseRequest{
 		sender:  client,
 		payload: data,
@@ -64,180 +62,31 @@ func (dbm *DatabaseManager) handleRequest(request DatabaseRequest) {
 
 	switch request.payload.Type {
 	case protocol.LOGIN:
-		if checkDatapacket(request.payload, 2, 2, request.sender) {
-			dbm.logInUser(request.sender, request.payload.Data[0], request.payload.Data[1])
-		}
+		Debug(dbm, "user wants to login")
+		loginHandler(dbm, request)
 	case protocol.CREATE_EVENT:
 		Debug(dbm, "user wants to create an event")
-		if checkDatapacket(request.payload, 1, math.MaxInt32, request.sender) && checkIfConnected(request.sender) {
-			eventName := request.payload.Data[0]
-			_, err := dbm.db.CreateEvent(eventName, request.sender.GetConnected())
-			if err != nil {
-				Debug(dbm, err.Error())
-				request.sender.SendError(err.Error())
-				break
-			}
-			event, err := dbm.db.GetEventByName(eventName)
-			if err != nil {
-				Debug(dbm, err.Error())
-				request.sender.SendError(err.Error())
-				break
-			}
-			// Populating the event with jobs
-			for i := 1; i < len(request.payload.Data)-1; i += 2 {
-				nbVolunteers, err := strconv.ParseUint(request.payload.Data[i+1], 10, 32)
-				if err != nil {
-					Debug(dbm, "Error parsing number of volunteers: "+err.Error())
-					request.sender.SendError(err.Error())
-					break
-				}
-				event.CreateJob(request.payload.Data[i], uint(nbVolunteers))
-			}
-			request.sender.SendSuccess("Event created")
-			Debug(dbm, "Event created")
-		}
+		createEventHandler(dbm, request)
 	case protocol.GET_EVENTS:
 		Debug(dbm, "user wants to get events")
-
-		if len(request.payload.Data) == 0 { // GET all events
-			err := request.sender.Write(protocol.DataPacket{
-				Type: protocol.OK,
-				Data: dbm.db.GetEventsAsStringArray(),
-			})
-			if err != nil {
-				Debug(dbm, "Error sending events: "+err.Error())
-				request.sender.SendError(err.Error())
-				break
-			}
-			Debug(dbm, "Events sent")
-
-		} else if len(request.payload.Data) == 1 { // GET all jobs for an event
-			eventId, err := strconv.ParseUint(request.payload.Data[0], 10, 32)
-			if err != nil {
-				Debug(dbm, "Invalid eventId: "+request.payload.Data[0])
-				request.sender.SendError("Invalid eventId: is not a uint64")
-				break
-			}
-			event, err := dbm.db.GetEvent(uint(eventId))
-			if err != nil {
-				request.sender.SendError(err.Error())
-				Debug(dbm, "Error getting event: "+err.Error())
-				break
-			}
-			err = request.sender.Write(protocol.DataPacket{
-				Type: protocol.OK,
-				Data: event.GetJobsAsStringArray(),
-			})
-			if err != nil {
-				Debug(dbm, "Error getting events: "+err.Error())
-				request.sender.SendError(err.Error())
-				break
-			}
-			Debug(dbm, "events sent")
-		} else {
-			Debug(dbm, "ERROR: wrong number of arguments")
-			request.sender.SendError("Incorrect number of arguments.\nNeed 0 or 1 (eventID)")
-		}
+		getEventsHandler(dbm, request)
 	case protocol.GET_JOBS:
 		Debug(dbm, "user wants to get jobs")
-
-		if checkDatapacket(request.payload, 1, 1, request.sender) {
-			eventId, err := strconv.ParseUint(request.payload.Data[0], 10, 32)
-			if err != nil {
-				Debug(dbm, "Invalid eventId: "+request.payload.Data[0])
-				request.sender.SendError("Invalid eventId: is not a uint64")
-				break
-			}
-			event, err := dbm.db.GetEvent(uint(eventId))
-			if err != nil {
-				request.sender.SendError(err.Error())
-				Debug(dbm, "Error getting event: "+err.Error())
-				break
-			}
-			err = request.sender.Write(protocol.DataPacket{
-				Type: protocol.OK,
-				Data: event.GetJobsRepartitionTable2(),
-			})
-			if err != nil {
-				Debug(dbm, "Error sending jobs: "+err.Error())
-				request.sender.SendError(err.Error())
-				break
-			}
-			Debug(dbm, "events sent")
-		}
-
+		getJobsHandler(dbm, request)
 	case protocol.EVENT_REG:
 		Debug(dbm, "user wants to join an event")
-
-		if checkDatapacket(request.payload, 2, 2, request.sender) && checkIfConnected(request.sender) {
-			eventId, err := parseInt(request.sender, request.payload.Data[0])
-			if err != nil {
-				break
-			}
-			jobId, err := parseInt(request.sender, request.payload.Data[1])
-			if err != nil {
-				break
-			}
-			event, err := dbm.db.GetEvent(uint(eventId))
-			if err != nil {
-				Debug(dbm, "Error getting event: "+err.Error())
-				request.sender.SendError(err.Error())
-				break
-			}
-
-			job, err := event.GetJob(uint(jobId))
-			if err != nil {
-				Debug(dbm, "Error getting job: "+err.Error())
-				request.sender.SendError(err.Error())
-				break
-			}
-			Debug(dbm, strings.Join(event.GetJobsRepartitionTable(), "\n"))
-			Debug(dbm, job.ToString())
-
-			_, err = event.AddVolunteer(job.ID, request.sender.GetConnected())
-			if err != nil {
-				Debug(dbm, "Error adding volunteer: "+err.Error())
-				request.sender.SendError(err.Error())
-				break
-			}
-
-			Debug(dbm, "Volunteer added")
-			Debug(dbm, strings.Join(event.GetJobsRepartitionTable(), "\n"))
-			Debug(dbm, job.ToString())
-			request.sender.SendSuccess("Volunteer added")
-		}
+		eventRegHandler(dbm, request)
 	case protocol.CLOSE_EVENT:
 		Debug(dbm, "user wants to close an event")
-
-		if checkDatapacket(request.payload, 1, 1, request.sender) && checkIfConnected(request.sender) {
-
-			eventId, err := parseInt(request.sender, request.payload.Data[0])
-			if err != nil {
-				break
-			}
-			event, err := dbm.db.GetEvent(uint(eventId))
-			if err != nil {
-				Debug(dbm, "Error getting event: "+err.Error())
-				request.sender.SendError(err.Error())
-				break
-			}
-
-			if checkIfOrganizer(request.sender, event) {
-				event.Close()
-				request.sender.SendSuccess("Event closed")
-			}
-		}
-
+		closeEventHandler(dbm, request)
 	case protocol.STOP:
 		Debug(dbm, "user wants to stop the a")
-		request.sender.Close()
-		return
-
+		stopHandler(dbm, request)
 	default:
 		Debug(dbm, "Unknown command")
 	}
-	if request.payload.Type != protocol.LOGIN {
-		request.sender.Logout()
+	if request.payload.Type != protocol.LOGIN && request.payload.Type != protocol.STOP {
+		request.sender.connectedUser = ""
 	}
 	Debug(dbm, "Request handled")
 }
@@ -245,9 +94,9 @@ func (dbm *DatabaseManager) handleRequest(request DatabaseRequest) {
 // checkDatapacket checks the number of parameters of a request
 //
 // returns true if everything is ok, false otherwise
-func checkDatapacket(data protocol.DataPacket, minNbParams int, maxNbParams int, client *Client) bool {
+func checkDatapacket(data protocol.DataPacket, minNbParams int, maxNbParams int, client *clientConnection) bool {
 	if len(data.Data) < minNbParams || len(data.Data) > maxNbParams {
-		client.SendError("Invalid number of arguments")
+		client.sendError("Invalid number of arguments")
 		return false
 	}
 	return true
@@ -256,7 +105,7 @@ func checkDatapacket(data protocol.DataPacket, minNbParams int, maxNbParams int,
 // logInUser checks if a user can login with the given credentials
 //
 // if login is successfull the client connected user is updated. An update tcp message is also sent to the client
-func (dbm *DatabaseManager) logInUser(client *Client, username string, password string) (bool, error) {
+func (dbm *DatabaseManager) logInUser(client *clientConnection, username string, password string) (bool, error) {
 	Debug(dbm, "user wants to login")
 	Debug(dbm, "name: "+username)
 	Debug(dbm, " password: "+password)
@@ -266,38 +115,38 @@ func (dbm *DatabaseManager) logInUser(client *Client, username string, password 
 	if err != nil {
 		errMsg = err.Error()
 	} else if user.Password == password {
-		client.Login(username)
-		client.SendSuccess("Login successful")
+		client.connectedUser = username
+		client.sendSuccess("Login successful")
 		return true, nil
 	}
 	Debug(dbm, errMsg)
-	client.SendError(errMsg)
+	client.sendError(errMsg)
 	return false, err
 }
 
 // checkIfConnected checks that the client is connected
-func checkIfConnected(client *Client) bool {
-	if !client.isLogged() {
-		client.SendError("You must be logged in to do this")
+func checkIfConnected(client *clientConnection) bool {
+	if client.connectedUser == "" {
+		client.sendError("You must be logged in to do this")
 		return false
 	}
 	return true
 }
 
 // checkIfOrganizer checks if the connected user to a given client is the organizer of a given event
-func checkIfOrganizer(client *Client, event *models.Event) bool {
-	if event.Organizer != client.GetConnected() {
-		client.SendError("You are not the organizer of this event")
+func checkIfOrganizer(client *clientConnection, event *models.Event) bool {
+	if event.Organizer != client.connectedUser {
+		client.sendError("You are not the organizer of this event")
 		return false
 	}
 	return true
 }
 
 // parseInt parses a string that should represents an int
-func parseInt(client *Client, data string) (int, error) {
+func parseInt(client *clientConnection, data string) (int, error) {
 	integer, err := strconv.ParseInt(data, 10, 32)
 	if err != nil {
-		client.SendError("Invalid integer")
+		client.sendError("Invalid integer")
 		return 0, err
 	}
 	return int(integer), nil

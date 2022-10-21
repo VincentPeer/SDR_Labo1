@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-var messagingProtocol = &protocol.TcpProtocol{}
+var messagingProtocol = &protocol.SDRProtocol{}
 var consoleIn = bufio.NewReader(os.Stdin)
 
 // userInterface is the main function for the user interface,

@@ -24,7 +24,7 @@ type Users []User
 // ToMap converts the json structure to a map of users
 func (users *Users) ToMap() map[string]*User {
 	usersMap := make(map[string]*User)
-	for i, _ := range *users {
+	for i := range *users {
 		usersMap[(*users)[i].Name] = &(*users)[i]
 	}
 	return usersMap

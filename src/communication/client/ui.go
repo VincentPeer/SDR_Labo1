@@ -3,6 +3,7 @@ package client
 import (
 	"SDR_Labo1/src/communication/protocol"
 	"bufio"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -84,13 +85,7 @@ func createEvent(c *Connection) {
 		if strings.Compare(jobName, "STOP") == 0 {
 			break
 		}
-
-		fmt.Print("Number of volunteers needed : ")
-		nbVolunteers, err := strconv.ParseInt(stringReader(""), 10, 32)
-		if err != nil {
-			log.Fatal(err)
-		}
-
+		nbVolunteers := c.integerReader("Number of volunteers needed for this job : ")
 		jobList = append(jobList, jobName, fmt.Sprint(nbVolunteers))
 	}
 	c.CreateEvent(jobList)
@@ -124,8 +119,7 @@ func listJobs(c *Connection) {
 
 // volunteerRepartition prints the volunteer repartition for a specific event
 func volunteerRepartition(c *Connection) {
-	var eventId int
-	eventId = c.integerReader("Enter event id : ")
+	eventId := c.integerReader("Enter event id : ")
 	c.VolunteerRepartition(eventId)
 }
 
@@ -150,19 +144,21 @@ func stringReader(optionalMessage string) string {
 
 // integerReader reads an integer from the console and returns it
 func (c *Connection) integerReader(optionalMessage string) int {
-	fmt.Print(optionalMessage)
-	var n int
-	nbScanned, err := fmt.Fscan(consoleIn, &n)
-	if err != nil {
-		log.Fatal(err)
-	} else if nbScanned != 1 {
-		log.Fatal("Expected one argument, actual : " + strconv.Itoa(nbScanned))
+	for {
+		fmt.Print(optionalMessage)
+		n, err := strconv.ParseInt(stringReader(""), 10, 32)
+		if errors.Is(err, strconv.ErrSyntax) {
+			fmt.Println()
+			fmt.Println("Not a number !")
+		} else if errors.Is(err, strconv.ErrRange) {
+			fmt.Println()
+			fmt.Println("Number too big !")
+		} else if err != nil {
+			log.Fatal(err)
+		} else {
+			return int(n)
+		}
 	}
-	_, e := consoleIn.ReadString('\n') // clean the buffer
-	if e != nil {
-		log.Fatal(e)
-	}
-	return n
 }
 
 // printDataPacket prints the content of a data packet

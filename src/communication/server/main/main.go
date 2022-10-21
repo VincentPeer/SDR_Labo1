@@ -12,6 +12,6 @@ func main() {
 		debug = true
 	}
 
-	server := server.NewServer(debug)
-	server.Start()
+	srv := server.NewServer(debug)
+	srv.Start()
 }

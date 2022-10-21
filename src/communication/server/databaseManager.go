@@ -20,12 +20,12 @@ type DatabaseManager struct {
 //
 // Client (goroutine) who originated the message, to use in responses
 type DatabaseRequest struct {
-	sender  *Client
+	sender  *clientConnection
 	payload protocol.DataPacket
 }
 
 // NewDatabaseRequest returns a database request initialised with payload as input and the goroutine origin
-func NewDatabaseRequest(client *Client, data protocol.DataPacket) *DatabaseRequest {
+func NewDatabaseRequest(client *clientConnection, data protocol.DataPacket) *DatabaseRequest {
 	return &DatabaseRequest{
 		sender:  client,
 		payload: data,
@@ -86,7 +86,7 @@ func (dbm *DatabaseManager) handleRequest(request DatabaseRequest) {
 		Debug(dbm, "Unknown command")
 	}
 	if request.payload.Type != protocol.LOGIN && request.payload.Type != protocol.STOP {
-		request.sender.Logout()
+		request.sender.connectedUser = ""
 	}
 	Debug(dbm, "Request handled")
 }
@@ -94,9 +94,9 @@ func (dbm *DatabaseManager) handleRequest(request DatabaseRequest) {
 // checkDatapacket checks the number of parameters of a request
 //
 // returns true if everything is ok, false otherwise
-func checkDatapacket(data protocol.DataPacket, minNbParams int, maxNbParams int, client *Client) bool {
+func checkDatapacket(data protocol.DataPacket, minNbParams int, maxNbParams int, client *clientConnection) bool {
 	if len(data.Data) < minNbParams || len(data.Data) > maxNbParams {
-		client.SendError("Invalid number of arguments")
+		client.sendError("Invalid number of arguments")
 		return false
 	}
 	return true
@@ -105,7 +105,7 @@ func checkDatapacket(data protocol.DataPacket, minNbParams int, maxNbParams int,
 // logInUser checks if a user can login with the given credentials
 //
 // if login is successfull the client connected user is updated. An update tcp message is also sent to the client
-func (dbm *DatabaseManager) logInUser(client *Client, username string, password string) (bool, error) {
+func (dbm *DatabaseManager) logInUser(client *clientConnection, username string, password string) (bool, error) {
 	Debug(dbm, "user wants to login")
 	Debug(dbm, "name: "+username)
 	Debug(dbm, " password: "+password)
@@ -115,38 +115,38 @@ func (dbm *DatabaseManager) logInUser(client *Client, username string, password 
 	if err != nil {
 		errMsg = err.Error()
 	} else if user.Password == password {
-		client.Login(username)
-		client.SendSuccess("Login successful")
+		client.connectedUser = username
+		client.sendSuccess("Login successful")
 		return true, nil
 	}
 	Debug(dbm, errMsg)
-	client.SendError(errMsg)
+	client.sendError(errMsg)
 	return false, err
 }
 
 // checkIfConnected checks that the client is connected
-func checkIfConnected(client *Client) bool {
-	if !client.isLogged() {
-		client.SendError("You must be logged in to do this")
+func checkIfConnected(client *clientConnection) bool {
+	if client.connectedUser == "" {
+		client.sendError("You must be logged in to do this")
 		return false
 	}
 	return true
 }
 
 // checkIfOrganizer checks if the connected user to a given client is the organizer of a given event
-func checkIfOrganizer(client *Client, event *models.Event) bool {
-	if event.Organizer != client.GetConnected() {
-		client.SendError("You are not the organizer of this event")
+func checkIfOrganizer(client *clientConnection, event *models.Event) bool {
+	if event.Organizer != client.connectedUser {
+		client.sendError("You are not the organizer of this event")
 		return false
 	}
 	return true
 }
 
 // parseInt parses a string that should represents an int
-func parseInt(client *Client, data string) (int, error) {
+func parseInt(client *clientConnection, data string) (int, error) {
 	integer, err := strconv.ParseInt(data, 10, 32)
 	if err != nil {
-		client.SendError("Invalid integer")
+		client.sendError("Invalid integer")
 		return 0, err
 	}
 	return int(integer), nil

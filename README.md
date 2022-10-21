@@ -53,3 +53,8 @@ Ensuite, à partir d'un terminal dans le dossier *SDR_Labo1*, tapez la commande
 Dans votre navigateur, entrez l'URL  
 `http://localhost:6060/pkg/SDR_Labo1/`  
 Vous pouvez alors parcourir notre documentation. 
+
+### Détails d'implémentation
+* Lors de l'affichage des manifestations et des postes, l'ordre affiché n'est pas ordré par id croissant.
+* Lorsque l'utilisateur doit entrer un id, nous traitons les entiers saisis, qu'ils soient valides ou non, mais si 
+  l'utilisateur entre un type différent d'un entier, une erreur se produit et le client est déconnecté.

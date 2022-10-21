@@ -31,5 +31,5 @@ func main() {
 	conn := client.CreateConnection(connHost, connPort, isDebug) // Create a new connection
 
 	client.StartUI(conn) // Start the user interface
-
+	conn.Close()
 }

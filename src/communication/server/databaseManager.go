@@ -156,7 +156,7 @@ func (dbm *DatabaseManager) handleRequest(request DatabaseRequest) {
 			}
 			err = request.sender.Write(protocol.DataPacket{
 				Type: protocol.OK,
-				Data: event.GetJobsAsStringArray(),
+				Data: event.GetJobsRepartitionTable2(),
 			})
 			if err != nil {
 				Debug(dbm, "Error sending jobs: "+err.Error())

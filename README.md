@@ -5,10 +5,10 @@ Ce travail est réalisé dans le cadre d'un laboratoire du module SDR du Bachelo
 L'objectif était de réaliser une application client/serveur permettant la répartition de bénévoles pour l'organisation d'évenements.
 
 Le cahier des charges détaillé est disponible [ici](Labo_1_SDR.pdf).
-### Auteurs
+### 🧍🏻‍♂️🧍🏽‍♂️ Auteurs
 * Nelson Jeanrenaud
 * Vincent Peer
-## Guide d'utilisation
+## 📚 Guide d'utilisation
 ### Installation des ressources
 Commencez par cloner notre repository dans le dossier de votre choix, la commande
 git est la suivante :  

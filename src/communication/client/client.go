@@ -1,5 +1,5 @@
 /*
-This package set up the Connection on the client side and provides methods to communicate with the server
+Package client set up the Connection on the client side and provides methods to communicate with the server
 */
 package client
 
@@ -17,7 +17,6 @@ const (
 	CONN_HOST = "localhost"
 	CONN_PORT = "3333"
 	CONN_TYPE = "tcp"
-	OK        = "OK"
 )
 
 // Connection contains buffered readers and writers to allow communication between the client and the server
@@ -156,8 +155,10 @@ func (c *Connection) writeToServer(data protocol.DataPacket) {
 }
 
 // ServerRequest sends a request to the server
-// Returns as first parameter true if the request was successful, false otherwise
-// Returns as second parameter the data received from the server
+//
+// Returns as first parameter true if the request was successful, false otherwise and
+// returns as second parameter the data received from the server
+//
 // If the request was not successful, we print the error message received from the server
 func (c *Connection) ServerRequest(data protocol.DataPacket) (bool, protocol.DataPacket) {
 	c.writeToServer(data)

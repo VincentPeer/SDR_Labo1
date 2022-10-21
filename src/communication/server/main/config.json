@@ -1,6 +1,16 @@
 {
     "users" : [
         {
+            "name" : "John",
+            "password" : "123",
+            "function" : "organizer"
+        },
+        {
+            "name" : "James",
+            "password" : "12345",
+            "function" : "volunteer"
+        },
+        {
             "name" : "a",
             "password" : "1",
             "function" : "organizer"
@@ -16,10 +26,10 @@
             "function" : "volunteer"
         },
         {
-            "name" : "Alain Terrieur",
+            "name" : "Alain Du Bois",
             "password" : "123456",
-            "function" : "volunteer"
-        }, 
+            "function" : "organizer"
+        },
         {
             "name" : "Sarah Croche",
             "password" : "123456",
@@ -30,33 +40,74 @@
             "password" : "123456",
             "function" : "organizer"
         }
-        
+
     ],
     "events" : [
         {
             "id" : 0,
             "name" : "Festival de la bière",
             "organizer" : "Sarah Croche",
+            "isOpen" : true,
             "jobs" : [
                 {
                     "id" : 0,
+                    "name" : "Bière",
+                    "required" : 2,
+                    "volunteers" : ["Alex"]
+                },
+                {
+                    "id" : 1,
+                    "name" : "Café",
+                    "required" : 2,
+                    "volunteers" : ["Alain Terrieur"]
+                }
+            ]
+        },
+        {
+            "id" : 1,
+            "name" : "Baleinev",
+            "organizer" : "Ondine Akeleur",
+            "isOpen" : true,
+            "jobs" : [
+                {
+                    "id": 0,
+                    "name" : "Bière",
+                    "required" : 2,
+                    "volunteers" : ["Alex"]
+                },
+                {
+                    "id" : 1,
+                    "name" : "Musique",
+                    "required" : 2,
+                    "volunteers" : ["Alain Terrieur"]
+                }
+            ]
+        },
+        {
+            "id" : 2,
+            "name" : "Foot",
+            "organizer" : "Alain Du Bois",
+            "isOpen" : true,
+            "jobs" : [
+                {
+                    "id": 0,
                     "name" : "Bière",
                     "required" : 2,
                     "volunteers" : ["Alex Terrieur"]
                 },
                 {
                     "id" : 1,
-                    "name" : "Café",
-                    "required" : 1,
-                    "volunteers" : ["Alain Terrieur"]
+                    "name" : "Musique",
+                    "required" : 2,
+                    "volunteers" : ["Alain"]
                 }
-            ],
-            "isOpen": true
+            ]
         },
         {
-            "id" : 1,
-            "name" : "Baleinev",
-            "organizer" : "Ondine Akeleur",
+            "id" : 3,
+            "name" : "Hockey",
+            "organizer" : "John",
+            "isOpen" : false,
             "jobs" : [
                 {
                     "id": 0,
@@ -70,8 +121,7 @@
                     "required" : 2,
                     "volunteers" : ["Alain Terrieur"]
                 }
-            ],
-            "isOpen": true
+            ]
         }
     ]
 

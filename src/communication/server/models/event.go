@@ -3,6 +3,7 @@ package models
 import (
 	"errors"
 	"fmt"
+	"strconv"
 )
 
 var (
@@ -111,6 +112,23 @@ func (e *event) GetJobsRepartitionTable() []string {
 		table = append(table, line)
 	}
 	return table
+}
+
+func (event *Event) GetJobsRepartitionTable2() []string {
+	head := "| Volunteers | "
+	for _, job := range event.Jobs {
+		s := fmt.Sprintf("%-15s", job.Name+" "+strconv.Itoa((int)(job.Required))+" |")
+		head += s
+	}
+	var tab []string
+	tab = append(tab, head)
+	for _, job := range event.Jobs {
+		for _, volunteer := range job.Volunteers {
+			s := fmt.Sprintf("%-10s", volunteer)
+			tab = append(tab, "| "+s+" | ")
+		}
+	}
+	return tab
 }
 
 // AddVolunteerToJob adds a volunteer to a job

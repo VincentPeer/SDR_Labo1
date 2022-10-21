@@ -5,7 +5,7 @@ Ce travail est réalisé dans le cadre d'un laboratoire du module SDR du Bachelo
 L'objectif était de réaliser une application client/serveur permettant la répartition de bénévoles pour l'organisation d'évenements.
 
 Le cahier des charges détaillé est disponible [ici](Labo_1_SDR.pdf).
-### 🧍🏻‍♂️🧍🏽‍♂️ Auteurs
+### 🧍🏻‍♂️🧍🏽‍♂️
 * Nelson Jeanrenaud
 * Vincent Peer
 ## 📚 Guide d'utilisation
@@ -17,15 +17,28 @@ Une fois effectué, vous disposer du projet et ne reste plus qu'à mettre en ser
 le serveur et le(s) client(s).
 
 ### Lancement du serveur
+Pour lancer le serveur, il suffit de se rendre dans le dossier `server` et de lancer la commande suivante :
+`go run .`
 
-
+options :  
+* `-P` ou `--port` : permet de spécifier le port sur lequel le serveur doit écouter (par défaut 3333)  
+* `-H` ou `--host` : permet de spécifier l'adresse sur laquelle le serveur doit écouter (par défaut localhost)
+* `-C` ou `--config` : permet de spécifier le dossier dans lequel le serveur doit chercher les fichiers de configuration (par défaut ./config)
+* `-D` ou `--debug` : permet d'activer le mode debug (par défaut false)
 ### Lancement d'un client
+Pour lancer un client, il suffit de se rendre dans le dossier `client` et de lancer la commande suivante :
+`go run .`
+
+options :
+* `-P` ou `--port` : permet de spécifier le port sur lequel le client doit se connecter (par défaut 3333)
+* `-H` ou `--host` : permet de spécifier l'adresse sur laquelle le client doit se connecter (par défaut localhost)
+* `-D` ou `--config` : permet d'activer le mode debug (par défaut false)
 
 ### Mode debug
 Le mode debug permet de voir les messages échangés entre le serveur et le client.
-Pour l'activer, il suffit de lancer le serveur avec l'argument `-d`.
+Pour l'activer, il suffit de lancer le serveur avec l'argument `-D` ou `--debug`.
 
-Pour tester les races conditions, il suffit de lancer le client avec l'argument `-d` également.
+Pour tester les races conditions, il suffit de lancer le client avec l'argument `-d` ou `--debug` également.
 L'accès au ressources par des clients lancés de cette manière est bloqué pendant 5 secondes, permettant de tester le conditions de concurrence.
 
 ### Utilitaire godoc

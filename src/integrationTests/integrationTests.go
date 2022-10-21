@@ -16,7 +16,7 @@ func main() {
 	fmt.Println("Running integration tests")
 
 	go server.NewServer(CONN_HOST, CONN_PORT, CONFIG_FILE_PATH, false)
-	conn := client.CreateConnection(false)
+	conn := client.CreateConnection(CONN_HOST, CONN_PORT, false)
 	fmt.Println("Client created...")
 	fmt.Println("Starting tests...")
 

@@ -13,20 +13,16 @@ var (
 
 func main() {
 
-	// -P flag to set the port
-	// -H flag to set the host
-	// -C flag to set the config file path
-	// -D or --debug flag to enable debug mode
 	isDebug := false
 	for i := 1; i < len(os.Args); i++ {
 		switch os.Args[i] {
-		case "-P":
+		case "-P", "--port":
 			connPort = os.Args[i+1]
 			i++
-		case "-H":
+		case "-H", "--host":
 			connHost = os.Args[i+1]
 			i++
-		case "-C":
+		case "-C", "--config":
 			configPath = os.Args[i+1]
 			i++
 		case "-D", "--debug":

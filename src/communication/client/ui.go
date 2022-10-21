@@ -21,16 +21,9 @@ func userInterface(c *Connection) {
 
 	var choice int
 	for {
-		fmt.Println("Choose one of the following functionality")
-		fmt.Println("[1] Create a new event")
-		fmt.Println("[2] Register to an event as a volunteer")
-		fmt.Println("[3] List all current events")
-		fmt.Println("[4] List all jobs for a specific event")
-		fmt.Println("[5] List the volunteers repartition for a specific event")
-		fmt.Println("[6] To close an event")
-		fmt.Println("[7] To terminate the process")
+		menu := "Choose one of the following functionality\n[1] Create a new event\n[2] Register to an event as a volunteer\n[3] List all current events\n[4] List all jobs for a specific event\n[5] List the volunteer repartition for a specific event\n[6] Close an event\n[7] Quit\n"
 
-		choice = c.integerReader("")
+		choice = c.integerReader(menu)
 		switch choice {
 		case 1:
 			createEvent(c)

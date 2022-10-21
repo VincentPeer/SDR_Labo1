@@ -44,7 +44,7 @@ func CreateConnection(isDebug bool) *Connection {
 		log.Fatal(err)
 	}
 
-	client := NewConnection(conn, &protocol.TcpProtocol{})
+	client := NewConnection(conn, &protocol.SDRProtocol{})
 	if isDebug {
 		client.sendDebugRequest()
 	}

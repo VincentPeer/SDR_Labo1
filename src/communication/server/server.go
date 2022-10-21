@@ -1,3 +1,6 @@
+/*
+This package sets up the TCP server and handles incoming requests.
+*/
 package server
 
 import (
@@ -20,7 +23,7 @@ const (
 // Server listens for incoming connections on a given port and forwards them to the database manager
 type Server struct {
 	dbm               *DatabaseManager
-	messagingProtocol protocol.TcpProtocol
+	messagingProtocol protocol.SDRProtocol
 	isDebug           bool
 }
 
@@ -37,7 +40,7 @@ func NewServer(isDebug bool) *Server {
 
 	return &Server{
 		dbm:               NewDatabaseManager(models.LoadDatabaseFromJson(path), isDebug),
-		messagingProtocol: protocol.TcpProtocol{},
+		messagingProtocol: protocol.SDRProtocol{},
 		isDebug:           isDebug,
 	}
 }

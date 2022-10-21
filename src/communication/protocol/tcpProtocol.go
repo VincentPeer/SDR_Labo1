@@ -21,12 +21,14 @@ const (
 	SEPARATOR    = ','
 )
 
-type TcpProtocol struct {
+// SDRProtocol is the protocol used by the server and the client
+type SDRProtocol struct {
 }
 
-// Formats a message to be sent to the client
+// ToSend Formats a message to be sent
+//
 // Returns the message to be sent
-func (t *TcpProtocol) ToSend(data DataPacket) (string, error) {
+func (t *SDRProtocol) ToSend(data DataPacket) (string, error) {
 	fullpacket := append([]string{data.Type}, data.Data...)
 	for s := range fullpacket {
 		if strings.ContainsRune(fullpacket[s], DELIMITER|SEPARATOR) {
@@ -39,9 +41,8 @@ func (t *TcpProtocol) ToSend(data DataPacket) (string, error) {
 	return data.Type + string(DELIMITER), nil
 }
 
-// Parses a message received from the client
-// Returns the data to be processed
-func (t *TcpProtocol) Receive(message string) (DataPacket, error) {
+// Receive Parses a message received
+func (t *SDRProtocol) Receive(message string) (DataPacket, error) {
 	// Remove the delimiter
 	message = message[:len(message)-1]
 
@@ -55,19 +56,21 @@ func (t *TcpProtocol) Receive(message string) (DataPacket, error) {
 	}, nil
 }
 
-// Get the delimiter used by the protocol
-func (t *TcpProtocol) GetDelimiter() byte {
+// GetDelimiter returns the delimiter used by the protocol
+func (t *SDRProtocol) GetDelimiter() byte {
 	return DELIMITER
 }
 
-func (t *TcpProtocol) NewError(message string) DataPacket {
+// NewError creates a new error packet
+func (t *SDRProtocol) NewError(message string) DataPacket {
 	return DataPacket{
 		Type: NOTOK,
 		Data: []string{message},
 	}
 }
 
-func (t *TcpProtocol) NewSuccess(message string) DataPacket {
+// NewSuccess creates a new success packet
+func (t *SDRProtocol) NewSuccess(message string) DataPacket {
 	if message == "" {
 		return DataPacket{
 			Type: OK,

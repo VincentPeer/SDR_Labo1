@@ -6,10 +6,16 @@ import (
 	"fmt"
 )
 
+const (
+	CONN_HOST        = "localhost"
+	CONN_PORT        = "3333"
+	CONFIG_FILE_PATH = "./config.json"
+)
+
 func main() {
 	fmt.Println("Running integration tests")
 
-	go server.NewServer(false)
+	go server.NewServer(CONN_HOST, CONN_PORT, CONFIG_FILE_PATH, false)
 	conn := client.CreateConnection(false)
 	fmt.Println("Client created...")
 	fmt.Println("Starting tests...")

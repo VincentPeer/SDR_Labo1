@@ -116,20 +116,49 @@ func (event *Event) GetJobsRepartitionTable() []string {
 }
 
 func (event *Event) GetJobsRepartitionTable2() []string {
-	head := "| Volunteers | "
+	head := "| Volunteers    | "
 	for _, job := range event.Jobs {
-		s := fmt.Sprintf("%-15s", job.Name+" "+strconv.Itoa((int)(job.Required))+" |")
+		s := fmt.Sprintf("%-10s", job.Name+" "+strconv.Itoa((int)(job.Required))) + " | "
 		head += s
 	}
 	var tab []string
 	tab = append(tab, head)
-	for _, job := range event.Jobs {
-		for _, volunteer := range job.Volunteers {
-			s := fmt.Sprintf("%-10s", volunteer)
-			tab = append(tab, "| "+s+" | ")
+
+	volunteers := event.getAllVolunteers()
+	for _, volunteer := range volunteers {
+		line := fmt.Sprintf("%-16s", "| "+volunteer)
+		for _, job := range event.Jobs {
+			if event.isRegisterToJob(volunteer, job.ID) {
+				line += "|" + fmt.Sprintf("%-5s", "") + "X" + fmt.Sprintf("%-6s", "")
+			} else {
+				line += "|" + fmt.Sprintf("%-12s", " ")
+			}
 		}
+		tab = append(tab, line+"|")
 	}
 	return tab
+}
+
+func (event *Event) isRegisterToJob(name string, jobID uint) bool {
+	job, err := event.GetJob(jobID)
+	if err != nil {
+		return false
+	}
+	_, err = job.GetVolunteer(name)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func (event *Event) getAllVolunteers() []string {
+	var volunteers []string
+	for _, job := range event.Jobs {
+		for _, volunteer := range job.Volunteers {
+			volunteers = append(volunteers, volunteer)
+		}
+	}
+	return volunteers
 }
 
 // AddVolunteerToJob adds a volunteer to a job

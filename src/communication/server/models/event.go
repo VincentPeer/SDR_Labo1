@@ -132,18 +132,13 @@ func (e *event) isRegisterToJob(name string, jobID uint) bool {
 		return false
 	}
 	_, err = job.GetVolunteer(name)
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 func (e *event) getAllVolunteers() []string {
 	var volunteers []string
 	for _, job := range e.Jobs {
-		for _, volunteer := range job.Volunteers {
-			volunteers = append(volunteers, volunteer)
-		}
+		volunteers = append(volunteers, job.Volunteers...)
 	}
 	return volunteers
 }

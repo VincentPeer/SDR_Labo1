@@ -9,6 +9,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"golang.org/x/term"
 )
 
 var messagingProtocol = &protocol.SDRProtocol{}
@@ -52,7 +54,7 @@ func userInterface(c *Connection) {
 func loginClient(c *Connection) {
 	for {
 		username := stringReader("Enter your username : ")
-		password := stringReader("Enter your password : ")
+		password := passwordReader("Enter your password : ")
 
 		if c.LoginClient(username, password) {
 			break
@@ -65,7 +67,7 @@ func loginClient(c *Connection) {
 func createEvent(c *Connection) {
 	loginClient(c)
 
-	eventName := stringReader("Enter the event name : ")
+	eventName := stringReader("\nEnter the event name : ")
 	fmt.Println("List all job's name followed by the number of volunteers needed\n" +
 		"(tap STOP when ended) : ")
 
@@ -133,6 +135,16 @@ func stringReader(optionalMessage string) string {
 		log.Fatal(err)
 	}
 	return strings.TrimRight(message, "\r\n")
+}
+
+func passwordReader(optionalMessage string) string {
+	fmt.Print(optionalMessage)
+
+	message, err := term.ReadPassword(int(os.Stdin.Fd()))
+	if err != nil {
+		log.Fatal(err)
+	}
+	return strings.TrimRight(string(message), "\r\n")
 }
 
 // integerReader reads an integer from the console and returns it

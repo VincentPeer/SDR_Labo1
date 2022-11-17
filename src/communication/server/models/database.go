@@ -12,8 +12,8 @@ import (
 
 // Database is a in memory structure holding event and user data
 type Database struct {
-	Events map[uint]*event
-	Users  map[string]*user
+	Events map[uint]*event  `json:"events"`
+	Users  map[string]*user `json:"users"`
 }
 
 // jsonDatabase is an helper structure used to serialize/deserialize the database to/from json.
@@ -132,4 +132,12 @@ func (db Database) Login(name string, password string) (bool, error) {
 		return false, err
 	}
 	return user.Password == password, nil
+}
+
+func (db Database) ToJson() string {
+	json, err := json.Marshal(db)
+	if err != nil {
+		return ""
+	}
+	return string(json)
 }

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
@@ -189,4 +190,12 @@ func (e *event) RemoveVolunteer(name string) error {
 // This means that no more volunteers can be added to the event
 func (e *event) Close() {
 	e.isOpen = false
+}
+
+func (e *event) ToJson() string {
+	json, err := json.Marshal(e)
+	if err != nil {
+		return ""
+	}
+	return string(json)
 }

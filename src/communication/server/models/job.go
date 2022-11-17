@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 )
@@ -66,4 +67,12 @@ func (j *job) RemoveVolunteer(name string) (*job, error) {
 // ToString converts the j to a string
 func (j *job) ToString() string {
 	return fmt.Sprintf("%d | %-10s | %d |", j.ID, j.Name, j.Required)
+}
+
+func (j *job) ToJson() string {
+	json, err := json.Marshal(j)
+	if err != nil {
+		return ""
+	}
+	return string(json)
 }

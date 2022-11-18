@@ -198,7 +198,7 @@ func printJobPepartitionTable(jobs map[string]interface{}) {
 	head := "| Volunteers     | "
 	for _, job := range jobs {
 		jobMap := job.(map[string]interface{})
-		s := fmt.Sprintf("%-10s %0.f", jobMap["name"], (jobMap["required"])) + " | "
+		s := fmt.Sprintf("%0.f : %-10s %0.f", jobMap["id"], jobMap["name"], (jobMap["required"])) + " | "
 		head += s
 	}
 	var tab []string

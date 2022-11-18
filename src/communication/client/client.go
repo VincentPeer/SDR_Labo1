@@ -121,7 +121,13 @@ func (c *Connection) VolunteerRepartition(eventId int) {
 	response, data := c.ServerRequest(request)
 
 	if response {
-		printDataPacket(data)
+		var objmap map[string]interface{}
+		//var objmap map[string]json.RawMessage
+		err := json.Unmarshal([]byte(data.Data[0]), &objmap)
+		if err != nil {
+			log.Fatal(err)
+		}
+		printJobPepartitionTable(objmap)
 	}
 }
 

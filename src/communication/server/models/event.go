@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strconv"
 )
 
 var (
@@ -108,31 +107,6 @@ func (e *event) JobsAsJson() string {
 		return ""
 	}
 	return string(json)
-}
-
-// GetJobsRepartitionTable returns a table with the jobs and which volunteers are assigned to them
-func (e *event) GetJobsRepartitionTable() []string {
-	head := "| Volunteers     | "
-	for _, job := range e.Jobs {
-		s := fmt.Sprintf("%-10s", job.Name+" "+strconv.Itoa((int)(job.Required))) + " | "
-		head += s
-	}
-	var tab []string
-	tab = append(tab, head)
-
-	volunteers := e.getAllVolunteers()
-	for _, volunteer := range volunteers {
-		line := fmt.Sprintf("%-16s", "| "+volunteer)
-		for _, job := range e.Jobs {
-			if e.isRegisterToJob(volunteer, job.ID) {
-				line += " |" + fmt.Sprintf("%-5s", "") + "X" + fmt.Sprintf("%-5s", "")
-			} else {
-				line += " |" + fmt.Sprintf("%-11s", " ")
-			}
-		}
-		tab = append(tab, line+" |")
-	}
-	return tab
 }
 
 func (e *event) isRegisterToJob(name string, jobID uint) bool {

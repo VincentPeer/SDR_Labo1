@@ -4,7 +4,6 @@ import (
 	"SDR_Labo1/src/communication/protocol"
 	"math"
 	"strconv"
-	"strings"
 )
 
 func loginHandler(dbm *databaseManager, request databaseRequest) {
@@ -102,7 +101,7 @@ func getJobsHandler(dbm *databaseManager, request databaseRequest) {
 		}
 		err = request.sender.write(protocol.DataPacket{
 			Type: protocol.OK,
-			Data: event.GetJobsRepartitionTable(),
+			Data: []string{event.JobsAsJson()},
 		})
 		if err != nil {
 			debug(dbm, "Error sending jobs: "+err.Error())
@@ -136,7 +135,7 @@ func eventRegHandler(dbm *databaseManager, request databaseRequest) {
 			request.sender.sendError(err.Error())
 			return
 		}
-		debug(dbm, strings.Join(event.GetJobsRepartitionTable(), "\n"))
+
 		debug(dbm, job.ToString())
 
 		_, err = event.AddVolunteer(job.ID, request.sender.connectedUser)
@@ -147,7 +146,6 @@ func eventRegHandler(dbm *databaseManager, request databaseRequest) {
 		}
 
 		debug(dbm, "Volunteer added")
-		debug(dbm, strings.Join(event.GetJobsRepartitionTable(), "\n"))
 		debug(dbm, job.ToString())
 		request.sender.sendSuccess("Volunteer added")
 	}

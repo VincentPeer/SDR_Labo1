@@ -192,3 +192,38 @@ func printJobTAble(jobs map[string]interface{}) {
 		fmt.Printf("%.0f | %-20s | %.0f |\n", jobMap["id"], jobMap["name"], jobMap["required"])
 	}
 }
+
+// GetJobsRepartitionTable returns a table with the jobs and which volunteers are assigned to them
+func printJobPepartitionTable(jobs map[string]interface{}) {
+	head := "| Volunteers     | "
+	for _, job := range jobs {
+		jobMap := job.(map[string]interface{})
+		s := fmt.Sprintf("%-10s %0.f", jobMap["name"], (jobMap["required"])) + " | "
+		head += s
+	}
+	var tab []string
+	tab = append(tab, head)
+
+	for _, job := range jobs {
+		jobMap := job.(map[string]interface{})
+		volunteers := jobMap["volunteers"].([]interface{})
+		for _, volunteer := range volunteers {
+			s := fmt.Sprintf("| %-14s |", volunteer)
+			for _, job := range jobs {
+				jobMap := job.(map[string]interface{})
+				volunteers := jobMap["volunteers"].([]interface{})
+				for _, volunteer2 := range volunteers {
+					if volunteer2 == volunteer {
+						s += " X          |"
+					} else {
+						s += "            |"
+					}
+				}
+			}
+			tab = append(tab, s)
+		}
+	}
+	for i := 0; i < len(tab); i++ {
+		fmt.Println(tab[i])
+	}
+}

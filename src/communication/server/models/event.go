@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
@@ -21,7 +22,7 @@ type event struct {
 	Name      string
 	Organizer string
 	Jobs      map[uint]*job
-	isOpen    bool
+	IsOpen    bool
 }
 
 // jsonEvent is an helper structure used to serialize/deserialize the event to/from json.
@@ -86,7 +87,7 @@ func (e *event) GetJobByName(name string) (*job, error) {
 // ToString returns a string representation of the event
 func (e *event) ToString() string {
 	openStatus := "open"
-	if !e.isOpen {
+	if !e.IsOpen {
 		openStatus = "closed"
 	}
 	return fmt.Sprintf("%d | %-20s | %-15s | %-6s |", e.ID, e.Name, e.Organizer, openStatus)
@@ -154,7 +155,7 @@ func (e *event) AddVolunteer(jobId uint, name string) (*job, error) {
 	if err != nil {
 		return nil, err
 	}
-	if !e.isOpen {
+	if !e.IsOpen {
 		return nil, ErrorEventIsClosed
 	}
 	if job.Required == uint(len(job.Volunteers)) {
@@ -188,5 +189,13 @@ func (e *event) RemoveVolunteer(name string) error {
 //
 // This means that no more volunteers can be added to the event
 func (e *event) Close() {
-	e.isOpen = false
+	e.IsOpen = false
+}
+
+func (e *event) ToJson() string {
+	json, err := json.Marshal(e)
+	if err != nil {
+		return ""
+	}
+	return string(json)
 }

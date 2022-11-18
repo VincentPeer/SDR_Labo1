@@ -6,10 +6,9 @@ import (
 )
 
 var (
-	connHost   = "localhost"
-	connPort   = "3333"
-	conn       = client.CreateConnection(connHost, connPort, false)
-	configPath = "./config.json"
+	connHost = "localhost"
+	connPort = "3333"
+	conn     = client.CreateConnection(connHost, connPort, false)
 )
 
 func TestLoginClient(t *testing.T) {
@@ -122,4 +121,10 @@ func TestListJobs(t *testing.T) {
 	if got {
 		t.Errorf("CreateEvent() = %v, want %v", got, false)
 	}
+}
+
+func TestVolunteerRepartition(t *testing.T) {
+	// A volunteer should be able to register to an event
+	conn.LoginClient("James", "12345")
+	conn.VolunteerRegistration(0, 0)
 }

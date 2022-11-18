@@ -68,36 +68,42 @@ func (c *Connection) LoginClient(username string, password string) bool {
 }
 
 // CreateEvent asks the server to add a new event
-func (c *Connection) CreateEvent(jobList []string) {
+func (c *Connection) CreateEvent(jobList []string) bool {
 	event := protocol.DataPacket{Type: protocol.CREATE_EVENT, Data: jobList}
-	c.ServerRequest(event)
+	response, _ := c.ServerRequest(event)
+	return response
 }
 
 // PrintEvents asks the server the data containing all the events
 // If events are found, they are printed
-func (c *Connection) PrintEvents() {
+func (c *Connection) PrintEvents() bool {
 	eventFound, data := c.ServerRequest(protocol.DataPacket{Type: protocol.GET_EVENTS})
 	if eventFound {
 		printDataPacket(data)
+		return true
 	}
+	return false
 }
 
 // VolunteerRegistration asks the server to add a new volunteer
-func (c *Connection) VolunteerRegistration(eventId int, jobId int) {
+func (c *Connection) VolunteerRegistration(eventId int, jobId int) bool {
 	request := protocol.DataPacket{Type: protocol.EVENT_REG, Data: []string{strconv.Itoa(eventId), strconv.Itoa(jobId)}}
-	c.ServerRequest(request)
+	response, _ := c.ServerRequest(request)
+	return response
 }
 
 // ListJobs asks the server the data containing all the jobs for a specific event
 //
 // If jobs are found, they are printed
-func (c *Connection) ListJobs(eventId int) {
+func (c *Connection) ListJobs(eventId int) bool {
 	request := protocol.DataPacket{Type: protocol.GET_EVENTS, Data: []string{strconv.Itoa(eventId)}}
 	response, data := c.ServerRequest(request)
 
 	if response {
 		printDataPacket(data)
+		return true
 	}
+	return false
 }
 
 // VolunteerRepartition asks the server the repartition of volunteers for a specific event

@@ -92,9 +92,10 @@ func (c *Connection) PrintEvents() bool {
 }
 
 // VolunteerRegistration asks the server to add a new volunteer
-func (c *Connection) VolunteerRegistration(eventId int, jobId int) {
+func (c *Connection) VolunteerRegistration(eventId int, jobId int) bool {
 	request := protocol.DataPacket{Type: protocol.EVENT_REG, Data: []string{strconv.Itoa(eventId), strconv.Itoa(jobId)}}
-	c.ServerRequest(request)
+	response, _ := c.ServerRequest(request)
+	return response
 }
 
 // ListJobs asks the server the data containing all the jobs for a specific event

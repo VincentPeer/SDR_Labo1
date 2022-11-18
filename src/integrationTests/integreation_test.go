@@ -126,5 +126,22 @@ func TestListJobs(t *testing.T) {
 func TestVolunteerRepartition(t *testing.T) {
 	// A volunteer should be able to register to an event
 	conn.LoginClient("James", "12345")
-	conn.VolunteerRegistration(0, 0)
+	got := conn.VolunteerRegistration(0, 0)
+	if !got {
+		t.Errorf("CreateEvent() = %v, want %v", got, true)
+	}
+
+	// Registration should fail when the job is full
+	conn.LoginClient("James", "12345")
+	got = conn.VolunteerRegistration(0, 1)
+	if got {
+		t.Errorf("CreateEvent() = %v, want %v", got, false)
+	}
+
+	// Registration should fail when the event is closed
+	conn.LoginClient("James", "12345")
+	got = conn.VolunteerRegistration(3, 0)
+	if got {
+		t.Errorf("CreateEvent() = %v, want %v", got, false)
+	}
 }

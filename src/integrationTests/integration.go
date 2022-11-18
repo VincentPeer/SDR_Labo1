@@ -9,36 +9,6 @@ const (
 /*
 
 
-func volunteerRegistration(conn *client.Connection) {
-	// Registration tests with event 0, volunteer James
-	fmt.Println("Test type : A volunteer should be able to register to an event")
-	conn.LoginClient("James", "12345")
-	conn.VolunteerRegistration(0, 0)
-	conn.VolunteerRepartition(0)
-	fmt.Println("\n")
-
-	fmt.Println("Test type : Registering twice should remove the first registration and add to the second")
-	conn.LoginClient("James", "12345")
-	conn.VolunteerRegistration(0, 1)
-	conn.VolunteerRepartition(0)
-	fmt.Println("\n")
-
-	fmt.Println("Test type : Registering should fail when the job is already full")
-	conn.LoginClient("James", "12345")
-	conn.VolunteerRegistration(0, 1)
-	conn.VolunteerRepartition(0)
-	fmt.Println("\n")
-
-	fmt.Println("Test type : Registering should fail when the event is closed")
-	conn.LoginClient("John", "123")
-	conn.CloseEvent(3)
-	conn.LoginClient("James", "12345")
-	conn.VolunteerRegistration(3, 0)
-	conn.VolunteerRepartition(3)
-	fmt.Println("\n")
-
-}
-
 
 
 

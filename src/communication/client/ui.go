@@ -172,3 +172,14 @@ func printDataPacket(data protocol.DataPacket) {
 		fmt.Println(data.Data[i])
 	}
 }
+
+func printEventTable(events map[string]interface{}) {
+	for _, event := range events {
+		eventMap := event.(map[string]interface{})
+		openStatus := "open"
+		if eventMap["IsOpen"] == "false" {
+			openStatus = "closed"
+		}
+		fmt.Printf("%.0f | %-20s | %-15s | %-6s |\n", eventMap["ID"], eventMap["Name"], eventMap["Organizer"], openStatus)
+	}
+}

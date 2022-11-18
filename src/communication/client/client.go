@@ -6,6 +6,7 @@ package client
 import (
 	"SDR_Labo1/src/communication/protocol"
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net"
@@ -78,7 +79,13 @@ func (c *Connection) CreateEvent(jobList []string) {
 func (c *Connection) PrintEvents() {
 	eventFound, data := c.ServerRequest(protocol.DataPacket{Type: protocol.GET_EVENTS})
 	if eventFound {
-		printDataPacket(data)
+		var objmap map[string]interface{}
+		//var objmap map[string]json.RawMessage
+		err := json.Unmarshal([]byte(data.Data[0]), &objmap)
+		if err != nil {
+			log.Fatal(err)
+		}
+		printEventTable(objmap)
 	}
 }
 

@@ -134,8 +134,24 @@ func (db Database) Login(name string, password string) (bool, error) {
 	return user.Password == password, nil
 }
 
+func (db Database) GetEventArray() []event {
+	var events []event
+	for _, event := range db.Events {
+		events = append(events, *event)
+	}
+	return events
+}
+
 func (db Database) ToJson() string {
 	json, err := json.Marshal(db)
+	if err != nil {
+		return ""
+	}
+	return string(json)
+}
+
+func (db Database) EventAsJson() string {
+	json, err := json.Marshal(db.Events)
 	if err != nil {
 		return ""
 	}

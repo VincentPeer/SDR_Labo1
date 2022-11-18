@@ -48,7 +48,7 @@ func getEventsHandler(dbm *databaseManager, request databaseRequest) {
 	if len(request.payload.Data) == 0 { // GET all events
 		err := request.sender.write(protocol.DataPacket{
 			Type: protocol.OK,
-			Data: dbm.db.GetEventsAsStringArray(),
+			Data: []string{dbm.db.EventAsJson()},
 		})
 		if err != nil {
 			debug(dbm, "Error sending events: "+err.Error())

@@ -17,8 +17,8 @@ const (
 	GET_EVENTS   = "GET_EVENTS"
 	GET_JOBS     = "GET_JOBS"
 	STOP         = "STOP"
-	DELIMITER    = ';'
-	SEPARATOR    = ','
+	DELIMITER    = '^'
+	SEPARATOR    = '¦'
 )
 
 // SDRProtocol is the protocol used by the server and the client

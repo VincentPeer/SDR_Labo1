@@ -102,6 +102,14 @@ func (e *event) GetJobsAsStringArray() []string {
 	return jobs
 }
 
+func (e *event) JobsAsJson() string {
+	json, err := json.Marshal(e.Jobs)
+	if err != nil {
+		return ""
+	}
+	return string(json)
+}
+
 // GetJobsRepartitionTable returns a table with the jobs and which volunteers are assigned to them
 func (e *event) GetJobsRepartitionTable() []string {
 	head := "| Volunteers     | "

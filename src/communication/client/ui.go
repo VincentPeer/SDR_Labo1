@@ -174,6 +174,7 @@ func printDataPacket(data protocol.DataPacket) {
 }
 
 func printEventTable(events map[string]interface{}) {
+	fmt.Printf("%s | %-20s | %-15s | %-6s |\n", "Id", "Name", "Organizer", "Status")
 	for _, event := range events {
 		eventMap := event.(map[string]interface{})
 		openStatus := "open"
@@ -181,5 +182,13 @@ func printEventTable(events map[string]interface{}) {
 			openStatus = "closed"
 		}
 		fmt.Printf("%.0f | %-20s | %-15s | %-6s |\n", eventMap["ID"], eventMap["Name"], eventMap["Organizer"], openStatus)
+	}
+}
+
+func printJobTAble(jobs map[string]interface{}) {
+	fmt.Printf("%s | %-20s | %s |\n", "Id", "Name", "Required")
+	for _, job := range jobs {
+		jobMap := job.(map[string]interface{})
+		fmt.Printf("%.0f | %-20s | %.0f |\n", jobMap["id"], jobMap["name"], jobMap["required"])
 	}
 }

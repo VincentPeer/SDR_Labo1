@@ -72,7 +72,7 @@ func getEventsHandler(dbm *databaseManager, request databaseRequest) {
 		}
 		err = request.sender.write(protocol.DataPacket{
 			Type: protocol.OK,
-			Data: event.GetJobsAsStringArray(),
+			Data: []string{event.JobsAsJson()},
 		})
 		if err != nil {
 			debug(dbm, "Error getting events: "+err.Error())

@@ -1,0 +1,20 @@
+{
+   "nbServers": 3,
+    "servers" : [
+        {
+            "id": 0,
+            "host": "localhost",
+            "port": "11211"
+        }, 
+        {
+            "id": 1,
+            "host": "localhost",
+            "port": "11212"
+        },
+        {
+            "id": 2,
+            "host": "localhost",
+            "port": "11213"
+        }
+    ]
+}

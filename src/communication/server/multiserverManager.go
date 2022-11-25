@@ -1,12 +1,26 @@
 package server
 
 import (
+	"SDR_Labo1/src/communication/protocol"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"os"
+	"strconv"
+	"sync"
 )
+
+var (
+	waitGroup sync.WaitGroup
+)
+
+type multiServerThread struct {
+	server            *Server
+	conn              *net.Conn
+	connectionCounter chan int
+}
 
 type serverConfig struct {
 	Id   int    `json:"id"`
@@ -37,32 +51,72 @@ func ReadNetworkConfig(path string) networkConfig {
 	return config
 }
 
-func (s *Server) connectToServer(serverConfig serverConfig) {
-	fmt.Println("Connecting to server", serverConfig.Id, "at", serverConfig.Host+":"+serverConfig.Port)
+func handleRequestFromServer(conn net.Conn, server *Server) {
+
+}
+
+func (s *Server) connectToServer(networkConfig networkConfig, id int) {
+	serverConfig := networkConfig.Servers[id]
 	conn, err := net.Dial(connType, serverConfig.Host+":"+serverConfig.Port)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Connected to " + conn.RemoteAddr().String())
-	defer conn.Close()
+
+	// Sends a request to establish connection with other server
+	clientServer := newClientConnection(s, &conn)
+	clientServer.write(protocol.DataPacket{Type: protocol.REQ, Data: []string{strconv.Itoa(s.Id)}})
+
 	for {
+		data, err := clientServer.read()
+		if err != nil {
+			if err == io.EOF { // Client disconnected
+				debug(s, "Client disconnected")
+				break
+			} else {
+				debug(s, "Error reading from client: "+err.Error())
+				break
+			}
+		}
+
+		if data.Type == protocol.ACK {
+			waitGroup.Done()
+			break
+		}
 
 	}
+
+	debug(s, "Conversation with server: "+strconv.Itoa(id))
+	waitGroup.Wait()
+	// TODO: talk to other servers
 }
 
 func (s *Server) handleConnectionFromServer(conn *net.Conn) {
-	for {
-
+	clientServer := newClientConnection(s, conn)
+	data, err := clientServer.read()
+	if err != nil {
+		if err == io.EOF { // Client disconnected
+			debug(s, "Client disconnected")
+			return
+		} else {
+			debug(s, "Error reading from client: "+err.Error())
+			return
+		}
 	}
+
+	if data.Type == protocol.REQ {
+		clientServer.write(protocol.DataPacket{Type: protocol.ACK, Data: []string{}})
+	}
+	debug(s, "Conversation with server: "+data.Data[0])
+	waitGroup.Done()
 }
 
 func (s *Server) connectToPrecedingServers(config networkConfig) {
 	for i := s.Id - 1; i >= 0; i-- {
-		go s.connectToServer(config.Servers[i])
+		go s.connectToServer(config, i)
 	}
 }
 
-func (s *Server) startWaitingForServers() {
+func (s *Server) startWaitingForServers(nbServers int) {
 	l, err := net.Listen(connType, s.host+":"+s.port)
 	if err != nil {
 		debug(s, "Error listening: "+err.Error())
@@ -70,18 +124,18 @@ func (s *Server) startWaitingForServers() {
 	}
 	// Close the listener when the application closes.
 	defer l.Close()
-	fmt.Println("Listening on " + s.host + ":" + s.port)
 
-	for {
+	for i := s.Id + 1; i < nbServers; i++ {
 		// Listen for an incoming connection.
 		conn, err := l.Accept()
 		if err != nil {
 			debug(s, "Error accepting: "+err.Error())
 			os.Exit(1)
 		}
-		fmt.Println(s, "New connection from "+conn.RemoteAddr().String())
 		go s.handleConnectionFromServer(&conn)
 	}
+
+	debug(s, "Don't accept any more connections")
 }
 
 func StartMultiServer(id int, serverConfigPath string, dataConfigPath string, isDebug bool) {
@@ -91,9 +145,11 @@ func StartMultiServer(id int, serverConfigPath string, dataConfigPath string, is
 		os.Exit(1)
 	}
 	server := NewServer(id, config.Servers[id].Host, config.Servers[id].Port, dataConfigPath, isDebug, false)
-	go server.startWaitingForServers()
+	debug(server, "Starting server:"+strconv.Itoa(id))
+	waitGroup.Add(config.NbServers - 1)
+	go server.startWaitingForServers(config.NbServers)
 	server.connectToPrecedingServers(config)
-	for {
-
-	}
+	waitGroup.Wait()
+	debug(server, "All servers connected")
+	server.start()
 }

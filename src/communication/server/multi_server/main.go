@@ -21,7 +21,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println("Starting server with id", os.Args[1])
 	idServ, err := strconv.Atoi(os.Args[1])
 	if err != nil {
 		fmt.Println("Error: server id is not a number")

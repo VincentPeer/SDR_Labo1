@@ -32,7 +32,7 @@ func (c *clientConnection) read() (protocol.DataPacket, error) {
 	message, err := c.bufin.ReadString(c.server.messagingProtocol.GetDelimiter())
 
 	if c.server.isDebug() {
-		debug(c.server, "Received message: "+message)
+		debug(c.server, "<-- "+message)
 	}
 
 	if err != nil {
@@ -52,7 +52,7 @@ func (c *clientConnection) write(data protocol.DataPacket) error {
 	}
 
 	if c.server.isDebug() {
-		debug(c.server, "Sent message to client: "+message)
+		debug(c.server, "--> "+message)
 	}
 	return err
 }

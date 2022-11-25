@@ -18,13 +18,14 @@ var (
 )
 
 type serverListener struct {
-	peerServer     *clientConnection
-	lamportChan    chan databaseRequest
-	peerServerChan chan protocol.DataPacket
+	peerServer          *clientConnection
+	lamportRequestChan  chan protocol.DataPacket
+	lamportResponseChan chan protocol.DataPacket
+	peerServerChan      chan protocol.DataPacket
 }
 
 func newServerListener(server *clientConnection) serverListener {
-	return serverListener{server, make(chan databaseRequest), make(chan protocol.DataPacket)}
+	return serverListener{server, make(chan protocol.DataPacket), make(chan protocol.DataPacket), make(chan protocol.DataPacket)}
 }
 
 type serverConfig struct {
@@ -74,12 +75,14 @@ func (s *Server) talkWith(listener serverListener) {
 	}()
 	for {
 		select {
-		case data := <-listener.lamportChan:
-			listener.peerServer.write(data.payload)
+		case data := <-listener.lamportRequestChan:
+			listener.peerServer.write(data)
 		case data := <-listener.peerServerChan:
-			debug(s, "Received data from peer server: "+data.Data[0])
+			{
+				debug(s, "Received data from peer server: "+data.Data[0])
+				listener.lamportReceiveRequest(data)
+			}
 		}
-
 	}
 }
 

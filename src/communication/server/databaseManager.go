@@ -50,17 +50,17 @@ func (dbm *databaseManager) isDebug() bool {
 func (dbm *databaseManager) start() {
 	for {
 		request := <-dbm.requestChannel
+		lamportRequest()
 		dbm.handleRequest(request)
 		switch request.payload.Type {
 		case protocol.CLOSE_EVENT:
-			syncServers(request)
+			//syncServers(request)
 		case protocol.CREATE_EVENT:
-			syncServers(request)
+			//syncServers(request)
 		case protocol.EVENT_REG:
-			syncServers(request)
+			//syncServers(request)
 		default:
 		}
-
 	}
 }
 

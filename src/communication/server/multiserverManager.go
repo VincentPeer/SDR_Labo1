@@ -51,8 +51,22 @@ func ReadNetworkConfig(path string) networkConfig {
 	return config
 }
 
-func handleRequestFromServer(conn net.Conn, server *Server) {
+func (s *Server) talkWith(peerServer *clientConnection) {
+	peerServer.write(protocol.DataPacket{Type: protocol.REQ, Data: []string{"yo"}})
+	for {
+		data, err := peerServer.read()
+		if err != nil {
+			if err == io.EOF { // Client disconnected
+				debug(s, "Client disconnected")
+				return
+			} else {
+				debug(s, "Error reading from client: "+err.Error())
+				return
+			}
+		}
 
+		debug(s, "Received data from peer server: "+data.Data[0])
+	}
 }
 
 func (s *Server) connectToServer(networkConfig networkConfig, id int) {
@@ -88,6 +102,7 @@ func (s *Server) connectToServer(networkConfig networkConfig, id int) {
 	debug(s, "Conversation with server: "+strconv.Itoa(id))
 	waitGroup.Wait()
 	// TODO: talk to other servers
+	s.talkWith(clientServer)
 }
 
 func (s *Server) handleConnectionFromServer(conn *net.Conn) {
@@ -108,6 +123,8 @@ func (s *Server) handleConnectionFromServer(conn *net.Conn) {
 	}
 	debug(s, "Conversation with server: "+data.Data[0])
 	waitGroup.Done()
+	waitGroup.Wait()
+	s.talkWith(clientServer)
 }
 
 func (s *Server) connectToPrecedingServers(config networkConfig) {

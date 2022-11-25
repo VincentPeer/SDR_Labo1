@@ -30,5 +30,5 @@ func main() {
 		}
 	}
 
-	server.NewServer(connHost, connPort, configPath, isDebug)
+	server.NewServer(1, connHost, connPort, configPath, isDebug, true)
 }

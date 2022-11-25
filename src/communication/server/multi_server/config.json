@@ -1,0 +1,127 @@
+{
+    "users" : [
+        {
+            "name" : "John",
+            "password" : "123",
+            "function" : "organizer"
+        },
+        {
+            "name" : "James",
+            "password" : "12345",
+            "function" : "volunteer"
+        },
+        {
+            "name" : "a",
+            "password" : "1",
+            "function" : "organizer"
+        },
+        {
+            "name" : "ab",
+            "password" : "12",
+            "function" : "volunteer"
+        },
+        {
+            "name" : "Alex Terrieur",
+            "password" : "123456",
+            "function" : "volunteer"
+        },
+        {
+            "name" : "Alain Du Bois",
+            "password" : "123456",
+            "function" : "organizer"
+        },
+        {
+            "name" : "Sarah Croche",
+            "password" : "123456",
+            "function" : "organizer"
+        },
+        {
+            "name" : "Ondine Akeleur",
+            "password" : "123456",
+            "function" : "organizer"
+        }
+
+    ],
+    "events" : [
+        {
+            "id" : 0,
+            "name" : "Festival de la bière",
+            "organizer" : "Sarah Croche",
+            "isOpen" : true,
+            "jobs" : [
+                {
+                    "id" : 0,
+                    "name" : "Bière",
+                    "required" : 2,
+                    "volunteers" : ["Alex Terrieur"]
+                },
+                {
+                    "id" : 1,
+                    "name" : "Café",
+                    "required" : 2,
+                    "volunteers" : ["Alain Du Bois"]
+                }
+            ]
+        },
+        {
+            "id" : 1,
+            "name" : "Baleinev",
+            "organizer" : "Ondine Akeleur",
+            "isOpen" : true,
+            "jobs" : [
+                {
+                    "id": 0,
+                    "name" : "Bière",
+                    "required" : 2,
+                    "volunteers" : ["Alex Terrieur"]
+                },
+                {
+                    "id" : 1,
+                    "name" : "Musique",
+                    "required" : 2,
+                    "volunteers" : ["Alain Du Bois"]
+                }
+            ]
+        },
+        {
+            "id" : 2,
+            "name" : "Foot",
+            "organizer" : "Alain Du Bois",
+            "isOpen" : true,
+            "jobs" : [
+                {
+                    "id": 0,
+                    "name" : "Bière",
+                    "required" : 2,
+                    "volunteers" : ["Alex Terrieur"]
+                },
+                {
+                    "id" : 1,
+                    "name" : "Musique",
+                    "required" : 2,
+                    "volunteers" : ["James"]
+                }
+            ]
+        },
+        {
+            "id" : 3,
+            "name" : "Hockey",
+            "organizer" : "John",
+            "isOpen" : false,
+            "jobs" : [
+                {
+                    "id": 0,
+                    "name" : "Bière",
+                    "required" : 2,
+                    "volunteers" : ["Alex Terrieur"]
+                },
+                {
+                    "id" : 1,
+                    "name" : "Musique",
+                    "required" : 2,
+                    "volunteers" : ["Alain Du Bois"]
+                }
+            ]
+        }
+    ]
+}

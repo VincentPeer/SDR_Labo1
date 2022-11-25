@@ -19,6 +19,9 @@ const (
 
 // Server listens for incoming connections on a given port and forwards them to the database manager
 type Server struct {
+	Id                int
+	host              string
+	port              string
 	dbm               *databaseManager
 	messagingProtocol protocol.SDRProtocol
 	debugFlag         bool
@@ -27,7 +30,7 @@ type Server struct {
 // NewServer returns a ready to use TCP server and starts it
 //
 // If debug is true, the server will print debug messages
-func NewServer(host string, port string, configFilePath string, isDebug bool) *Server {
+func NewServer(id int, host string, port string, configFilePath string, isDebug bool, startDirectly bool) *Server {
 	path, err := filepath.Abs(configFilePath)
 
 	if err != nil {
@@ -36,11 +39,16 @@ func NewServer(host string, port string, configFilePath string, isDebug bool) *S
 	}
 
 	srv := &Server{
+		Id:                id,
+		host:              host,
+		port:              port,
 		dbm:               newDatabaseManager(models.LoadDatabaseFromJson(path), isDebug),
 		messagingProtocol: protocol.SDRProtocol{},
 		debugFlag:         isDebug,
 	}
-	srv.start(host, port)
+	if startDirectly {
+		srv.start()
+	}
 	return srv
 }
 
@@ -50,18 +58,18 @@ func (server *Server) isDebug() bool {
 }
 
 // start listening for incoming connections. Will block unless an error occurs.
-func (server *Server) start(host string, port string) {
+func (server *Server) start() {
 
 	go server.dbm.start()
 	// Listen for incoming connections.
-	l, err := net.Listen(connType, host+":"+port)
+	l, err := net.Listen(connType, server.host+":"+server.port)
 	if err != nil {
 		debug(server, "Error listening: "+err.Error())
 		os.Exit(1)
 	}
 	// Close the listener when the application closes.
 	defer l.Close()
-	debug(server, "Listening on "+host+":"+port)
+	debug(server, "Listening on "+server.host+":"+server.port)
 	for {
 		// Listen for an incoming connection.
 		conn, err := l.Accept()

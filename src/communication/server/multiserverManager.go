@@ -13,13 +13,18 @@ import (
 )
 
 var (
-	waitGroup sync.WaitGroup
+	waitGroup       sync.WaitGroup
+	serverListeners []serverListener
 )
 
-type multiServerThread struct {
-	server            *Server
-	conn              *net.Conn
-	connectionCounter chan int
+type serverListener struct {
+	peerServer     *clientConnection
+	lamportChan    chan databaseRequest
+	peerServerChan chan protocol.DataPacket
+}
+
+func newServerListener(server *clientConnection) serverListener {
+	return serverListener{server, make(chan databaseRequest), make(chan protocol.DataPacket)}
 }
 
 type serverConfig struct {
@@ -51,21 +56,30 @@ func ReadNetworkConfig(path string) networkConfig {
 	return config
 }
 
-func (s *Server) talkWith(peerServer *clientConnection) {
-	peerServer.write(protocol.DataPacket{Type: protocol.REQ, Data: []string{"yo"}})
-	for {
-		data, err := peerServer.read()
-		if err != nil {
-			if err == io.EOF { // Client disconnected
-				debug(s, "Client disconnected")
-				return
-			} else {
-				debug(s, "Error reading from client: "+err.Error())
-				return
+func (s *Server) talkWith(listener serverListener) {
+	go func() {
+		for {
+			data, err := listener.peerServer.read()
+			if err != nil {
+				if err == io.EOF { // Client disconnected
+					debug(s, "Client disconnected")
+					break
+				} else {
+					debug(s, "Error reading from client: "+err.Error())
+					break
+				}
 			}
+			listener.peerServerChan <- data
+		}
+	}()
+	for {
+		select {
+		case data := <-listener.lamportChan:
+			listener.peerServer.write(data.payload)
+		case data := <-listener.peerServerChan:
+			debug(s, "Received data from peer server: "+data.Data[0])
 		}
 
-		debug(s, "Received data from peer server: "+data.Data[0])
 	}
 }
 
@@ -101,8 +115,10 @@ func (s *Server) connectToServer(networkConfig networkConfig, id int) {
 
 	debug(s, "Conversation with server: "+strconv.Itoa(id))
 	waitGroup.Wait()
-	// TODO: talk to other servers
-	s.talkWith(clientServer)
+
+	listener := newServerListener(clientServer)
+	serverListeners = append(serverListeners, listener)
+	s.talkWith(listener)
 }
 
 func (s *Server) handleConnectionFromServer(conn *net.Conn) {
@@ -124,7 +140,10 @@ func (s *Server) handleConnectionFromServer(conn *net.Conn) {
 	debug(s, "Conversation with server: "+data.Data[0])
 	waitGroup.Done()
 	waitGroup.Wait()
-	s.talkWith(clientServer)
+
+	listener := newServerListener(clientServer)
+	serverListeners = append(serverListeners, listener)
+	s.talkWith(listener)
 }
 
 func (s *Server) connectToPrecedingServers(config networkConfig) {

@@ -51,6 +51,16 @@ func (dbm *databaseManager) start() {
 	for {
 		request := <-dbm.requestChannel
 		dbm.handleRequest(request)
+		switch request.payload.Type {
+		case protocol.CLOSE_EVENT:
+			syncServers(request)
+		case protocol.CREATE_EVENT:
+			syncServers(request)
+		case protocol.EVENT_REG:
+			syncServers(request)
+		default:
+		}
+
 	}
 }
 

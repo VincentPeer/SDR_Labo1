@@ -122,7 +122,7 @@ func (c *Connection) ListJobs(eventId int) bool {
 // VolunteerRepartition asks the server the repartition of volunteers for a specific event
 //
 // If repartition is found, it is printed
-func (c *Connection) VolunteerRepartition(eventId int) {
+func (c *Connection) VolunteerRepartition(eventId int) bool {
 	request := protocol.DataPacket{Type: protocol.GET_JOBS, Data: []string{strconv.Itoa(eventId)}}
 	response, data := c.ServerRequest(request)
 
@@ -134,13 +134,16 @@ func (c *Connection) VolunteerRepartition(eventId int) {
 			log.Fatal(err)
 		}
 		printJobPepartitionTable(objmap)
+		return true
 	}
+	return false
 }
 
 // CloseEvent asks the server to close an event by specifying its id
-func (c *Connection) CloseEvent(eventId int) {
+func (c *Connection) CloseEvent(eventId int) bool {
 	closeEvent := protocol.DataPacket{Type: protocol.CLOSE_EVENT, Data: []string{strconv.Itoa(eventId)}}
-	c.ServerRequest(closeEvent)
+	response, _ := c.ServerRequest(closeEvent)
+	return response
 }
 
 // readFromServer reads a response from the server

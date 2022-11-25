@@ -98,7 +98,7 @@
                 {
                     "id" : 1,
                     "name" : "Musique",
-                    "required" : 2,
+                    "required" : 1,
                     "volunteers" : ["Alain"]
                 }
             ]

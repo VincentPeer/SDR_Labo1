@@ -62,6 +62,22 @@ non exportées.
 * Les alignements des colonnes pour les affichages de manifestation, poste et bénévole fonctionnent tant que
  l'utilisateur n'entre pas de données extrêmement longues.
 
+### Tests automatisés
+Une série de tests automatisés ont pour but de tester les fonctions utilisées pour la communication entre le client et
+le serveur. Dans le projet, ils se trouvent dans les sources dans le dossier `integrationTests`. Emplacement :
+> SDR_Labo1\src\integrationTests
+
+Pour lancer les tests, il faut d'abord lancer un serveur. 
+Ensuite, il faut se rendre dans le dossier `integrationTests` et effectuer la commande suivante :
+> go test
+
+Le résultat des tests est simple, on obtient un `PASS` si tout a passé avec succès, et un `FAIL` sinon.
+Pour avoir plus de détail sur le noms des tests effetués, l'option -v peut être ajouté à la commande :
+>go test -v
+
+
+
+
 ## 📖 Protocole
 ### ⬅ Format des messages
 Les paramètres sont séparés par des virgules, les messages sont séparés par des points-virgules.

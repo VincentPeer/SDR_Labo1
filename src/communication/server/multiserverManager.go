@@ -14,18 +14,22 @@ import (
 
 var (
 	waitGroup       sync.WaitGroup
-	serverListeners []serverListener
+	serverListeners []*serverListener
+	idcounter       = 0
 )
 
 type serverListener struct {
+	id                  int // TODO remove
 	peerServer          *clientConnection
 	lamportRequestChan  chan protocol.DataPacket
 	lamportResponseChan chan protocol.DataPacket
 	peerServerChan      chan protocol.DataPacket
+	lamportRegister     *protocol.DataPacket
 }
 
 func newServerListener(server *clientConnection) serverListener {
-	return serverListener{server, make(chan protocol.DataPacket), make(chan protocol.DataPacket), make(chan protocol.DataPacket)}
+	idcounter++
+	return serverListener{idcounter, server, make(chan protocol.DataPacket), make(chan protocol.DataPacket), make(chan protocol.DataPacket), nil}
 }
 
 type serverConfig struct {
@@ -57,7 +61,7 @@ func ReadNetworkConfig(path string) networkConfig {
 	return config
 }
 
-func (s *Server) talkWith(listener serverListener) {
+func (s *Server) talkWith(listener *serverListener) {
 	go func() {
 		for {
 			data, err := listener.peerServer.read()
@@ -120,8 +124,8 @@ func (s *Server) connectToServer(networkConfig networkConfig, id int) {
 	waitGroup.Wait()
 
 	listener := newServerListener(clientServer)
-	serverListeners = append(serverListeners, listener)
-	s.talkWith(listener)
+	serverListeners = append(serverListeners, &listener)
+	s.talkWith(&listener)
 }
 
 func (s *Server) handleConnectionFromServer(conn *net.Conn) {
@@ -145,8 +149,8 @@ func (s *Server) handleConnectionFromServer(conn *net.Conn) {
 	waitGroup.Wait()
 
 	listener := newServerListener(clientServer)
-	serverListeners = append(serverListeners, listener)
-	s.talkWith(listener)
+	serverListeners = append(serverListeners, &listener)
+	s.talkWith(&listener)
 }
 
 func (s *Server) connectToPrecedingServers(config networkConfig) {

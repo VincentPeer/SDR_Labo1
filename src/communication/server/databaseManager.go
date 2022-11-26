@@ -52,15 +52,7 @@ func (dbm *databaseManager) start() {
 		request := <-dbm.requestChannel
 		lamportRequest()
 		dbm.handleRequest(request)
-		switch request.payload.Type {
-		case protocol.CLOSE_EVENT:
-			//syncServers(request)
-		case protocol.CREATE_EVENT:
-			//syncServers(request)
-		case protocol.EVENT_REG:
-			//syncServers(request)
-		default:
-		}
+		lamportRelease()
 	}
 }
 

@@ -13,7 +13,7 @@ import (
 var (
 	connHost  = "localhost"
 	connPort  = []string{"11211", "11212", "11213"}
-	serverIds = []int{1, 2, 3}
+	serverIds = []int{0, 1, 2}
 )
 
 // Main function that start a new client
@@ -32,7 +32,7 @@ func main() {
 	if len(os.Args) == 2 || os.Args[2] != "-I" && os.Args[2] != "--id" {
 		s1 := rand.NewSource(time.Now().UnixNano())
 		r1 := rand.New(s1)
-		serverId = r1.Intn(len(serverIds)) + 1
+		serverId = r1.Intn(len(serverIds))
 		fmt.Println(serverId)
 	}
 
@@ -52,7 +52,7 @@ func main() {
 		}
 	}
 
-	conn := client.CreateConnection(clientName, connHost, connPort[serverId-1], isDebug) // Create a new connection
-	client.StartUI(conn)                                                                 // Start the user interface
+	conn := client.CreateConnection(clientName, connHost, connPort[serverId], isDebug) // Create a new connection
+	client.StartUI(conn)                                                               // Start the user interface
 	conn.Close()
 }

@@ -54,8 +54,7 @@ Où `option` est facultatif et propose :
 * `-H` ou `--host` : permet de spécifier l'adresse sur laquelle le client doit se connecter (par défaut localhost)
 * `-D` ou `--config` : permet d'activer le mode debug (par défaut false)
 
-Si aucun argument n'est fourni, c'est-à-dire uniquement `go run .`, nous établissons une connexion telle qu'an laboratoire 1 avec le
-serveur simple.
+Si aucun argument n'est fourni, c'est-à-dire uniquement `go run .`, nous établissons une connexion telle qu'an laboratoire 1 avec le serveur simple.
 ### 🦟 Mode debug
 Le mode debug permet de voir les messages échangés entre le serveur et le client.
 Pour l'activer, il suffit de lancer le serveur avec l'argument `-D` ou `--debug`.
@@ -85,7 +84,14 @@ non exportées.
 * Le client (`mainClient/main.go`) contient en dur les ports et les id des serveurs disponibles. Si le nombre de serveur vient à évoluer,  il faudra mettre à jour ce fichier en ajoutant l'id du nouveau serveur et son port, le reste de l'implémentation prendra en compte ces changements.
 #### Diagramme de classes
 ![Diagramme de classes](docs/uml.svg)
+### Implémentation de lamport
+On crée une go routine pour chaque serveur, qui va écouter sur le port défini dans le fichier de configuration.
+Lorsqu'un client envoi un requête, le client envoie la requête à la go routine qui gère la base de données du serveur, assurant ainsi l'exclusion mutuelle sur la base de données pour les clients.
 
+Pour l'exclusion mutuelle entre les serveurs, on utilise un algorithme de Lamport. Chaque serveur possède une estampille et enregistre le dernier message qu'il a envoyé. Il enregistre également, pour chaque serveurs le dernier message reçu et l'estampille associée. 
+Lorsque le serveur veut accéder à la section critique il envoit via des canaux, une requête d'accès à la section critique au go routines communiquant avec les autres serveurs. Il attend ensuite la réponse de ces derniers qui est renvoyée à la go routine qui gère la base de données via un autre canal. Lorsque la go routine a reçu la réponse de tous les serveurs, elle peut accéder à la section critique. Lorsque la section critique est terminée, le serveur envoit un message de libération de la section critique aux autres serveurs.
+
+Avant de quitter la section critique, si l'action sur la base de données la modifiée (ajout, suppression, modification), le serveur envoit un message de synchronisation à tous les autres serveurs. Ce message contient l'action à effectuer sur la base de données du serveur qui a reçu le message et l'estampille du serveur qui a effectué l'action. Lorsque le serveur reçoit un message de synchronisation, il effectue l'action sur sa base de données et met à jour son estampille.
 ### Tests automatisés
 Une série de tests automatisés ont pour but de tester les fonctions utilisées pour la communication entre le client et le serveur. Dans le projet, ils se trouvent dans les sources dans le dossier `integrationTests`. Emplacement :
 > SDR_Labo1\src\integrationTests

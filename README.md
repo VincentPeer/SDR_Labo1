@@ -74,7 +74,8 @@ Lancez ensuite 2 clients, un en mode debug et un en mode normal :
 > go run . client1 -I 0 -D  
 > go run . client2 -I 0   
 
-A présent, on peut vérifier la concurrence en profitant du client en debug qui est bloqué pendant 5 secondes pour chaque commande.  
+A présent, on peut vérifier la concurrence en profitant du client en debug qui est bloqué pendant 5 secondes pour chaque commande, la suite du test consiste à
+faire un test de lecture puis un test en écriture.
 #### Test en lecture
 Dans le client en mode debug, entrez 3 afin de lister les événements, puis entrez aussitôt 3 dans le client normal. Entrées  à saisir :
 > clientDebug : 3  

@@ -45,11 +45,11 @@ le client en spécifiant un serveur qui a bien démarré.
 Les log concernant le trafic réseau sont affichés, que ce soit des requêtes/réponses avec un client ou des messages de synchronisation entre serveurs.
 
 ### Lancement d'un client
-Pour lancer un client, il suffit de se rendre dans le dossier `mainClient` et d'entrer la commande suivante :
->go run . clientName serverId [option] 
+Pour lancer un client avec le mode multi-serveur, il suffit de se rendre dans le dossier `mainClient` et d'entrer la commande suivante :
+>go run . [clientName] -I [serverId] [option] 
 
-Où `clientName` est le nom du client à lancer.  
-`serverId` est l'id du serveur auquel il doit se connecter, obligatoire dans la version multi-serveur.   
+Où `[clientName]` est le nom du client à lancer.  
+`[serverId]` est l'id du serveur auquel il doit se connecter, obligatoire dans la version multi-serveur.   
 `serverId` est optionnel, sans id entré, un id aléatoire sera choisi parmi la liste des serveurs (id 0 à 2).  
 
 Où `option` est facultatif et propose :

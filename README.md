@@ -137,7 +137,7 @@ Le résultat des tests est simple, on obtient un `PASS` si tout a passé avec su
 Pour avoir plus de détail sur le noms des tests effetués, l'option -v peut être ajouté à la commande :
 >go test -v
 
-Important: Comme les tests modifient les données, une fois la commande `go test`lancée, on ne peut pas la relancer une seconde fois car il y aura des erreurs. En effet, nous avons par exemple testé qu'il est possible pour un bénévole de s'inscrire à un poste qui requière encore 1 personne. Or, cette place ne sera plus disponible si nous relançons les tests une deuxième fois et lévera une erreur.  
+Important: Comme les tests modifient les données, une fois la commande `go test`lancée, on ne peut pas la relancer une seconde fois car il y aura des erreurs. En effet, nous avons par exemple testé qu'il est possible pour un bénévole de s'inscrire à un poste qui requière encore 1 personne. Or, cette place ne sera plus disponible si nous relançons les tests une deuxième fois et lèvera une erreur.  
 Pour relancer, il suffit de terminer l'exécution et de la relancer.
 
 

@@ -17,33 +17,35 @@ const connType = "tcp"
 
 // Connection contains buffered readers and writers to allow communication between the client and the server
 type Connection struct {
-	conn      net.Conn
-	serverIn  *bufio.Reader
-	serverOut *bufio.Writer
-	protocol  protocol.Protocol
+	clientName string
+	conn       net.Conn
+	serverIn   *bufio.Reader
+	serverOut  *bufio.Writer
+	protocol   protocol.Protocol
 }
 
 // NewConnection establishes a new Connection based on our own protocol
-func NewConnection(conn net.Conn, protocol protocol.Protocol) *Connection {
+func NewConnection(clientName string, conn net.Conn, protocol protocol.Protocol) *Connection {
 	return &Connection{
-		serverIn:  bufio.NewReader(conn),
-		serverOut: bufio.NewWriter(conn),
-		protocol:  protocol,
+		clientName: clientName,
+		serverIn:   bufio.NewReader(conn),
+		serverOut:  bufio.NewWriter(conn),
+		protocol:   protocol,
 	}
 }
 
 // CreateConnection prepare the Connection and start a client
-func CreateConnection(host string, port string, isDebug bool) *Connection {
+func CreateConnection(clientName string, host string, port string, isDebug bool) *Connection {
 	conn, err := net.Dial(connType, host+":"+port)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	client := NewConnection(conn, &protocol.SDRProtocol{})
+	client := NewConnection(clientName, conn, &protocol.SDRProtocol{})
 	if isDebug {
 		client.sendDebugRequest()
 	}
-
+	fmt.Println(clientName + " created with success")
 	return client
 }
 

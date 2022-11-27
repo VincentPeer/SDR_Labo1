@@ -21,6 +21,10 @@ var (
 func main() {
 
 	isDebug := false
+	if len(os.Args) < 2 {
+		fmt.Println("Error: missing client name")
+		os.Exit(1)
+	}
 	clientName := os.Args[1]
 	var serverId int
 
@@ -31,12 +35,11 @@ func main() {
 		serverId = r1.Intn(len(serverIds)) + 1
 		fmt.Println(serverId)
 	}
+
 	for i := 2; i < len(os.Args); i++ {
 		switch os.Args[i] {
 		case "-I", "--id":
 			serverId, _ = strconv.Atoi(os.Args[i+1])
-		case "-P", "--port":
-			connPort[0] = os.Args[i+1] // TODO change this to support multiple servers
 			i++
 		case "-H", "--host":
 			connHost = os.Args[i+1]

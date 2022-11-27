@@ -8,7 +8,7 @@ import (
 var (
 	connHost = "localhost"
 	connPort = "3333"
-	conn     = client.CreateConnection(connHost, connPort, false)
+	conn     = client.CreateConnection("test", connHost, connPort, false)
 )
 
 func TestLoginClient(t *testing.T) {

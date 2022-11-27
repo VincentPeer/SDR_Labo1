@@ -26,6 +26,16 @@
             "function" : "volunteer"
         },
         {
+            "name" : "Celine Lond",
+            "password" : "123",
+            "function" : "volunteer"
+        },
+        {
+            "name" : "Valentin Dufour",
+            "password" : "123456",
+            "function" : "volunteer"
+        },
+        {
             "name" : "Alain Du Bois",
             "password" : "123456",
             "function" : "organizer"
@@ -114,6 +124,26 @@
                     "name" : "Bière",
                     "required" : 2,
                     "volunteers" : ["Alex Terrieur"]
+                },
+                {
+                    "id" : 1,
+                    "name" : "Musique",
+                    "required" : 2,
+                    "volunteers" : ["Alain Du Bois"]
+                }
+            ]
+        },
+        {
+            "id" : 4,
+            "name" : "Giron",
+            "organizer" : "John",
+            "isOpen" : false,
+            "jobs" : [
+                {
+                    "id": 0,
+                    "name" : "Tonnelle",
+                    "required" : 3,
+                    "volunteers" : ["Valentin Dufour", "Celine Lond", "James"]
                 },
                 {
                     "id" : 1,

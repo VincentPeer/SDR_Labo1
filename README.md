@@ -72,9 +72,7 @@ Commencez par lancer les 3 serveurs dans l'ordre croissant de leur id dans le do
 
 Lancez ensuite 2 clients, un en mode debug et un en mode normal :
 > go run . client1 -I 0 -D  
-> go run . client2 -I 0  
-
-(Possibilité de lancer un 3ème client sur le serveur 1 ou 2 si besoin mais pas nécessaire pour tester les conditions de concurrence.)  
+> go run . client2 -I 0   
 
 A présent, on peut vérifier la concurrence en profitant du client en debug qui est bloqué pendant 5 secondes pour chaque commande.  
 #### Test en lecture
@@ -98,7 +96,7 @@ Dans le client en mode debug, saisissez les entrées suivantes afin de modifier 
 On observe que le client normal doit à attendre que le client debug ait fini sa requête afin d'afficher la liste des événements
 qui a bien ajouté le nouvel événement `manif`.  
 
-Le même test peut être réalisé en connectant les clients sur des serveurs différents.
+Le même test peut être réalisé en connectant les clients sur des serveurs différents. On peut également lancer plus de 2 clients.
 
 
 ### 👨🏽‍⚕️ Utilitaire godoc

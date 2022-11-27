@@ -50,7 +50,9 @@ func (dbm *databaseManager) isDebug() bool {
 func (dbm *databaseManager) start() {
 	for {
 		request := <-dbm.requestChannel
+		lamportRequest()
 		dbm.handleRequest(request)
+		lamportRelease()
 	}
 }
 

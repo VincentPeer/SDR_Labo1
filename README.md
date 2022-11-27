@@ -24,27 +24,36 @@ dans le dossier main :
 On y trouve le mainClient, le mainServer et le mainMultiServer qui contiennent chacun un 
 fichier main.go qui sera celui à exécuter pour un comportement souhaité.
 ### Lancement d'un serveur simple
+Il s'agit de la version du laboratoire 1.
 Pour lancer le serveur, il suffit de se rendre dans le dossier `mainServer` et de lancer la commande suivante :
-`go run .`
+>go run . [option]
 
-options :  
+Où `option` est facultatif et propose :  
 * `-P` ou `--port` : permet de spécifier le port sur lequel le serveur doit écouter (par défaut 3333)  
 * `-H` ou `--host` : permet de spécifier l'adresse sur laquelle le serveur doit écouter (par défaut localhost)
 * `-C` ou `--config` : permet de spécifier le dossier dans lequel le serveur doit chercher les fichiers de configuration (par défaut ./config)
 * `-D` ou `--debug` : permet d'activer le mode debug (par défaut false)
 
-### Lancement d'un serveur multi-client
-Pour le mode multi-serveur, il faut se rendre dans le dossier `mainMultiServer` et entrer la commande suivante :
+### Lancement de plusieurs serveurs
+Pour le mode multi-serveur, il faut se rendre dans le dossier `mainMultiServer`. Nous avons implémenté 3 serveurs 
+possédant des ids de 0 à 2. Il faut les lancer dans l'ordre croissant de leur id. Pour lancé un serveur, il faut entrer la commande suivante :
+> go run . [serverId]
+
+Où `[serverId]` est obligatoire et indique l'id du serveur à lancer.
+Le terminal affiche le trafic réseau, que ce soit des requêtes/réponses avec un client ou des messages de synchronisation entre serveurs.
 
 ### Lancement d'un client
 Pour lancer un client, il suffit de se rendre dans le dossier `mainClient` et d'entrer la commande suivante :
-`go run . clientName serverId`, où `clientName` est le nom du client à lancer et `serverId` est l'id du serveur auquel il doit se connecter.
+>go run . clientName serverId [option]
+
+Où `clientName` est le nom du client à lancer.  
+`serverId` est l'id du serveur auquel il doit se connecter.  
 Si aucun argument n'est fourni, nous établissons une connexion telle qu'un laboratoire 1 avec le
 serveur simple.   
-Pour pouvoir se connecter avec la version du laboratoire 2, il faut ajouter le `clientName`.
-`serverId` est optionnel, sans id entré, un id aléatoire sera choisi parmi la liste des serveurs.
+Pour pouvoir se connecter avec la version du laboratoire 2, il faut ajouter le `clientName`.  
+`serverId` est optionnel, sans id entré, un id aléatoire sera choisi parmi la liste des serveurs (id 0 à 2).
 
-options :
+Où `option` est facultatif et propose :
 * `-I` ou `--id` : permet de spécifier l'id du serveur sur lequel le client doit se connecter 
 * `-H` ou `--host` : permet de spécifier l'adresse sur laquelle le client doit se connecter (par défaut localhost)
 * `-D` ou `--config` : permet d'activer le mode debug (par défaut false)

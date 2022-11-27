@@ -42,13 +42,13 @@ Pour lancer un client, il suffit de se rendre dans le dossier `mainClient` et d'
 Si aucun argument n'est fourni, nous établissons une connexion telle qu'un laboratoire 1 avec le
 serveur simple.   
 Pour pouvoir se connecter avec la version du laboratoire 2, il faut ajouter le `clientName`.
-`serverId` est optionnel, sans id entré, un id aléatoire sera choisi parmi les serveurs disponibles.
+`serverId` est optionnel, sans id entré, un id aléatoire sera choisi parmi la liste des serveurs.
 
 options :
 * `-I` ou `--id` : permet de spécifier l'id du serveur sur lequel le client doit se connecter 
 * `-H` ou `--host` : permet de spécifier l'adresse sur laquelle le client doit se connecter (par défaut localhost)
 * `-D` ou `--config` : permet d'activer le mode debug (par défaut false)
-
+* 
 ### 🦟 Mode debug
 Le mode debug permet de voir les messages échangés entre le serveur et le client.
 Pour l'activer, il suffit de lancer le serveur avec l'argument `-D` ou `--debug`.

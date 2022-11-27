@@ -115,8 +115,6 @@ Vous pouvez alors parcourir notre documentation. Les packages main ne sont pas v
 non exportées.
 
 ### 🔎 Détails d'implémentation
-* Lors de l'affichage des manifestations et des postes, l'ordre affiché n'est pas ordré par id croissant. Nous utilisons des map qui sont
-particulièrment pratique d'utilisation, mais qui ne préservent pas l'ordre de leur clé.
 * Lorsqu'une saisie concerne l'id d'une manifestation ou d'un poste, l'indice commence à 0.
 * Lorsque l'utilisateur doit se loguer, il ne peut plus revenir en arrière et n'a pas d'autre choix que de réussir le log in.
 * Les alignements des colonnes pour les affichages de manifestation, poste et bénévole fonctionnent tant que

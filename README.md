@@ -64,13 +64,13 @@ Pour tester les races conditions, il suffit de lancer le client avec l'argument 
 L'accès au ressources par des clients lancés de cette manière est bloqué pendant 5 secondes, permettant de tester le conditions de concurrence.
 
 ### Test de la concurrence
-Voici une marche à suivre permettant de tester les conditions de concurrence. 
-Lancer les 3 serveurs dans l'ordre croissant de leur id dans le dossier `mainMultiServer` :
+Voici une marche à suivre permettant de tester les conditions de concurrence.   
+Commencez par lancer les 3 serveurs dans l'ordre croissant de leur id dans le dossier `mainMultiServer` :
 > go run . 0  
 > go run . 1  
 > go run . 2  
 
-Lancer ensuite 2 clients, un en mode debug et un en mode normal :
+Lancez ensuite 2 clients, un en mode debug et un en mode normal :
 > go run . client1 -I 0 -D  
 > go run . client2 -I 0  
 
@@ -78,13 +78,14 @@ Lancer ensuite 2 clients, un en mode debug et un en mode normal :
 
 A présent, on peut vérifier la concurrence en profitant du client en debug qui est bloqué pendant 5 secondes pour chaque commande.  
 #### Test en lecture
-Dans le client en mode debug, entrer 3 afin de lister les événements, puis entrez aussitôt 3 dans le client normal. Entrées  à saisir :
+Dans le client en mode debug, entrez 3 afin de lister les événements, puis entrez aussitôt 3 dans le client normal. Entrées  à saisir :
 > clientDebug : 3  
 > clientNormal : 3
 
 On observe que le client normal doit attendre que le client debug ait fini sa requête pour afficher les évênements.
 #### Test en écriture
-Dans le client en mode debug, saisissez les entrées suivantes
+Dans le client en mode debug, saisissez les entrées suivantes afin de modifier la base de donnée en ajoutant un nouvel évenement :  
+(Ne pas oublier que certaine étape demande au client debug d'attendre 5 secondes)  ^.
 > clientDebug : 1   (création d'un événement)  
 > clientDebug : a   (username)  
 > clientDebug : 1   (password)  
@@ -95,7 +96,9 @@ Dans le client en mode debug, saisissez les entrées suivantes
 > clientNormal : 3   (affichage des événements)  
 
 On observe que le client normal doit à attendre que le client debug ait fini sa requête afin d'afficher la liste des événements
-qui a bien ajouté le nouvel événement `manif`.
+qui a bien ajouté le nouvel événement `manif`.  
+
+Le même test peut être réalisé en connectant les clients sur des serveurs différents.
 
 
 ### 👨🏽‍⚕️ Utilitaire godoc

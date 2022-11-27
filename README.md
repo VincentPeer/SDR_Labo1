@@ -84,7 +84,7 @@ Dans le client en mode debug, entrez 3 afin de lister les événements, puis ent
 On observe que le client normal doit attendre que le client debug ait fini sa requête pour afficher les évênements. En effet, le client normal n'a pas directement accès à la section critique tant le client debug n'a pas terminé.
 #### Test en écriture
 Dans le client en mode debug, saisissez les entrées suivantes afin de modifier la base de donnée en ajoutant un nouvel évenement :  
-(Ne pas oublier que certaine étape demande au client debug d'attendre 5 secondes)  ^.
+(Ne pas oublier que certaine étape demande au client debug d'attendre 5 secondes).
 > clientDebug : 1   (création d'un événement)  
 > clientDebug : a   (username)  
 > clientDebug : 1   (password)  
@@ -94,8 +94,8 @@ Dans le client en mode debug, saisissez les entrées suivantes afin de modifier 
 > clientDebug : STOP    (fin de la saisie)  
 > clientNormal : 3   (affichage des événements)  
 
-On observe que le client normal doit à attendre que le client debug ait fini sa requête afin d'afficher la liste des événements
-qui a bien ajouté le nouvel événement `manif`.  
+On observe que le client normal doit attendre que le client debug ait fini sa requête afin d'afficher la liste des événements
+et que le nouvel événement `manif` a bien été ajouté.  
 
 Le même test peut être réalisé en connectant les clients sur des serveurs différents. On peut également lancer plus de 2 clients.
 

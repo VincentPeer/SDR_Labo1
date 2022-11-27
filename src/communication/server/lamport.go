@@ -145,7 +145,7 @@ func handleUpdateDatabaseRequest(dbm *databaseManager, payload protocol.DataPack
 				return
 			}
 			// Populating the event with jobs
-			for i := 1; i < len(payload.Data)-1; i += 2 {
+			for i := 1; i < len(payload.Data)-3; i += 2 {
 				nbVolunteers, err := strconv.ParseUint(payload.Data[i+1], 10, 32)
 				if err != nil {
 					debug(dbm, "Error parsing number of volunteers: "+err.Error())
@@ -156,9 +156,49 @@ func handleUpdateDatabaseRequest(dbm *databaseManager, payload protocol.DataPack
 		}
 	case protocol.EVENT_REG:
 		{
+			eventId, err := strconv.ParseUint(payload.Data[0], 10, 32)
+			if err != nil {
+				return
+			}
+			jobId, err := strconv.ParseUint(payload.Data[1], 10, 32)
+			if err != nil {
+				return
+			}
+			event, err := dbm.db.GetEvent(uint(eventId))
+			if err != nil {
+				debug(dbm, "Error getting event: "+err.Error())
+				return
+			}
+
+			job, err := event.GetJob(uint(jobId))
+			if err != nil {
+				debug(dbm, "Error getting job: "+err.Error())
+				return
+			}
+
+			debug(dbm, job.ToString())
+
+			_, err = event.AddVolunteer(job.ID, user)
+			if err != nil {
+				debug(dbm, "Error adding volunteer: "+err.Error())
+				return
+			}
+
+			debug(dbm, "Volunteer added")
+			debug(dbm, job.ToString())
 		}
 	case protocol.CLOSE_EVENT:
 		{
+			eventId, err := strconv.ParseUint(payload.Data[0], 10, 32)
+			if err != nil {
+				return
+			}
+			event, err := dbm.db.GetEvent(uint(eventId))
+			if err != nil {
+				debug(dbm, "Error getting event: "+err.Error())
+				return
+			}
+			event.Close()
 		}
 	}
 }

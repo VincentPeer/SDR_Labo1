@@ -13,7 +13,7 @@ Le cahier des charges détaillé est disponible [ici](docs/Labo_2_SDR.pdf).
 Commencez par cloner notre repository dans le dossier de votre choix, la commande
 git est la suivante :  
 `git clone https://github.com/VincentPeer/SDR_Labo1.git`  
-Une fois effectué, vous disposer du projet et ne reste plus qu'à mettre en service 
+Une fois effectué, vous disposez du projet et ne reste plus qu'à mettre en service 
 le serveur et le(s) client(s).
 
 ## Lancement de l'application
@@ -36,12 +36,10 @@ Où `option` est facultatif et propose :
 
 ### Lancement de plusieurs serveurs
 Pour le mode multi-serveur, il faut se rendre dans le dossier `mainMultiServer`. Nous avons implémenté 3 serveurs 
-possédant des ids de 0 à 2. Il faut les lancer dans l'ordre croissant de leur id. Pour lancé un serveur, il faut entrer la commande suivante :
+possédant des ids de 0 à 2. Comme défini dans le fichier `networkConfig.json` Il faut les lancer dans l'ordre croissant de leur id. Pour lancer un serveur, il faut entrer la commande suivante :
 > go run . [serverId]
 
 Où `[serverId]` est obligatoire et indique l'id du serveur à lancer.  
-Il est possible de lancer moins de 3 serveurs, mais dans ce cas, il faudra en tenir compte dans 
-le client en spécifiant un serveur qui a bien démarré.  
 Les log concernant le trafic réseau sont affichés, que ce soit des requêtes/réponses avec un client ou des messages de synchronisation entre serveurs.
 
 ### Lancement d'un client
@@ -84,15 +82,13 @@ non exportées.
 * Lors de l'affichage des manifestations et des postes, l'ordre affiché n'est pas ordré par id croissant.
 * Lorsqu'une saisie concerne l'id d'une manifestation ou d'un poste, l'indice commence à 0.
 * Lorsque l'utilisateur doit se loguer, il ne peut plus revenir en arrière et n'a pas d'autre choix que de réussir le log in.
-* Les alignements des colonnes pour les affichages de manifestation, poste et bénévole fonctionnent tant que
- l'utilisateur n'entre pas de données extrêmement longues.
-* Le client (`mainClient/main.go`) contient en dur les ports et les id des serveurs disponibles. Si le nombre de serveur vient à évoluer, 
- il faudra mettre à jour ce fichier en ajoutant l'id du nouveau serveur et son port, le reste de l'implémentation
-prendra en compte ces changements.
+* Les alignements des colonnes pour les affichages de manifestation, poste et bénévole fonctionnent tant que l'utilisateur n'entre pas de données extrêmement longues.
+* Le client (`mainClient/main.go`) contient en dur les ports et les id des serveurs disponibles. Si le nombre de serveur vient à évoluer,  il faudra mettre à jour ce fichier en ajoutant l'id du nouveau serveur et son port, le reste de l'implémentation prendra en compte ces changements.
+#### Diagramme de classes
+![Diagramme de classes](docs/uml.svg)
 
 ### Tests automatisés
-Une série de tests automatisés ont pour but de tester les fonctions utilisées pour la communication entre le client et
-le serveur. Dans le projet, ils se trouvent dans les sources dans le dossier `integrationTests`. Emplacement :
+Une série de tests automatisés ont pour but de tester les fonctions utilisées pour la communication entre le client et le serveur. Dans le projet, ils se trouvent dans les sources dans le dossier `integrationTests`. Emplacement :
 > SDR_Labo1\src\integrationTests
 
 Pour lancer les tests, il faut d'abord lancer un serveur. 
@@ -102,9 +98,6 @@ Ensuite, il faut se rendre dans le dossier `integrationTests` et effectuer la co
 Le résultat des tests est simple, on obtient un `PASS` si tout a passé avec succès, et un `FAIL` sinon.
 Pour avoir plus de détail sur le noms des tests effetués, l'option -v peut être ajouté à la commande :
 >go test -v
-
-
-
 
 ## 📖 Protocole
 ### ⬅ Format des messages

@@ -19,9 +19,8 @@ const (
 	STOP         = "STOP"
 
 	REQ = "REQ"
-	RES = "RES"
+	REL = "REL"
 	ACK = "ACK"
-	SYN = "SYN"
 
 	DELIMITER = '^'
 	SEPARATOR = '¦'

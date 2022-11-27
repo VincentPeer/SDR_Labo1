@@ -47,7 +47,7 @@ func lamportRequest() {
 				}
 
 				// If the estampille of the response is greater than our request, the server i knows we want to enter the critical section
-				if (l.Type == protocol.ACK || l.Type == protocol.REQ || l.Type == protocol.RES) && registeredEstampille < receivedEstampille {
+				if (l.Type == protocol.ACK || l.Type == protocol.REQ || l.Type == protocol.REL) && registeredEstampille < receivedEstampille {
 					ackWaitGroup.Done()
 					break
 				}
@@ -61,7 +61,7 @@ func lamportRequest() {
 func lamportRelease() {
 	estampille++
 	release := protocol.DataPacket{
-		Type: protocol.RES,
+		Type: protocol.REL,
 		Data: []string{strconv.Itoa(estampille)},
 	}
 	lamportRegister = &release
@@ -102,7 +102,7 @@ func lamportReceive(listener *serverListener, request protocol.DataPacket) {
 		}
 	// If the request is a release we save it and inform the main thread that we received a release
 	// only if we have a saved request (to check if we can enter the critical section now)
-	case protocol.RES:
+	case protocol.REL:
 		{
 			listener.lamportRegister = &request
 			if lamportRegister != nil && lamportRegister.Type == protocol.REQ {

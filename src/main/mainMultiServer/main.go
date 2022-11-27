@@ -8,8 +8,6 @@ import (
 )
 
 var (
-	connHost          = "localhost"
-	connPort          = "3333"
 	configPath        = "./config.json"
 	networkConfigPath = "./networkConfig.json"
 )

@@ -16,8 +16,15 @@ git est la suivante :
 Une fois effectué, vous disposer du projet et ne reste plus qu'à mettre en service 
 le serveur et le(s) client(s).
 
-### Lancement du serveur
-Pour lancer le serveur, il suffit de se rendre dans le dossier `server` et de lancer la commande suivante :
+## Lancement de l'application
+Pour démarrer un serveur ou un client, il faut premièrement se rendre en ligne de commande
+dans le dossier main :
+> SDR_Labo1\src\main 
+
+On y trouve le mainClient, le mainServer et le mainMultiServer qui contiennent chacun un 
+fichier main.go qui sera celui à exécuter pour un comportement souhaité.
+### Lancement d'un serveur simple
+Pour lancer le serveur, il suffit de se rendre dans le dossier `mainServer` et de lancer la commande suivante :
 `go run .`
 
 options :  
@@ -25,15 +32,23 @@ options :
 * `-H` ou `--host` : permet de spécifier l'adresse sur laquelle le serveur doit écouter (par défaut localhost)
 * `-C` ou `--config` : permet de spécifier le dossier dans lequel le serveur doit chercher les fichiers de configuration (par défaut ./config)
 * `-D` ou `--debug` : permet d'activer le mode debug (par défaut false)
+
+### Lancement d'un serveur multi-client
+Pour le mode multi-serveur, il faut se rendre dans le dossier `mainMultiServer` et entrer la commande suivante :
+
 ### Lancement d'un client
-Pour lancer un client, il suffit de se rendre dans le dossier `client` et de lancer la commande suivante :
-`go run .`
+Pour lancer un client, il suffit de se rendre dans le dossier `mainClient` et d'entrer la commande suivante :
+`go run . clientName serverId`, où `clientName` est le nom du client à lancer et `serverId` est l'id du serveur auquel il doit se connecter.
+Si aucun argument n'est fourni, nous établissons une connexion telle qu'un laboratoire 1 avec le
+serveur simple.   
+Pour pouvoir se connecter avec la version du laboratoire 2, il faut ajouter le `clientName`.
+`serverId` est optionnel, sans id entré, un id aléatoire sera choisi parmi la liste des serveurs.
 
 options :
-* `-P` ou `--port` : permet de spécifier le port sur lequel le client doit se connecter (par défaut 3333)
+* `-I` ou `--id` : permet de spécifier l'id du serveur sur lequel le client doit se connecter 
 * `-H` ou `--host` : permet de spécifier l'adresse sur laquelle le client doit se connecter (par défaut localhost)
 * `-D` ou `--config` : permet d'activer le mode debug (par défaut false)
-
+* 
 ### 🦟 Mode debug
 Le mode debug permet de voir les messages échangés entre le serveur et le client.
 Pour l'activer, il suffit de lancer le serveur avec l'argument `-D` ou `--debug`.
@@ -61,6 +76,9 @@ non exportées.
 * Lorsque l'utilisateur doit se loguer, il ne peut plus revenir en arrière et n'a pas d'autre choix que de réussir le log in.
 * Les alignements des colonnes pour les affichages de manifestation, poste et bénévole fonctionnent tant que
  l'utilisateur n'entre pas de données extrêmement longues.
+* Le client (`mainClient/main.go`) contient en dur les ports et les id des serveurs disponibles. Si le nombre de serveur vient à évoluer, 
+ il faudra mettre à jour ce fichier en ajoutant l'id du nouveau serveur et son port, le reste de l'implémentation
+prendra en compte ces changements.
 
 ### Tests automatisés
 Une série de tests automatisés ont pour but de tester les fonctions utilisées pour la communication entre le client et

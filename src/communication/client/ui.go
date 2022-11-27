@@ -167,6 +167,19 @@ func (c *Connection) integerReader(optionalMessage string) int {
 	}
 }
 
+func sortInterfaceMap(m map[string]interface{}) []interface{} {
+	var sortedM []interface{}
+	keys := make([]string, 0, len(m))
+	for k, _ := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		sortedM = append(sortedM, m[k])
+	}
+	return sortedM
+}
+
 // printDataPacket prints the content of a data packet
 func printDataPacket(data protocol.DataPacket) {
 	for i := 0; i < len(data.Data); i++ {
@@ -176,7 +189,8 @@ func printDataPacket(data protocol.DataPacket) {
 
 func printEventTable(events map[string]interface{}) {
 	fmt.Printf("%s | %-20s | %-15s | %-6s |\n", "Id", "Name", "Organizer", "Status")
-	for _, event := range events {
+
+	for _, event := range sortInterfaceMap(events) {
 		eventMap := event.(map[string]interface{})
 		openStatus := "open"
 		if eventMap["IsOpen"] == false {
@@ -188,7 +202,7 @@ func printEventTable(events map[string]interface{}) {
 
 func printJobTAble(jobs map[string]interface{}) {
 	fmt.Printf("%s | %-20s | %s |\n", "Id", "Name", "Required")
-	for _, job := range jobs {
+	for _, job := range sortInterfaceMap(jobs) {
 		jobMap := job.(map[string]interface{})
 		fmt.Printf("%.0f | %-20s | %.0f |\n", jobMap["id"], jobMap["name"], jobMap["required"])
 	}

@@ -105,9 +105,8 @@ func (s *Server) connectToServer(networkConfig networkConfig, id int) {
 
 	// Sends a handshake to the server
 	clientServer := newClientConnection(s, &conn)
-	clientServer.write(protocol.DataPacket{Type: protocol.REQ, Data: []string{strconv.Itoa(s.Id)}})
+	clientServer.write(protocol.DataPacket{Type: protocol.HANDSHAKE, Data: []string{strconv.Itoa(s.Id)}})
 	defer clientServer.close()
-	// TODO use another type that REQ to establish connection
 
 	// Waits for the other server to accept the connection
 	for {
@@ -150,8 +149,7 @@ func (s *Server) handleConnectionFromServer(conn *net.Conn) {
 		}
 	}
 
-	// TODO use another type that REQ to establish connection
-	if data.Type == protocol.REQ {
+	if data.Type == protocol.HANDSHAKE {
 		clientServer.write(protocol.DataPacket{Type: protocol.ACK, Data: []string{}})
 	}
 

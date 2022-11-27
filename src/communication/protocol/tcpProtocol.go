@@ -18,9 +18,10 @@ const (
 	GET_JOBS     = "GET_JOBS"
 	STOP         = "STOP"
 
-	REQ = "REQ"
-	REL = "REL"
-	ACK = "ACK"
+	HANDSHAKE = "HANDSHAKE"
+	REQ       = "REQ"
+	REL       = "REL"
+	ACK       = "ACK"
 
 	DELIMITER = '^'
 	SEPARATOR = '¦'

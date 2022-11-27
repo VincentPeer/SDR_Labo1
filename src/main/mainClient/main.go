@@ -44,6 +44,9 @@ func main() {
 		case "-H", "--host":
 			connHost = os.Args[i+1]
 			i++
+		case "-P", "--port":
+			connPort = os.Args[i+1:]
+			i = len(os.Args)
 		case "-D", "--debug":
 			isDebug = true
 		}

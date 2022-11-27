@@ -12,7 +12,8 @@ Le cahier des charges détaillé est disponible [ici](docs/Labo_2_SDR.pdf).
 ### 💾 Installation des ressources
 Commencez par cloner notre repository dans le dossier de votre choix, la commande
 git est la suivante :  
-`git clone https://github.com/VincentPeer/SDR_Labo1.git`  
+>git clone https://github.com/VincentPeer/SDR_Labo1.git
+  
 Une fois effectué, vous disposez du projet et ne reste plus qu'à mettre en service 
 le serveur et le(s) client(s).
 
@@ -54,7 +55,7 @@ Où `[clientName]` est le nom du client à lancer, obligatoire dans la version m
 * `-H` ou `--host` : permet de spécifier l'adresse sur laquelle le client doit se connecter (par défaut localhost)
 * `-D` ou `--config` : permet d'activer le mode debug (par défaut false)
 
-Si aucun argument n'est fourni, c'est-à-dire uniquement `go run .`, nous établissons une connexion telle qu'an laboratoire 1 avec le
+Si aucun argument n'est fourni, c'est-à-dire uniquement `go run .`, nous établissons une connexion telle qu'au laboratoire 1 avec le
 serveur simple.
 ### 🦟 Mode debug 
 Le mode debug permet de voir les messages échangés entre le serveur et le client.

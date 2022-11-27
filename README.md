@@ -21,7 +21,7 @@ Pour démarrer un serveur ou un client, il faut premièrement se rendre en ligne
 dans le dossier main :
 > SDR_Labo1\src\main 
 
-On y trouve le mainClient, le mainServer et le mainMultiServer qui contiennent chacun un 
+On y trouve les dossiers mainClient, le mainServer et mainMultiServer qui contiennent chacun un 
 fichier main.go qui sera celui à exécuter pour un comportement souhaité.
 ### Lancement d'un serveur simple
 Il s'agit de la version du laboratoire 1.
@@ -39,7 +39,9 @@ Pour le mode multi-serveur, il faut se rendre dans le dossier `mainMultiServer`.
 possédant des ids de 0 à 2. Il faut les lancer dans l'ordre croissant de leur id. Pour lancé un serveur, il faut entrer la commande suivante :
 > go run . [serverId]
 
-Où `[serverId]` est obligatoire et indique l'id du serveur à lancer.
+Où `[serverId]` est obligatoire et indique l'id du serveur à lancer.  
+Il est possible de lancer moins de 3 serveurs, mais dans ce cas, il faudra en tenir compte dans 
+le client en spécifiant un serveur qui a bien démarré.  
 Le terminal affiche le trafic réseau, que ce soit des requêtes/réponses avec un client ou des messages de synchronisation entre serveurs.
 
 ### Lancement d'un client
@@ -47,17 +49,16 @@ Pour lancer un client, il suffit de se rendre dans le dossier `mainClient` et d'
 >go run . clientName serverId [option]
 
 Où `clientName` est le nom du client à lancer.  
-`serverId` est l'id du serveur auquel il doit se connecter.  
-Si aucun argument n'est fourni, nous établissons une connexion telle qu'un laboratoire 1 avec le
-serveur simple.   
-Pour pouvoir se connecter avec la version du laboratoire 2, il faut ajouter le `clientName`.  
-`serverId` est optionnel, sans id entré, un id aléatoire sera choisi parmi la liste des serveurs (id 0 à 2).
+`serverId` est l'id du serveur auquel il doit se connecter, obligatoire dans la version multi-serveur.   
+`serverId` est optionnel, sans id entré, un id aléatoire sera choisi parmi la liste des serveurs (id 0 à 2).  
 
 Où `option` est facultatif et propose :
 * `-I` ou `--id` : permet de spécifier l'id du serveur sur lequel le client doit se connecter 
 * `-H` ou `--host` : permet de spécifier l'adresse sur laquelle le client doit se connecter (par défaut localhost)
 * `-D` ou `--config` : permet d'activer le mode debug (par défaut false)
-* 
+
+Si aucun argument n'est fourni, c'est-à-dire uniquement `go run .`, nous établissons une connexion telle qu'an laboratoire 1 avec le
+serveur simple.
 ### 🦟 Mode debug
 Le mode debug permet de voir les messages échangés entre le serveur et le client.
 Pour l'activer, il suffit de lancer le serveur avec l'argument `-D` ou `--debug`.

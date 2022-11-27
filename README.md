@@ -42,11 +42,11 @@ possédant des ids de 0 à 2. Il faut les lancer dans l'ordre croissant de leur 
 Où `[serverId]` est obligatoire et indique l'id du serveur à lancer.  
 Il est possible de lancer moins de 3 serveurs, mais dans ce cas, il faudra en tenir compte dans 
 le client en spécifiant un serveur qui a bien démarré.  
-Le terminal affiche le trafic réseau, que ce soit des requêtes/réponses avec un client ou des messages de synchronisation entre serveurs.
+Les log concernant le trafic réseau sont affichés, que ce soit des requêtes/réponses avec un client ou des messages de synchronisation entre serveurs.
 
 ### Lancement d'un client
 Pour lancer un client, il suffit de se rendre dans le dossier `mainClient` et d'entrer la commande suivante :
->go run . clientName serverId [option]
+>go run . clientName serverId [option] 
 
 Où `clientName` est le nom du client à lancer.  
 `serverId` est l'id du serveur auquel il doit se connecter, obligatoire dans la version multi-serveur.   

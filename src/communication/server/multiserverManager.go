@@ -84,7 +84,7 @@ func (s *Server) talkWith(listener *serverListener) {
 		case data := <-listener.peerServerChan:
 			{
 				debug(s, "Received data from peer server: "+data.Data[0])
-				listener.lamportReceiveRequest(data)
+				lamportReceive(listener, data)
 			}
 		}
 	}

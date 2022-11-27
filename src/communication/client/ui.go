@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -194,35 +195,71 @@ func printJobTAble(jobs map[string]interface{}) {
 }
 
 // GetJobsRepartitionTable returns a table with the jobs and which volunteers are assigned to them
-func printJobPepartitionTable(jobs map[string]interface{}) {
+func printJobPrepartitionTable(jobs map[string]interface{}) {
 	head := "| Volunteers     | "
+	// Sort jobs by id
+	var keys []int
 	for _, job := range jobs {
 		jobMap := job.(map[string]interface{})
-		s := fmt.Sprintf("%0.f : %-10s %0.f", jobMap["id"], jobMap["name"], (jobMap["required"])) + " | "
+		keys = append(keys, int(jobMap["id"].(float64)))
+	}
+	sort.Ints(keys)
+
+	jobsName := make([]string, 0)
+	for _, job := range jobs {
+		jobMap := job.(map[string]interface{})
+		s := fmt.Sprintf("%0.f: %-10s /%0.f", jobMap["id"], jobMap["name"], (jobMap["required"])) + " | "
+		jobsName = append(jobsName, jobMap["name"].(string))
 		head += s
 	}
+
 	var tab []string
 	tab = append(tab, head)
-
-	for _, job := range jobs {
-		jobMap := job.(map[string]interface{})
-		volunteers := jobMap["volunteers"].([]interface{})
+	// Repartition of volunteers
+	for k := range keys {
+		i := 0
+		jobI := jobs[strconv.Itoa(keys[k])].(map[string]interface{})
+		fmt.Println("jobI : ", jobI)
+		volunteers := jobI["volunteers"].([]interface{})
 		for _, volunteer := range volunteers {
-			s := fmt.Sprintf("| %-14s |", volunteer)
-			for _, job := range jobs {
-				jobMap := job.(map[string]interface{})
-				volunteers := jobMap["volunteers"].([]interface{})
-				for _, volunteer2 := range volunteers {
-					if volunteer2 == volunteer {
-						s += " X          |"
-					} else {
-						s += "            |"
-					}
+			fmt.Println("volunteer: ", volunteer)
+			line := fmt.Sprintf("| %-15s", volunteer)
+			for i := range keys {
+				jobJ := jobs[strconv.Itoa(keys[k])].(map[string]interface{})
+				if jobJ["name"] == jobsName[i] {
+					line += "|" + fmt.Sprintf("%-9s", "") + "X" + fmt.Sprintf("%-8s", "")
+				} else {
+					line += "|" + fmt.Sprintf("%-18s", " ")
 				}
 			}
-			tab = append(tab, s)
+			i++
+			tab = append(tab, line+"|")
 		}
 	}
+
+	//for _, job := range jobs {
+	//	fmt.Println(jobs)
+	//	jobMap := job.(map[string]interface{})
+	//	volunteers := jobMap["volunteers"].([]interface{})
+	//	for _, volunteer := range volunteers {
+	//		fmt.Println("volunteer : ", volunteer)
+	//		line := fmt.Sprintf("| %-15s", volunteer)
+	//		for _, job := range jobs {
+	//			jobMap := job.(map[string]interface{})
+	//			volunteers := jobMap["volunteers"].([]interface{})
+	//			for _, volunteer2 := range volunteers {
+	//				fmt.Println("volunteer2 : ", volunteer)
+	//				fmt.Println(jobMap)
+	//				if volunteer2 == volunteer {
+	//					line += "|" + fmt.Sprintf("%-9s", "") + "X" + fmt.Sprintf("%-8s", "")
+	//				} else {
+	//					line += "|" + fmt.Sprintf("%-18s", " ")
+	//				}
+	//			}
+	//		}
+	//		tab = append(tab, line+"|")
+	//	}
+	//}
 	for i := 0; i < len(tab); i++ {
 		fmt.Println(tab[i])
 	}

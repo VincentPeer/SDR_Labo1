@@ -133,7 +133,7 @@ func (c *Connection) VolunteerRepartition(eventId int) bool {
 		if err != nil {
 			log.Fatal(err)
 		}
-		printJobPepartitionTable(objmap)
+		printJobPrepartitionTable(objmap)
 		return true
 	}
 	return false

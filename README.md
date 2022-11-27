@@ -50,7 +50,7 @@ Pour lancer un client avec le mode multi-serveur, il suffit de se rendre dans le
 
 Où `[clientName]` est le nom du client à lancer.  
 `[serverId]` est l'id du serveur auquel il doit se connecter, obligatoire dans la version multi-serveur.   
-`serverId` est optionnel, sans id entré, un id aléatoire sera choisi parmi la liste des serveurs (id 0 à 2).  
+`-I serverId` est optionnel, sans id entré, un id aléatoire sera choisi parmi la liste des serveurs (id 0 à 2).  
 
 Où `option` est facultatif et propose :
 * `-I` ou `--id` : permet de spécifier l'id du serveur sur lequel le client doit se connecter 

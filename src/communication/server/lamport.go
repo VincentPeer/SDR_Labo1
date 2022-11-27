@@ -119,6 +119,8 @@ func lamportReceive(listener *serverListener, request protocol.DataPacket) {
 	}
 }
 
+// sendUpdateDatabaseRequest sends a request to all servers to update their database
+// The request is identical to the one sent by the client except we add the name of the connected user and the estampille
 func sendUpdateDatabaseRequest(request databaseRequest) {
 	estampille++
 	request.payload.Data = append(request.payload.Data, request.sender.connectedUser)
@@ -128,6 +130,7 @@ func sendUpdateDatabaseRequest(request databaseRequest) {
 	}
 }
 
+// handleUpdateDatabaseRequest handles the reception of a database update request
 func handleUpdateDatabaseRequest(dbm *databaseManager, payload protocol.DataPacket) {
 	user := payload.Data[len(payload.Data)-2]
 	switch payload.Type {

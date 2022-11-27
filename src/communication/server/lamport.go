@@ -13,7 +13,6 @@ var (
 	lamportRegister *protocol.DataPacket // Last request or release sent by the current server
 )
 
-// TODO add a timeout to the ackWaitGroup
 // lamportRequest sends a request to all servers and waits for all acks to be received
 // This function is blocking until the critical section can be entered
 func lamportRequest() {

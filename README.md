@@ -13,7 +13,7 @@ Le cahier des charges détaillé est disponible [ici](docs/Labo_2_SDR.pdf).
 Commencez par cloner notre repository dans le dossier de votre choix, la commande
 git est la suivante :  
 `git clone https://github.com/VincentPeer/SDR_Labo1.git`  
-Une fois effectué, vous disposer du projet et ne reste plus qu'à mettre en service 
+Une fois effectué, vous disposez du projet et ne reste plus qu'à mettre en service 
 le serveur et le(s) client(s).
 
 ## Lancement de l'application
@@ -36,7 +36,7 @@ Où `option` est facultatif et propose :
 
 ### Lancement de plusieurs serveurs
 Pour le mode multi-serveur, il faut se rendre dans le dossier `mainMultiServer`. Nous avons implémenté 3 serveurs 
-possédant des ids de 0 à 2. Il faut les lancer dans l'ordre croissant de leur id. Pour lancé un serveur, il faut entrer la commande suivante :
+possédant des ids de 0 à 2. Comme défini dans le fichier `networkConfig.json` Il faut les lancer dans l'ordre croissant de leur id. Pour lancer un serveur, il faut entrer la commande suivante :
 > go run . [serverId]
 
 Où `[serverId]` est obligatoire et indique l'id du serveur à lancer.
@@ -117,12 +117,18 @@ non exportées.
 ### 🔎 Détails d'implémentation
 * Lorsqu'une saisie concerne l'id d'une manifestation ou d'un poste, l'indice commence à 0.
 * Lorsque l'utilisateur doit se loguer, il ne peut plus revenir en arrière et n'a pas d'autre choix que de réussir le log in.
-* Les alignements des colonnes pour les affichages de manifestation, poste et bénévole fonctionnent tant que
- l'utilisateur n'entre pas de données extrêmement longues.
-* Le client (`mainClient/main.go`) contient en dur les ports et les id des serveurs disponibles. Si le nombre de serveur vient à évoluer, 
- il faudra mettre à jour ce fichier en ajoutant l'id du nouveau serveur et son port, le reste de l'implémentation
-prendra en compte ces changements.
+* Les alignements des colonnes pour les affichages de manifestation, poste et bénévole fonctionnent tant que l'utilisateur n'entre pas de données extrêmement longues.
+* Le client (`mainClient/main.go`) contient en dur les ports et les id des serveurs disponibles. Si le nombre de serveur vient à évoluer, il faudra mettre à jour ce fichier en ajoutant l'id du nouveau serveur et son port, le reste de l'implémentation prendra en compte ces changements.
+#### Diagramme de classes
+![Diagramme de classes](docs/uml.svg)
+### Implémentation de lamport
+On crée une go routine pour chaque serveur, qui va écouter sur le port défini dans le fichier de configuration.
+Lorsqu'un client envoi un requête, le client envoie la requête à la go routine qui gère la base de données du serveur, assurant ainsi l'exclusion mutuelle sur la base de données pour les clients.
 
+Pour l'exclusion mutuelle entre les serveurs, on utilise un algorithme de Lamport. Chaque serveur possède une estampille et enregistre le dernier message qu'il a envoyé. Il enregistre également, pour chaque serveurs le dernier message reçu et l'estampille associée. 
+Lorsque le serveur veut accéder à la section critique il envoit via des canaux, une requête d'accès à la section critique au go routines communiquant avec les autres serveurs. Il attend ensuite la réponse de ces derniers qui est renvoyée à la go routine qui gère la base de données via un autre canal. Lorsque la go routine a reçu la réponse de tous les serveurs, elle peut accéder à la section critique. Lorsque la section critique est terminée, le serveur envoit un message de libération de la section critique aux autres serveurs.
+
+Avant de quitter la section critique, si l'action sur la base de données la modifiée (ajout, suppression, modification), le serveur envoit un message de synchronisation à tous les autres serveurs. Ce message contient l'action à effectuer sur la base de données du serveur qui a reçu le message et l'estampille du serveur qui a effectué l'action. Lorsque le serveur reçoit un message de synchronisation, il effectue l'action sur sa base de données et met à jour son estampille.
 ### Tests automatisés
 Une série de tests automatisés ont pour but de tester les fonctions utilisées pour la communication entre le client et
 le serveur. Dans le projet, ils se trouvent dans les sources dans le dossier `integrationTests`. Emplacement :

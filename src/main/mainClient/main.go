@@ -8,7 +8,7 @@ import (
 // Default connection values
 var (
 	connHost = "localhost"
-	connPort = []string{"11211", "11212", "11213"}
+	connPort = []string{"333", "3333", "11213"}
 )
 
 // Main function that start a new client

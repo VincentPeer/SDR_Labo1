@@ -205,10 +205,12 @@ func printJobPrepartitionTable(jobs map[string]interface{}) {
 	}
 	sort.Ints(keys)
 
+	// Print header
 	jobsName := make([]string, 0)
-	for _, job := range jobs {
-		jobMap := job.(map[string]interface{})
-		s := fmt.Sprintf("%0.f: %-10s /%0.f", jobMap["id"], jobMap["name"], (jobMap["required"])) + " | "
+	for k := range keys {
+		jobMap := jobs[strconv.Itoa(keys[k])].(map[string]interface{})
+		nbVolunteers := len(jobMap["volunteers"].([]interface{}))
+		s := fmt.Sprintf("%0.f: %-10s %d/%0.f", jobMap["id"], jobMap["name"], nbVolunteers, (jobMap["required"])) + " | "
 		jobsName = append(jobsName, jobMap["name"].(string))
 		head += s
 	}
@@ -237,29 +239,6 @@ func printJobPrepartitionTable(jobs map[string]interface{}) {
 		}
 	}
 
-	//for _, job := range jobs {
-	//	fmt.Println(jobs)
-	//	jobMap := job.(map[string]interface{})
-	//	volunteers := jobMap["volunteers"].([]interface{})
-	//	for _, volunteer := range volunteers {
-	//		fmt.Println("volunteer : ", volunteer)
-	//		line := fmt.Sprintf("| %-15s", volunteer)
-	//		for _, job := range jobs {
-	//			jobMap := job.(map[string]interface{})
-	//			volunteers := jobMap["volunteers"].([]interface{})
-	//			for _, volunteer2 := range volunteers {
-	//				fmt.Println("volunteer2 : ", volunteer)
-	//				fmt.Println(jobMap)
-	//				if volunteer2 == volunteer {
-	//					line += "|" + fmt.Sprintf("%-9s", "") + "X" + fmt.Sprintf("%-8s", "")
-	//				} else {
-	//					line += "|" + fmt.Sprintf("%-18s", " ")
-	//				}
-	//			}
-	//		}
-	//		tab = append(tab, line+"|")
-	//	}
-	//}
 	for i := 0; i < len(tab); i++ {
 		fmt.Println(tab[i])
 	}

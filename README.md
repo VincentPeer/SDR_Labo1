@@ -124,7 +124,7 @@ non exportées.
 ![Diagramme de classes](docs/uml.svg)
 ### Implémentation de lamport
 On crée une go routine pour chaque serveur, qui va écouter sur le port défini dans le fichier de configuration.
-Lorsqu'un client envoi un requête, le client envoie la requête à la go routine qui gère la base de données du serveur, assurant ainsi l'exclusion mutuelle sur la base de données pour les clients.
+Lorsqu'un client envoie une requête, le client envoie la requête à la go routine qui gère la base de données du serveur, assurant ainsi l'exclusion mutuelle sur la base de données pour les clients.
 
 Pour l'exclusion mutuelle entre les serveurs, on utilise un algorithme de Lamport. Chaque serveur possède une estampille et enregistre le dernier message qu'il a envoyé. Il enregistre également, pour chaque serveurs le dernier message reçu et l'estampille associée. 
 Lorsque le serveur veut accéder à la section critique il envoit via des canaux, une requête d'accès à la section critique au go routines communiquant avec les autres serveurs. Il attend ensuite la réponse de ces derniers qui est renvoyée à la go routine qui gère la base de données via un autre canal. Lorsque la go routine a reçu la réponse de tous les serveurs, elle peut accéder à la section critique. Lorsque la section critique est terminée, le serveur envoit un message de libération de la section critique aux autres serveurs.

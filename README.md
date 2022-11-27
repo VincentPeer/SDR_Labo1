@@ -39,9 +39,7 @@ Pour le mode multi-serveur, il faut se rendre dans le dossier `mainMultiServer`.
 possédant des ids de 0 à 2. Il faut les lancer dans l'ordre croissant de leur id. Pour lancé un serveur, il faut entrer la commande suivante :
 > go run . [serverId]
 
-Où `[serverId]` est obligatoire et indique l'id du serveur à lancer.  
-Il est possible de lancer moins de 3 serveurs, mais dans ce cas, il faudra en tenir compte dans 
-le client en spécifiant un serveur qui a bien démarré.  
+Où `[serverId]` est obligatoire et indique l'id du serveur à lancer.
 Les log concernant le trafic réseau sont affichés, que ce soit des requêtes/réponses avec un client ou des messages de synchronisation entre serveurs.
 
 ### Lancement d'un client
@@ -52,18 +50,53 @@ Où `[clientName]` est le nom du client à lancer, obligatoire dans la version m
 `[serverId]` est l'id du serveur auquel il doit se connecter.  
 `-I serverId`, ou `--id serverId` est optionnel, sans id entré, un id aléatoire sera choisi parmi la liste des serveurs (id 0 à 2).  
 
-Où `option` est facultatif et propose :
+`option` est facultatif et propose :
 * `-H` ou `--host` : permet de spécifier l'adresse sur laquelle le client doit se connecter (par défaut localhost)
 * `-D` ou `--config` : permet d'activer le mode debug (par défaut false)
 
 Si aucun argument n'est fourni, c'est-à-dire uniquement `go run .`, nous établissons une connexion telle qu'an laboratoire 1 avec le
 serveur simple.
-### 🦟 Mode debug
+### 🦟 Mode debug 
 Le mode debug permet de voir les messages échangés entre le serveur et le client.
 Pour l'activer, il suffit de lancer le serveur avec l'argument `-D` ou `--debug`.
 
 Pour tester les races conditions, il suffit de lancer le client avec l'argument `-d` ou `--debug` également.
 L'accès au ressources par des clients lancés de cette manière est bloqué pendant 5 secondes, permettant de tester le conditions de concurrence.
+
+### Test de la concurrence
+Voici une marche à suivre permettant de tester les conditions de concurrence. 
+Lancer les 3 serveurs dans l'ordre croissant de leur id dans le dossier `mainMultiServer` :
+> go run . 0  
+> go run . 1  
+> go run . 2  
+
+Lancer ensuite 2 clients, un en mode debug et un en mode normal :
+> go run . client1 -I 0 -D  
+> go run . client2 -I 0  
+
+(Possibilité de lancer un 3ème client sur le serveur 1 ou 2 si besoin mais pas nécessaire pour tester les conditions de concurrence.)  
+
+A présent, on peut vérifier la concurrence en profitant du client en debug qui est bloqué pendant 5 secondes pour chaque commande.  
+#### Test en lecture
+Dans le client en mode debug, entrer 3 afin de lister les événements, puis entrez aussitôt 3 dans le client normal. Entrées  à saisir :
+> clientDebug : 3  
+> clientNormal : 3
+
+On observe que le client normal doit attendre que le client debug ait fini sa requête pour afficher les évênements.
+#### Test en écriture
+Dans le client en mode debug, saisissez les entrées suivantes
+> clientDebug : 1   (création d'un événement)  
+> clientDebug : a   (username)  
+> clientDebug : 1   (password)  
+> clientDebug : manif   (nom manifestation)  
+> clientDebug : cuisine     (nom job)  
+> clientDebug : 3   (nombre de bénévole)  
+> clientDebug : STOP    (fin de la saisie)  
+> clientNormal : 3   (affichage des événements)  
+
+On observe que le client normal doit à attendre que le client debug ait fini sa requête afin d'afficher la liste des événements
+qui a bien ajouté le nouvel événement `manif`.
+
 
 ### 👨🏽‍⚕️ Utilitaire godoc
 Afin d'avoir une documentation claire de nos packages, fonctions et l'ensemble

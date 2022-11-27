@@ -76,7 +76,7 @@ func lamportRelease() {
 func lamportReceive(listener *serverListener, request protocol.DataPacket) {
 
 	// Sync the estampille of the current server with the received request
-	receivedEstampille, _ := strconv.Atoi(request.Data[0])
+	receivedEstampille, _ := strconv.Atoi(request.Data[len(request.Data)-1])
 	if receivedEstampille > estampille {
 		estampille = receivedEstampille
 	}
@@ -109,6 +109,56 @@ func lamportReceive(listener *serverListener, request protocol.DataPacket) {
 			if lamportRegister != nil && lamportRegister.Type == protocol.REQ {
 				listener.lamportResponseChan <- request
 			}
+		}
+		// Other requests type are database sync requests and are forwarded to the database manager
+	default:
+		{
+			dbRequest := newDatabaseRequest(listener.peerServer, request)
+			handleUpdateDatabaseRequest(listener.peerServer.server.dbm, dbRequest.payload)
+		}
+	}
+}
+
+func sendUpdateDatabaseRequest(request databaseRequest) {
+	estampille++
+	request.payload.Data = append(request.payload.Data, request.sender.connectedUser)
+	request.payload.Data = append(request.payload.Data, strconv.Itoa(estampille))
+	for i := range serverListeners {
+		serverListeners[i].peerServer.write(request.payload)
+	}
+}
+
+func handleUpdateDatabaseRequest(dbm *databaseManager, payload protocol.DataPacket) {
+	user := payload.Data[len(payload.Data)-2]
+	switch payload.Type {
+	case protocol.CREATE_EVENT:
+		{
+			eventName := payload.Data[0]
+			_, err := dbm.db.CreateEvent(eventName, user)
+			if err != nil {
+				debug(dbm, err.Error())
+				return
+			}
+			event, err := dbm.db.GetEventByName(eventName)
+			if err != nil {
+				debug(dbm, err.Error())
+				return
+			}
+			// Populating the event with jobs
+			for i := 1; i < len(payload.Data)-1; i += 2 {
+				nbVolunteers, err := strconv.ParseUint(payload.Data[i+1], 10, 32)
+				if err != nil {
+					debug(dbm, "Error parsing number of volunteers: "+err.Error())
+				} else {
+					event.CreateJob(payload.Data[i], uint(nbVolunteers))
+				}
+			}
+		}
+	case protocol.EVENT_REG:
+		{
+		}
+	case protocol.CLOSE_EVENT:
+		{
 		}
 	}
 }

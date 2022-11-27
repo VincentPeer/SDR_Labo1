@@ -87,6 +87,9 @@ func (dbm *databaseManager) handleRequest(request databaseRequest) {
 	default:
 		debug(dbm, "Unknown command")
 	}
+	if request.payload.Type == protocol.CREATE_EVENT || request.payload.Type == protocol.CLOSE_EVENT || request.payload.Type == protocol.EVENT_REG {
+		sendUpdateDatabaseRequest(request)
+	}
 	if request.payload.Type != protocol.LOGIN && request.payload.Type != protocol.STOP {
 		request.sender.connectedUser = ""
 	}
